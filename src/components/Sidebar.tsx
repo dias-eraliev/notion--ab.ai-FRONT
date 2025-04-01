@@ -32,33 +32,13 @@ import {
   FaLock,
   FaPlug,
   FaPalette,
-  FaCogs
+  FaCogs,
+  FaWarehouse,
+  FaBarcode,
+  FaShoppingCart,
+  FaShieldAlt
 } from 'react-icons/fa';
-
-interface SidebarLinkProps {
-  to: string;
-  icon: React.ReactNode;
-  label: string;
-}
-
-const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to;
-
-  return (
-    <Link 
-      to={to}
-      className={`flex items-center px-4 py-2 text-sm rounded-lg transition-all duration-150 ${
-        isActive 
-          ? 'bg-blue-50 text-blue-600' 
-          : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
-      }`}
-    >
-      <span className="w-4 h-4 mr-3">{icon}</span>
-      <span>{label}</span>
-    </Link>
-  );
-};
+import { SidebarLink } from './SidebarLink';
 
 export const Sidebar: React.FC = () => {
   const [expandedItems, setExpandedItems] = useState<{[key: string]: boolean}>({
@@ -67,7 +47,8 @@ export const Sidebar: React.FC = () => {
     hr: false,
     finance: false,
     analytics: false,
-    settings: false
+    settings: false,
+    erp: false
   });
 
   const [isAppOpen, setIsAppOpen] = useState(false);
@@ -122,7 +103,6 @@ export const Sidebar: React.FC = () => {
                 <SidebarLink to="/app/email" icon={<FaEnvelope />} label="Эл. почта" />
                 <SidebarLink to="/app/tasks" icon={<FaListUl />} label="Список дел" />
                 <SidebarLink to="/app/files" icon={<FaFolder />} label="Файловый менеджер" />
-                <SidebarLink to="/app/profile" icon={<FaUser />} label="Профиль" />
               </div>
             )}
           </div>
@@ -306,6 +286,44 @@ export const Sidebar: React.FC = () => {
                   to="/finance/payroll" 
                   icon={<FaUserTie />}
                   label="Управление зарплатой"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* ERP секция */}
+          <div className="mb-4">
+            <button
+              onClick={() => toggleExpand('erp')}
+              className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+            >
+              <div className="flex items-center">
+                <FaWarehouse className="w-4 h-4 mr-3" />
+                <span>ERP система</span>
+              </div>
+              <FaChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  expandedItems.erp ? 'transform rotate-180' : ''
+                }`}
+              />
+            </button>
+            
+            {expandedItems.erp && (
+              <div className="pl-4 space-y-2">
+                <SidebarLink
+                  to="/app/erp/inventory"
+                  icon={<FaBarcode />}
+                  label="Digital инвентаризация"
+                />
+                <SidebarLink
+                  to="/app/erp/supply"
+                  icon={<FaShoppingCart />}
+                  label="Запросы на снабжение"
+                />
+                <SidebarLink
+                  to="/app/erp/security"
+                  icon={<FaShieldAlt />}
+                  label="Безопасность"
                 />
               </div>
             )}

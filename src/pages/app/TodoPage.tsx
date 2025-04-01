@@ -18,6 +18,7 @@ import {
   FaUser,
   FaUsers
 } from 'react-icons/fa';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
 interface User {
   id: string;
@@ -38,6 +39,7 @@ interface Todo {
   status: 'todo' | 'in_progress' | 'review' | 'done';
   assignee?: User;
   watchers: User[];
+  priority: 'low' | 'medium' | 'high';
 }
 
 const TodoPage: React.FC = () => {
@@ -61,7 +63,8 @@ const TodoPage: React.FC = () => {
       createdAt: '2025-04-10T08:30',
       status: 'todo',
       assignee: users[0],
-      watchers: [users[1]]
+      watchers: [users[1]],
+      priority: 'high'
     },
     {
       id: '2',
@@ -74,7 +77,8 @@ const TodoPage: React.FC = () => {
       createdAt: '2025-04-10T09:00',
       status: 'in_progress',
       assignee: users[1],
-      watchers: [users[0], users[2]]
+      watchers: [users[0], users[2]],
+      priority: 'medium'
     },
     {
       id: '3',
@@ -87,7 +91,8 @@ const TodoPage: React.FC = () => {
       createdAt: '2025-04-10T10:00',
       status: 'review',
       assignee: users[0],
-      watchers: []
+      watchers: [],
+      priority: 'medium'
     }
   ]);
 
@@ -133,7 +138,8 @@ const TodoPage: React.FC = () => {
       id: String(Date.now()),
       createdAt: new Date().toISOString(),
       status: 'todo',
-      watchers: []
+      watchers: [],
+      priority: 'low'
     };
     setTodos([...todos, newTodo]);
     setShowAddTodo(false);
@@ -156,6 +162,28 @@ const TodoPage: React.FC = () => {
         todo.id === todoId ? { ...todo, status: newStatus } : todo
       )
     );
+  };
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const { source, destination } = result;
+    const updatedTodos = Array.from(todos);
+    const [movedTodo] = updatedTodos.filter(todo => todo.id === result.draggableId);
+    
+    if (movedTodo) {
+      // Обновляем статус задачи
+      movedTodo.status = destination.droppableId as Todo['status'];
+      
+      // Обновляем состояние
+      setTodos(updatedTodos.map(todo => 
+        todo.id === movedTodo.id ? movedTodo : todo
+      ));
+    }
+  };
+
+  const getFilteredTodos = (status: Todo['status']) => {
+    return filteredTodos.filter(todo => todo.status === status);
   };
 
   return (
@@ -361,61 +389,287 @@ const TodoPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-4 h-full">
-            {Object.entries(groupedTodos).map(([status, todos]) => (
-              <div
-                key={status}
-                className="bg-gray-100 rounded-lg p-4"
-              >
-                <h3 className="text-lg font-medium text-gray-700 mb-4">
-                  {status === 'todo' && 'К выполнению'}
-                  {status === 'in_progress' && 'В работе'}
-                  {status === 'review' && 'На проверке'}
-                  {status === 'done' && 'Выполнено'}
-                </h3>
-                <div className="space-y-4">
-                  {todos.map((todo) => (
-                    <div
-                      key={todo.id}
-                      className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <h4 className="font-medium text-gray-900">{todo.title}</h4>
-                      {todo.description && (
-                        <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-                          {todo.description}
-                        </p>
-                      )}
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {todo.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
-                          >
-                            {tag}
-                          </span>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <div className="flex-1 p-4 overflow-x-auto">
+              <div className="flex gap-6 min-h-full">
+                {/* Колонка "К выполнению" */}
+                <div className="flex-1 min-w-[300px] max-w-[400px]">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-3">К выполнению</h3>
+                  <Droppable droppableId="todo">
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`bg-gray-100 rounded-lg p-3 min-h-[200px] transition-colors ${
+                          snapshot.isDraggingOver ? 'bg-corporate-primary/5' : ''
+                        }`}
+                      >
+                        {getFilteredTodos('todo').map((todo, index) => (
+                          <Draggable key={todo.id} draggableId={todo.id} index={index}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`bg-white rounded-lg p-4 mb-2 ${
+                                  snapshot.isDragging
+                                    ? 'shadow-lg ring-2 ring-corporate-primary/20'
+                                    : 'shadow-sm hover:shadow-md'
+                                } transition-all`}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  transform: snapshot.isDragging
+                                    ? provided.draggableProps.style?.transform
+                                    : 'none'
+                                }}
+                              >
+                                <h4 className="font-semibold text-gray-800 mb-2">{todo.title}</h4>
+                                {todo.description && (
+                                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{todo.description}</p>
+                                )}
+                                <div className="flex items-center justify-between text-xs text-gray-500">
+                                  <div className="flex items-center gap-2">
+                                    <FaUser className="text-gray-400" />
+                                    <span>{todo.assignee?.name}</span>
+                                  </div>
+                                  {todo.dueDate && (
+                                    <div className="flex items-center gap-2">
+                                      <FaClock className="text-gray-400" />
+                                      <span>{new Date(todo.dueDate).toLocaleDateString('ru')}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                {todo.tags && todo.tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {todo.tags.map((tag) => (
+                                      <span
+                                        key={tag}
+                                        className="px-2 py-1 bg-corporate-primary/10 text-corporate-primary text-xs rounded-full"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </Draggable>
                         ))}
+                        {provided.placeholder}
                       </div>
-                      <div className="mt-2 flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          {todo.assignee && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <FaUser className="mr-1" />
-                              {todo.assignee.name}
-                            </div>
-                          )}
-                        </div>
-                        {todo.dueDate && (
-                          <div className="text-xs text-gray-500">
-                            {new Date(todo.dueDate).toLocaleDateString('ru')}
-                          </div>
-                        )}
+                    )}
+                  </Droppable>
+                </div>
+
+                {/* Колонка "В работе" */}
+                <div className="flex-1 min-w-[300px] max-w-[400px]">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-3">В работе</h3>
+                  <Droppable droppableId="in_progress">
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`bg-gray-100 rounded-lg p-3 min-h-[200px] transition-colors ${
+                          snapshot.isDraggingOver ? 'bg-corporate-primary/5' : ''
+                        }`}
+                      >
+                        {getFilteredTodos('in_progress').map((todo, index) => (
+                          <Draggable key={todo.id} draggableId={todo.id} index={index}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`bg-white rounded-lg p-4 mb-2 ${
+                                  snapshot.isDragging
+                                    ? 'shadow-lg ring-2 ring-corporate-primary/20'
+                                    : 'shadow-sm hover:shadow-md'
+                                } transition-all`}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  transform: snapshot.isDragging
+                                    ? provided.draggableProps.style?.transform
+                                    : 'none'
+                                }}
+                              >
+                                <h4 className="font-semibold text-gray-800 mb-2">{todo.title}</h4>
+                                {todo.description && (
+                                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{todo.description}</p>
+                                )}
+                                <div className="flex items-center justify-between text-xs text-gray-500">
+                                  <div className="flex items-center gap-2">
+                                    <FaUser className="text-gray-400" />
+                                    <span>{todo.assignee?.name}</span>
+                                  </div>
+                                  {todo.dueDate && (
+                                    <div className="flex items-center gap-2">
+                                      <FaClock className="text-gray-400" />
+                                      <span>{new Date(todo.dueDate).toLocaleDateString('ru')}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                {todo.tags && todo.tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {todo.tags.map((tag) => (
+                                      <span
+                                        key={tag}
+                                        className="px-2 py-1 bg-corporate-primary/10 text-corporate-primary text-xs rounded-full"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
                       </div>
-                    </div>
-                  ))}
+                    )}
+                  </Droppable>
+                </div>
+
+                {/* Колонка "На проверке" */}
+                <div className="flex-1 min-w-[300px] max-w-[400px]">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-3">На проверке</h3>
+                  <Droppable droppableId="review">
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`bg-gray-100 rounded-lg p-3 min-h-[200px] transition-colors ${
+                          snapshot.isDraggingOver ? 'bg-corporate-primary/5' : ''
+                        }`}
+                      >
+                        {getFilteredTodos('review').map((todo, index) => (
+                          <Draggable key={todo.id} draggableId={todo.id} index={index}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`bg-white rounded-lg p-4 mb-2 ${
+                                  snapshot.isDragging
+                                    ? 'shadow-lg ring-2 ring-corporate-primary/20'
+                                    : 'shadow-sm hover:shadow-md'
+                                } transition-all`}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  transform: snapshot.isDragging
+                                    ? provided.draggableProps.style?.transform
+                                    : 'none'
+                                }}
+                              >
+                                <h4 className="font-semibold text-gray-800 mb-2">{todo.title}</h4>
+                                {todo.description && (
+                                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{todo.description}</p>
+                                )}
+                                <div className="flex items-center justify-between text-xs text-gray-500">
+                                  <div className="flex items-center gap-2">
+                                    <FaUser className="text-gray-400" />
+                                    <span>{todo.assignee?.name}</span>
+                                  </div>
+                                  {todo.dueDate && (
+                                    <div className="flex items-center gap-2">
+                                      <FaClock className="text-gray-400" />
+                                      <span>{new Date(todo.dueDate).toLocaleDateString('ru')}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                {todo.tags && todo.tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {todo.tags.map((tag) => (
+                                      <span
+                                        key={tag}
+                                        className="px-2 py-1 bg-corporate-primary/10 text-corporate-primary text-xs rounded-full"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </div>
+
+                {/* Колонка "Выполнено" */}
+                <div className="flex-1 min-w-[300px] max-w-[400px]">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-3">Выполнено</h3>
+                  <Droppable droppableId="done">
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`bg-gray-100 rounded-lg p-3 min-h-[200px] transition-colors ${
+                          snapshot.isDraggingOver ? 'bg-corporate-primary/5' : ''
+                        }`}
+                      >
+                        {getFilteredTodos('done').map((todo, index) => (
+                          <Draggable key={todo.id} draggableId={todo.id} index={index}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`bg-white rounded-lg p-4 mb-2 ${
+                                  snapshot.isDragging
+                                    ? 'shadow-lg ring-2 ring-corporate-primary/20'
+                                    : 'shadow-sm hover:shadow-md'
+                                } transition-all`}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  transform: snapshot.isDragging
+                                    ? provided.draggableProps.style?.transform
+                                    : 'none'
+                                }}
+                              >
+                                <h4 className="font-semibold text-gray-800 mb-2">{todo.title}</h4>
+                                {todo.description && (
+                                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{todo.description}</p>
+                                )}
+                                <div className="flex items-center justify-between text-xs text-gray-500">
+                                  <div className="flex items-center gap-2">
+                                    <FaUser className="text-gray-400" />
+                                    <span>{todo.assignee?.name}</span>
+                                  </div>
+                                  {todo.dueDate && (
+                                    <div className="flex items-center gap-2">
+                                      <FaClock className="text-gray-400" />
+                                      <span>{new Date(todo.dueDate).toLocaleDateString('ru')}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                {todo.tags && todo.tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {todo.tags.map((tag) => (
+                                      <span
+                                        key={tag}
+                                        className="px-2 py-1 bg-corporate-primary/10 text-corporate-primary text-xs rounded-full"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          </DragDropContext>
         )}
       </div>
 

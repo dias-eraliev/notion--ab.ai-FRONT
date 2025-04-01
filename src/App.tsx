@@ -34,6 +34,15 @@ import PayrollPage from './pages/finance/PayrollPage';
 import SalariesPage from './pages/finance/SalariesPage';
 import AntiFraudPage from './pages/finance/AntiFraudPage';
 import Login from './pages/Login';
+import FileManagerPage from './pages/app/FileManagerPage';
+import InventoryPage from './pages/erp/InventoryPage';
+import SupplyPage from './pages/erp/SupplyPage';
+import SecurityPage from './pages/erp/SecurityPage';
+import UsersPage from './pages/settings/UsersPage';
+import PermissionsPage from './pages/settings/PermissionsPage';
+import IntegrationsPage from './pages/settings/IntegrationsPage';
+import BrandingPage from './pages/settings/BrandingPage';
+import SystemPage from './pages/settings/SystemPage';
 
 const App: React.FC = () => {
   return (
@@ -66,8 +75,11 @@ const App: React.FC = () => {
             <Route path="app/calendar" element={<CalendarPage />} />
             <Route path="app/email" element={<EmailPage />} />
             <Route path="app/tasks" element={<TodoPage />} />
-            <Route path="app/files" element={<FilesPage />} />
+            <Route path="app/files" element={<FileManagerPage />} />
             <Route path="app/profile" element={<ProfilePage />} />
+            <Route path="app/erp/inventory" element={<InventoryPage />} />
+            <Route path="app/erp/supply" element={<SupplyPage />} />
+            <Route path="app/erp/security" element={<SecurityPage />} />
             
             {/* HR routes */}
             <Route path="hr/employees" element={<EmployeesPage />} />
@@ -85,11 +97,11 @@ const App: React.FC = () => {
             <Route path="finance/antifraud" element={<AntiFraudPage />} />
             
             {/* Settings routes */}
-            <Route path="settings/users" element={<SettingsPage />} />
-            <Route path="settings/permissions" element={<SettingsPage />} />
-            <Route path="settings/integrations" element={<SettingsPage />} />
-            <Route path="settings/branding" element={<SettingsPage />} />
-            <Route path="settings/system" element={<SettingsPage />} />
+            <Route path="settings/users" element={<UsersPage />} />
+            <Route path="settings/permissions" element={<PermissionsPage />} />
+            <Route path="settings/integrations" element={<IntegrationsPage />} />
+            <Route path="settings/branding" element={<BrandingPage />} />
+            <Route path="settings/system" element={<SystemPage />} />
           </Route>
         </Routes>
       </Router>

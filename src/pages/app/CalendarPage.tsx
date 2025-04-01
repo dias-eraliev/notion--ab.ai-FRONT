@@ -449,7 +449,7 @@ const CalendarPage: React.FC = () => {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
           }}
-          initialView="timeGridWeek"
+          initialView="dayGridMonth"
           initialDate="2025-04-01"
           locale={ruLocale}
           editable={true}
@@ -485,10 +485,10 @@ const CalendarPage: React.FC = () => {
             list: 'Список'
           }}
           firstDay={1}
+          dayHeaderClassNames="text-sm font-semibold text-gray-700 py-2"
+          dayCellClassNames="min-h-[120px] p-1 hover:bg-gray-50 transition-colors"
+          slotLabelClassNames="text-xs font-medium text-gray-500 w-16"
           eventClassNames="rounded-lg shadow-sm"
-          dayCellClassNames="hover:bg-gray-50"
-          slotLabelClassNames="text-gray-500 font-medium"
-          dayHeaderClassNames="text-gray-700 font-semibold"
           nowIndicatorClassNames="bg-corporate-primary"
           slotEventOverlap={false}
           eventContent={(eventInfo) => {
@@ -496,36 +496,76 @@ const CalendarPage: React.FC = () => {
             const isMonthView = eventInfo.view.type === 'dayGridMonth';
             
             return (
-              <div className={`h-full rounded-lg ${
-                isMonthView ? 'p-1' : 'p-2 shadow-md'
-              } ${
-                event?.type ? `bg-corporate-${event.type === 'class' ? 'primary' : event.type === 'meeting' ? 'secondary' : event.type === 'task' ? 'accent' : 'tertiary'} ${isMonthView ? 'bg-opacity-90 text-white' : 'bg-opacity-10'}` : ''
-              } ${
-                !isMonthView ? `border-l-4 border-corporate-${event.type === 'class' ? 'primary' : event.type === 'meeting' ? 'secondary' : event.type === 'task' ? 'accent' : 'tertiary'}` : ''
-              }`}>
-                <div className={`font-semibold text-sm truncate ${isMonthView ? 'text-white' : 'text-gray-800'}`}>
-                  {eventInfo.event.title}
+              <div className={`
+                h-full rounded-lg border-l-4 
+                ${isMonthView ? 'p-1.5' : 'p-2'} 
+                bg-white shadow-sm hover:shadow-md transition-all
+                ${event?.type === 'class' 
+                  ? 'border-corporate-primary' 
+                  : event?.type === 'meeting' 
+                    ? 'border-corporate-secondary'
+                    : event?.type === 'task' 
+                      ? 'border-corporate-accent'
+                      : 'border-corporate-tertiary'
+                }
+              `}>
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center gap-1.5">
+                    {event?.type === 'class' && <FaChalkboardTeacher size={12} className="text-corporate-primary flex-shrink-0" />}
+                    {event?.type === 'meeting' && <FaUsers size={12} className="text-corporate-secondary flex-shrink-0" />}
+                    {event?.type === 'task' && <FaClock size={12} className="text-corporate-accent flex-shrink-0" />}
+                    {event?.type === 'event' && <FaCalendarAlt size={12} className="text-corporate-tertiary flex-shrink-0" />}
+                    <div className="font-semibold text-sm text-gray-800 truncate flex-1">
+                      {eventInfo.event.title}
+                    </div>
+                  </div>
+                  
+                  {!isMonthView && (
+                    <div className="mt-1 space-y-1">
+                      {!eventInfo.event.allDay && (
+                        <div className="flex items-center gap-1">
+                          <FaClock size={10} className="text-gray-400 flex-shrink-0" />
+                          <span className="text-xs text-gray-600">
+                            {eventInfo.timeText}
+                          </span>
+                        </div>
+                      )}
+                      {event?.location && (
+                        <div className="flex items-center gap-1">
+                          <FaBuilding size={10} className="text-gray-400 flex-shrink-0" />
+                          <span className="text-xs text-gray-600 truncate">
+                            {event.location}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                {!eventInfo.event.allDay && !isMonthView && (
-                  <div className="text-xs font-medium text-gray-600 truncate mt-0.5">
-                    {eventInfo.timeText}
-                  </div>
-                )}
-                {event?.location && !isMonthView && (
-                  <div className="text-xs text-gray-600 truncate flex items-center mt-0.5">
-                    <FaBuilding className="mr-1 flex-shrink-0 text-gray-500" size={10} />
-                    {event.location}
-                  </div>
-                )}
               </div>
             );
           }}
+          dayHeaderFormat={{ weekday: 'short', day: 'numeric' }}
+          moreLinkContent={({ num }) => (
+            <div className="text-xs font-medium text-corporate-primary hover:text-corporate-primary/80 transition-colors">
+              +{num} ещё
+            </div>
+          )}
+          moreLinkClassNames="bg-corporate-primary/5 rounded-full px-2 py-0.5"
+          dayCellContent={(arg) => (
+            <div className="text-sm font-medium text-gray-700">
+              {arg.dayNumberText}
+            </div>
+          )}
           views={{
             dayGridMonth: {
               dayMaxEventRows: 4,
-              moreLinkContent: (args) => {
-                return `Ещё ${args.num} событий`;
-              }
+              dayHeaderFormat: { weekday: 'short', day: 'numeric' }
+            },
+            timeGridWeek: {
+              dayHeaderFormat: { weekday: 'short', day: 'numeric' }
+            },
+            timeGridDay: {
+              dayHeaderFormat: { weekday: 'long', day: 'numeric', month: 'long' }
             }
           }}
         />
