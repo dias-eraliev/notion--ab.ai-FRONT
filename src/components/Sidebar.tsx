@@ -1,61 +1,363 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { 
-  FaHome, 
-  FaBook, 
-  FaTasks, 
-  FaRegCalendar,
+  FaHome,
+  FaBook,
+  FaUsers,
+  FaUserTie,
+  FaChartBar,
   FaCog,
-  FaSearch
+  FaSearch,
+  FaHeart,
+  FaUserGraduate,
+  FaChartLine,
+  FaCalendarAlt,
+  FaBuilding,
+  FaGraduationCap,
+  FaChevronDown,
+  FaSmile,
+  FaMoneyBillWave,
+  FaCreditCard,
+  FaFileInvoiceDollar,
+  FaFileAlt,
+  FaBookOpen,
+  FaThLarge,
+  FaComments,
+  FaRobot,
+  FaCalendar,
+  FaEnvelope,
+  FaListUl,
+  FaFolder,
+  FaUser,
+  FaLock,
+  FaPlug,
+  FaPalette,
+  FaCogs
 } from 'react-icons/fa';
 
-interface SidebarItemProps {
-  icon: React.ReactNode;
-  text: string;
+interface SidebarLinkProps {
   to: string;
+  icon: React.ReactNode;
+  label: string;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, to }) => (
-  <Link 
-    to={to}
-    className="flex items-center px-4 py-2 text-gray-700 hover:bg-notion-gray-light rounded-lg transition-colors duration-200"
-  >
-    <span className="mr-3">{icon}</span>
-    <span>{text}</span>
-  </Link>
-);
+const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
+  return (
+    <Link 
+      to={to}
+      className={`flex items-center px-4 py-2 text-sm rounded-lg transition-all duration-150 ${
+        isActive 
+          ? 'bg-blue-50 text-blue-600' 
+          : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
+      }`}
+    >
+      <span className="w-4 h-4 mr-3">{icon}</span>
+      <span>{label}</span>
+    </Link>
+  );
+};
 
 export const Sidebar: React.FC = () => {
+  const [expandedItems, setExpandedItems] = useState<{[key: string]: boolean}>({
+    study: false,
+    students: false,
+    hr: false,
+    finance: false,
+    analytics: false,
+    settings: false
+  });
+
+  const [isAppOpen, setIsAppOpen] = useState(false);
+
+  const toggleExpand = (key: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   return (
-    <div className="w-sidebar h-screen bg-white border-r border-notion-gray fixed left-0 top-0 overflow-y-auto">
+    <div className="w-64 h-screen bg-white shadow-lg fixed left-0 top-0 overflow-y-auto z-50">
       <div className="p-4">
         <div className="flex items-center mb-8">
-          <img src="/logo.svg" alt="Logo" className="w-8 h-8 mr-2" />
-          <h1 className="text-xl font-semibold">LMS Platform</h1>
+          <Link to="/" className="flex items-center">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">AB.AI</span>
+          </Link>
         </div>
 
-        <div className="mb-4">
-          <div className="flex items-center px-4 py-2 bg-notion-gray-light rounded-lg">
-            <FaSearch className="text-gray-500 mr-3" />
+        <div className="mb-6">
+          <div className="flex items-center px-4 py-2.5 bg-gray-50 rounded-xl">
+            <FaSearch className="text-gray-400 mr-3" />
             <input
               type="text"
               placeholder="Поиск..."
-              className="bg-transparent w-full focus:outline-none"
+              className="bg-transparent w-full text-sm focus:outline-none text-gray-600"
             />
           </div>
         </div>
 
-        <nav className="space-y-1">
-          <SidebarItem icon={<FaHome />} text="Главная" to="/" />
-          <SidebarItem icon={<FaBook />} text="Курсы" to="/courses" />
-          <SidebarItem icon={<FaTasks />} text="Задания" to="/tasks" />
-          <SidebarItem icon={<FaRegCalendar />} text="Календарь" to="/calendar" />
-        </nav>
+        <nav className="space-y-2">
+          {/* Главная */}
+          <SidebarLink to="/" icon={<FaHome />} label="Главная" />
+          
+          {/* Приложение с выпадающим списком */}
+          <div className="sidebar-item">
+            <button 
+              onClick={() => setIsAppOpen(!isAppOpen)}
+              className="sidebar-button flex items-center w-full px-4 py-2 text-gray-600 hover:bg-gray-100"
+            >
+              <FaThLarge className="mr-3" />
+              <span>Приложение</span>
+              <FaChevronDown className={`ml-auto transform ${isAppOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-        <div className="mt-auto pt-4 border-t border-notion-gray mt-8">
-          <SidebarItem icon={<FaCog />} text="Настройки" to="/settings" />
-        </div>
+            {isAppOpen && (
+              <div className="pl-4">
+                <SidebarLink to="/app/chat" icon={<FaComments />} label="Чат" />
+                <SidebarLink to="/app/ai-chat" icon={<FaRobot />} label="AI чат" />
+                <SidebarLink to="/app/calendar" icon={<FaCalendar />} label="Календарь" />
+                <SidebarLink to="/app/email" icon={<FaEnvelope />} label="Эл. почта" />
+                <SidebarLink to="/app/tasks" icon={<FaListUl />} label="Список дел" />
+                <SidebarLink to="/app/files" icon={<FaFolder />} label="Файловый менеджер" />
+                <SidebarLink to="/app/profile" icon={<FaUser />} label="Профиль" />
+              </div>
+            )}
+          </div>
+          
+          {/* Учебный процесс */}
+          <div className="group">
+            <div 
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.study ? 'bg-blue-50 text-blue-600' : ''}`}
+              onClick={() => toggleExpand('study')}
+            >
+              <div className="flex items-center">
+                <FaBook className="w-5 h-5 mr-3" />
+                <span className="font-medium">Учебный процесс</span>
+              </div>
+              <FaChevronDown className={`w-4 h-4 transition-transform duration-200 ${expandedItems.study ? 'transform rotate-180' : ''}`} />
+            </div>
+            
+            {expandedItems.study && (
+              <div className="mt-2 ml-4 space-y-1">
+                <Link 
+                  to="/academic-journal"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <FaBook className="w-4 h-4 mr-3" />
+                  <span>Учебный журнал</span>
+                </Link>
+                
+                <Link 
+                  to="/schedule"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <FaCalendarAlt className="w-4 h-4 mr-3" />
+                  <span>Расписание</span>
+                </Link>
+
+                <Link 
+                  to="/classrooms"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <FaBuilding className="w-4 h-4 mr-3" />
+                  <span>Аудитории и секции</span>
+                </Link>
+
+                <Link 
+                  to="/study-plans"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <FaGraduationCap className="w-4 h-4 mr-3" />
+                  <span>Учебные планы</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Студенты */}
+          <div className="group">
+            <div 
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.students ? 'bg-blue-50 text-blue-600' : ''}`}
+              onClick={() => toggleExpand('students')}
+            >
+              <div className="flex items-center">
+                <FaUsers className="w-5 h-5 mr-3" />
+                <span className="font-medium">Студенты</span>
+              </div>
+              <FaChevronDown className={`w-4 h-4 transition-transform duration-200 ${expandedItems.students ? 'transform rotate-180' : ''}`} />
+            </div>
+            
+            {expandedItems.students && (
+              <div className="mt-2 ml-4 space-y-1">
+                <Link 
+                  to="/students"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <FaUserGraduate className="w-4 h-4 mr-3" />
+                  <span>Списки учащихся</span>
+                </Link>
+                
+                <Link 
+                  to="/performance"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <FaChartLine className="w-4 h-4 mr-3" />
+                  <span>Успеваемость</span>
+                </Link>
+
+                <Link 
+                  to="/students/emotional-analysis"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <FaSmile className="w-4 h-4 mr-3" />
+                  <span>Эмоциональный анализ</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* HR (Персонал) */}
+          <div className="group">
+            <div 
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.hr ? 'bg-blue-50 text-blue-600' : ''}`}
+              onClick={() => toggleExpand('hr')}
+            >
+              <div className="flex items-center">
+                <FaUserTie className="w-5 h-5 mr-3" />
+                <span className="font-medium">HR (Персонал)</span>
+              </div>
+              <FaChevronDown className={`w-4 h-4 transition-transform duration-200 ${expandedItems.hr ? 'transform rotate-180' : ''}`} />
+            </div>
+            
+            {expandedItems.hr && (
+              <div className="mt-2 ml-4 space-y-1">
+                <Link 
+                  to="/hr/employees"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <span>Сотрудники и преподаватели</span>
+                </Link>
+                
+                <Link 
+                  to="/hr/workload"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <span>Нагрузки и расписание ставок</span>
+                </Link>
+
+                <Link 
+                  to="/hr/kpi"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <span>KPI и эффективность</span>
+                </Link>
+
+                <Link 
+                  to="/hr/vacation"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <span>Отпуска и замены</span>
+                </Link>
+                
+                <Link 
+                  to="/hr/fake-positions"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <span>Контроль фиктивных ставок (AI)</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Финансы */}
+          <div className="group">
+            <div 
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.finance ? 'bg-blue-50 text-blue-600' : ''}`}
+              onClick={() => toggleExpand('finance')}
+            >
+              <div className="flex items-center">
+                <FaMoneyBillWave className="w-5 h-5 mr-3" />
+                <span className="font-medium">Финансы</span>
+              </div>
+              <FaChevronDown className={`w-4 h-4 transition-transform duration-200 ${expandedItems.finance ? 'transform rotate-180' : ''}`} />
+            </div>
+            
+            {expandedItems.finance && (
+              <div className="mt-2 ml-4 space-y-1">
+                <SidebarLink 
+                  to="/finance/payments" 
+                  icon={<FaMoneyBillWave />}
+                  label="Оплаты и задолженности"
+                />
+                <SidebarLink 
+                  to="/finance/reports" 
+                  icon={<FaFileAlt />}
+                  label="Финансовые отчеты"
+                />
+                <SidebarLink 
+                  to="/finance/budget" 
+                  icon={<FaChartBar />}
+                  label="Бюджет и прогноз"
+                />
+                <SidebarLink 
+                  to="/finance/payroll" 
+                  icon={<FaUserTie />}
+                  label="Управление зарплатой"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Настройки */}
+          <div className="group">
+            <div 
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.settings ? 'bg-blue-50 text-blue-600' : ''}`}
+              onClick={() => toggleExpand('settings')}
+            >
+              <div className="flex items-center">
+                <FaCog className="w-5 h-5 mr-3" />
+                <span className="font-medium">Настройки</span>
+              </div>
+              <FaChevronDown className={`w-4 h-4 transition-transform duration-200 ${expandedItems.settings ? 'transform rotate-180' : ''}`} />
+            </div>
+            
+            {expandedItems.settings && (
+              <div className="mt-2 ml-4 space-y-1">
+                <SidebarLink 
+                  to="/settings/users" 
+                  icon={<FaUsers />}
+                  label="Пользователи"
+                />
+                <SidebarLink 
+                  to="/settings/permissions" 
+                  icon={<FaLock />}
+                  label="Права доступа"
+                />
+                <SidebarLink 
+                  to="/settings/integrations" 
+                  icon={<FaPlug />}
+                  label="Интеграции"
+                />
+                <SidebarLink 
+                  to="/settings/branding" 
+                  icon={<FaPalette />}
+                  label="Брендинг"
+                />
+                <SidebarLink 
+                  to="/settings/system" 
+                  icon={<FaCogs />}
+                  label="Система"
+                />
+              </div>
+            )}
+          </div>
+        </nav>
       </div>
     </div>
   );
-}; 
+};
+
+export default Sidebar; 
