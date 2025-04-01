@@ -5,6 +5,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import DateRangePicker from '../components/DateRangePicker';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useAuthContext, UserRole } from '../providers/AuthProvider';
 
 interface Student {
   id: number;
@@ -195,6 +196,47 @@ const GradeInfoModal: React.FC<{
   );
 };
 
+// Компонент переключателя ролей
+const RoleSwitcher: React.FC = () => {
+  const { role, setRole } = useAuthContext();
+  
+  return (
+    <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <div className="flex items-center gap-4">
+        <span className="text-sm font-medium text-yellow-800">
+          Тестовый режим просмотра:
+        </span>
+        <div className="flex gap-2">
+          {(['admin', 'teacher', 'student', 'parent'] as UserRole[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRole(r)}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                ${role === r 
+                  ? 'bg-yellow-500 text-white' 
+                  : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                }`}
+            >
+              {r === 'admin' && 'Администратор'}
+              {r === 'teacher' && 'Учитель'}
+              {r === 'student' && 'Ученик'}
+              {r === 'parent' && 'Родитель'}
+            </button>
+          ))}
+        </div>
+        <span className="text-xs text-yellow-600">
+          Текущая роль: {
+            role === 'admin' ? 'Администратор' :
+            role === 'teacher' ? 'Учитель' :
+            role === 'student' ? 'Ученик' :
+            'Родитель'
+          }
+        </span>
+      </div>
+    </div>
+  );
+};
+
 const AcademicJournalPage: React.FC = () => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -209,6 +251,7 @@ const AcademicJournalPage: React.FC = () => {
     date: string;
   } | null>(null);
   const [selectedGrade, setSelectedGrade] = useState<GradeInfo | null>(null);
+  const { role } = useAuthContext();
 
   // Даты для колонок (в реальном приложении это должно быть динамическим)
   const dates = ['27.02', '28.02', '01.03', '02.03', '05.03', '06.03'];
@@ -289,10 +332,48 @@ const AcademicJournalPage: React.FC = () => {
     }
   ];
 
-  // Фильтрация студентов по поисковому запросу
-  const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Функция фильтрации студентов в зависимости от роли
+  const getFilteredStudents = () => {
+    let filtered = [...students];
+
+    // Базовая фильтрация по поиску
+    if (searchQuery) {
+      filtered = filtered.filter(student =>
+        student.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Фильтрация по роли
+    switch (role) {
+      case 'student':
+        // Студент видит только свои оценки (допустим, его ID = 1)
+        filtered = filtered.filter(student => student.id === 1);
+        break;
+      
+      case 'parent':
+        // Родитель видит оценки только своего ребенка (допустим, ID ребенка = 2)
+        filtered = filtered.filter(student => student.id === 2);
+        break;
+      
+      case 'teacher':
+        // Учитель видит всех студентов выбранного класса
+        if (selectedClass) {
+          filtered = filtered.filter(student => true); // Здесь должна быть фильтрация по классу
+        }
+        break;
+      
+      case 'admin':
+        // Администратор видит всех
+        break;
+    }
+
+    return filtered;
+  };
+
+  // Определяем, можно ли редактировать оценки
+  const canEditGrades = () => {
+    return role === 'admin' || role === 'teacher';
+  };
 
   const handleGradeClick = (studentId: number, date: string) => {
     setSelectedGradeInfo({ studentId, date });
@@ -320,83 +401,134 @@ const AcademicJournalPage: React.FC = () => {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
-      {/* Заголовок */}
+      <RoleSwitcher />
+      
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">{t('menu.academic.journal')}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          {role === 'student' ? 'Мои оценки' :
+           role === 'parent' ? 'Оценки ребенка' :
+           role === 'teacher' ? 'Журнал успеваемости' :
+           'Электронный журнал'}
+        </h1>
       </div>
 
-      {/* Панель фильтров */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
-        <div className="relative">
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-          >
-            <option value="">{t('selectSubject')}</option>
-            <option value="math">{t('math')}</option>
-            <option value="physics">{t('physics')}</option>
-            <option value="chemistry">{t('chemistry')}</option>
-            <option value="biology">{t('biology')}</option>
-          </select>
-          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-            <FaCaretDown className="text-gray-400" />
+      {/* Показываем панель фильтров только для учителей и администраторов */}
+      {(role === 'admin' || role === 'teacher') && (
+        <div className="grid grid-cols-5 gap-4 mb-6">
+          <div className="relative">
+            <select
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+            >
+              <option value="">{t('selectSubject')}</option>
+              <option value="math">{t('math')}</option>
+              <option value="physics">{t('physics')}</option>
+              <option value="chemistry">{t('chemistry')}</option>
+              <option value="biology">{t('biology')}</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
+            </div>
+          </div>
+
+          <div className="relative">
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+            >
+              <option value="">{t('selectClass')}</option>
+              <option value="10A">10A</option>
+              <option value="10B">10B</option>
+              <option value="11A">11A</option>
+              <option value="11B">11B</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
+            </div>
+          </div>
+
+          <div className="relative">
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+            >
+              <option value="">{t('selectSemester')}</option>
+              <option value="1">{t('semester1')}</option>
+              <option value="2">{t('semester2')}</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
+            </div>
+          </div>
+
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onChange={handleDateChange}
+          />
+
+          <div className="relative">
+            <div className="flex items-center w-full">
+              <input
+                type="text"
+                placeholder={t('searchByName')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button className="px-4 py-2 bg-white border border-l-0 border-gray-200 rounded-r-md hover:bg-gray-50">
+                <FaSearch className="text-gray-400" />
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        <div className="relative">
-          <select
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-          >
-            <option value="">{t('selectClass')}</option>
-            <option value="10A">10A</option>
-            <option value="10B">10B</option>
-            <option value="11A">11A</option>
-            <option value="11B">11B</option>
-          </select>
-          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-            <FaCaretDown className="text-gray-400" />
+      {/* Для студентов и родителей показываем упрощенные фильтры */}
+      {(role === 'student' || role === 'parent') && (
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="relative">
+            <select
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+            >
+              <option value="">{t('selectSubject')}</option>
+              <option value="math">{t('math')}</option>
+              <option value="physics">{t('physics')}</option>
+              <option value="chemistry">{t('chemistry')}</option>
+              <option value="biology">{t('biology')}</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
+            </div>
           </div>
-        </div>
 
-        <div className="relative">
-          <select
-            value={selectedSemester}
-            onChange={(e) => setSelectedSemester(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-          >
-            <option value="">{t('selectSemester')}</option>
-            <option value="1">{t('semester1')}</option>
-            <option value="2">{t('semester2')}</option>
-          </select>
-          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-            <FaCaretDown className="text-gray-400" />
+          <div className="relative">
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+            >
+              <option value="">{t('selectSemester')}</option>
+              <option value="1">{t('semester1')}</option>
+              <option value="2">{t('semester2')}</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
+            </div>
           </div>
-        </div>
 
-        <DateRangePicker
-          startDate={startDate}
-          endDate={endDate}
-          onChange={handleDateChange}
-        />
-
-        <div className="relative">
-          <div className="flex items-center w-full">
-            <input
-              type="text"
-              placeholder={t('searchByName')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <button className="px-4 py-2 bg-white border border-l-0 border-gray-200 rounded-r-md hover:bg-gray-50">
-              <FaSearch className="text-gray-400" />
-            </button>
-          </div>
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onChange={handleDateChange}
+          />
         </div>
-      </div>
+      )}
 
       {/* Таблица журнала */}
       <div className="mt-6 bg-white rounded-lg shadow overflow-hidden border border-gray-200">
@@ -405,7 +537,7 @@ const AcademicJournalPage: React.FC = () => {
             <thead>
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 border-b border-r border-gray-200 min-w-[200px]">
-                  Студент
+                  {role === 'student' ? 'Предмет' : 'Студент'}
                 </th>
                 {dates.map((date) => (
                   <th key={date} className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px] border-b border-r border-gray-200 bg-gray-50">
@@ -415,12 +547,12 @@ const AcademicJournalPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredStudents.map((student, index) => (
+              {getFilteredStudents().map((student, index) => (
                 <tr key={student.id} className="hover:bg-gray-50">
                   <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white border-r border-gray-200 ${index !== students.length - 1 ? 'border-b' : ''}`}>
                     {student.name}
                   </td>
-                  {dates.map((date, dateIndex) => (
+                  {dates.map((date) => (
                     <td key={date} className={`px-6 py-4 border-r border-gray-200 ${index !== students.length - 1 ? 'border-b' : ''}`}>
                       <div className="flex items-center justify-center">
                         {student.grades[date] ? (
@@ -449,12 +581,14 @@ const AcademicJournalPage: React.FC = () => {
                             </div>
                           </div>
                         ) : (
-                          <button
-                            onClick={() => handleGradeClick(student.id, date)}
-                            className="w-9 h-9 rounded-full border-2 border-dashed border-gray-300 text-gray-400 flex items-center justify-center hover:border-blue-500 hover:text-blue-600 transition-colors"
-                          >
-                            <span className="text-xl leading-none">+</span>
-                          </button>
+                          canEditGrades() && (
+                            <button
+                              onClick={() => handleGradeClick(student.id, date)}
+                              className="w-9 h-9 rounded-full border-2 border-dashed border-gray-300 text-gray-400 flex items-center justify-center hover:border-blue-500 hover:text-blue-600 transition-colors"
+                            >
+                              <span className="text-xl leading-none">+</span>
+                            </button>
+                          )
                         )}
                       </div>
                     </td>

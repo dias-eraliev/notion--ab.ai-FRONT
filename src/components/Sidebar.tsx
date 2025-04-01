@@ -123,7 +123,7 @@ export const Sidebar: React.FC = () => {
             {expandedItems.study && (
               <div className="mt-2 ml-4 space-y-1">
                 <Link 
-                  to="/academic-journal"
+                  to="/academic/academic-journal"
                   className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
                 >
                   <FaBook className="w-4 h-4 mr-3" />
@@ -131,7 +131,7 @@ export const Sidebar: React.FC = () => {
                 </Link>
                 
                 <Link 
-                  to="/schedule"
+                  to="/academic/schedule"
                   className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
                 >
                   <FaCalendarAlt className="w-4 h-4 mr-3" />
@@ -139,7 +139,15 @@ export const Sidebar: React.FC = () => {
                 </Link>
 
                 <Link 
-                  to="/classrooms"
+                  to="/academic/homework"
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
+                >
+                  <FaBookOpen className="w-4 h-4 mr-3" />
+                  <span>Домашние задания</span>
+                </Link>
+
+                <Link 
+                  to="/academic/classrooms"
                   className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
                 >
                   <FaBuilding className="w-4 h-4 mr-3" />
@@ -150,7 +158,7 @@ export const Sidebar: React.FC = () => {
                   to="/study-plans"
                   className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
                 >
-                  <FaGraduationCap className="w-4 h-4 mr-3" />
+                  <FaBook className="w-4 h-4 mr-3" />
                   <span>Учебные планы</span>
                 </Link>
               </div>

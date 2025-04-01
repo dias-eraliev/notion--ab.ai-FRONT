@@ -6,6 +6,7 @@ import WeekGrid from '../components/WeekGrid';
 import ClassroomModal from '../components/ClassroomModal';
 import * as XLSX from 'xlsx';
 import { useSearchParams } from 'react-router-dom';
+import { useAuthContext, UserRole } from '../providers/AuthProvider';
 
 // Типы данных
 interface Schedule {
@@ -525,6 +526,47 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onSave, 
   );
 };
 
+// Компонент переключателя ролей (такой же, как в AcademicJournalPage)
+const RoleSwitcher: React.FC = () => {
+  const { role, setRole } = useAuthContext();
+  
+  return (
+    <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <div className="flex items-center gap-4">
+        <span className="text-sm font-medium text-yellow-800">
+          Тестовый режим просмотра:
+        </span>
+        <div className="flex gap-2">
+          {(['admin', 'teacher', 'student', 'parent'] as UserRole[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRole(r)}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                ${role === r 
+                  ? 'bg-yellow-500 text-white' 
+                  : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                }`}
+            >
+              {r === 'admin' && 'Администратор'}
+              {r === 'teacher' && 'Учитель'}
+              {r === 'student' && 'Ученик'}
+              {r === 'parent' && 'Родитель'}
+            </button>
+          ))}
+        </div>
+        <span className="text-xs text-yellow-600">
+          Текущая роль: {
+            role === 'admin' ? 'Администратор' :
+            role === 'teacher' ? 'Учитель' :
+            role === 'student' ? 'Ученик' :
+            'Родитель'
+          }
+        </span>
+      </div>
+    </div>
+  );
+};
+
 const SchedulePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const roomFilter = searchParams.get('room');
@@ -548,6 +590,7 @@ const SchedulePage: React.FC = () => {
     capacity: number;
     equipment: string[];
   } | null>(null);
+  const { role } = useAuthContext();
 
   useEffect(() => {
     if (roomFilter) {
@@ -558,15 +601,47 @@ const SchedulePage: React.FC = () => {
     }
   }, [roomFilter]);
 
-  const filteredSchedule = schedule.filter(item => {
-    const matchesDay = !filters.day || item.day === filters.day;
-    const matchesClass = !filters.classId || item.classId === filters.classId;
-    const matchesSubject = !filters.subject || item.subject === filters.subject;
-    const matchesTeacher = !filters.teacherId || item.teacherId === filters.teacherId;
-    const matchesRoom = !filters.roomId || item.roomId === filters.roomId;
-    
-    return matchesDay && matchesClass && matchesSubject && matchesTeacher && matchesRoom;
-  });
+  // Функция фильтрации расписания в зависимости от роли
+  const getFilteredSchedule = () => {
+    let filtered = [...schedule];
+
+    switch (role) {
+      case 'student':
+        // Студент видит только расписание своего класса (допустим, он в 10A)
+        filtered = filtered.filter(item => item.classId === '10A');
+        break;
+      
+      case 'parent':
+        // Родитель видит расписание класса своего ребенка (допустим, 10B)
+        filtered = filtered.filter(item => item.classId === '10B');
+        break;
+      
+      case 'teacher':
+        // Учитель видит только свои занятия
+        filtered = filtered.filter(item => item.teacherId === 'ivanova'); // Предполагаем, что текущий учитель - Иванова
+        break;
+      
+      case 'admin':
+        // Администратор видит все расписание
+        break;
+    }
+
+    // Применяем дополнительные фильтры
+    return filtered.filter(item => {
+      const matchesDay = !filters.day || item.day === filters.day;
+      const matchesClass = !filters.classId || item.classId === filters.classId;
+      const matchesSubject = !filters.subject || item.subject === filters.subject;
+      const matchesTeacher = !filters.teacherId || item.teacherId === filters.teacherId;
+      const matchesRoom = !filters.roomId || item.roomId === filters.roomId;
+      
+      return matchesDay && matchesClass && matchesSubject && matchesTeacher && matchesRoom;
+    });
+  };
+
+  // Функция проверки прав на редактирование
+  const canEditSchedule = () => {
+    return role === 'admin';
+  };
 
   const handleCellClick = (day: Schedule['day'], time: string) => {
     setSelectedCell({ day, startTime: time });
@@ -654,58 +729,49 @@ const SchedulePage: React.FC = () => {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
+      {/* Добавляем переключатель ролей */}
+      <RoleSwitcher />
+
       {/* Заголовок и кнопки */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">
-          <h1 className="text-3xl font-bold text-gray-900">Расписание</h1>
-          <div className="flex space-x-2">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleExcelImport}
-              accept=".xlsx,.xls"
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center"
-            >
-              <FaFileExcel className="mr-2" />
-              Импорт Excel
-            </button>
-            <button
-              onClick={handleAISchedule}
-              disabled={isLoading}
-              className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 flex items-center relative"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Генерация...
-                </div>
-              ) : (
-                <>
-                  <FaRobot className="mr-2" />
-                  AI Расписание
-                </>
-              )}
-            </button>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {role === 'student' ? 'Моё расписание' :
+             role === 'parent' ? 'Расписание занятий' :
+             role === 'teacher' ? 'Мои занятия' :
+             'Управление расписанием'}
+          </h1>
+          
+          {/* Показываем кнопки импорта и AI только администратору */}
+          {role === 'admin' && (
+            <div className="flex space-x-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleExcelImport}
+                accept=".xlsx,.xls"
+                className="hidden"
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center"
+              >
+                <FaFileExcel className="mr-2" />
+                Импорт Excel
+              </button>
+              <button
+                onClick={handleAISchedule}
+                disabled={isLoading}
+                className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 flex items-center"
+              >
+                <FaRobot className="mr-2" />
+                AI Расписание
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Переключатель вида доступен всем */}
         <div className="flex space-x-2">
           <button
             onClick={() => setViewMode('table')}
@@ -728,9 +794,10 @@ const SchedulePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Панель фильтров */}
+      {/* Панель фильтров - адаптированная под роли */}
       <div className="bg-white p-4 rounded-lg shadow mb-6">
         <div className="grid grid-cols-5 gap-4">
+          {/* День недели доступен всем */}
           <div>
             <select
               value={filters.day}
@@ -745,19 +812,25 @@ const SchedulePage: React.FC = () => {
               <option value="friday">Пятница</option>
             </select>
           </div>
-          <div>
-            <select
-              value={filters.classId}
-              onChange={(e) => setFilters({ ...filters, classId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="">Класс</option>
-              <option value="10A">10A</option>
-              <option value="10B">10B</option>
-              <option value="11A">11A</option>
-              <option value="11B">11B</option>
-            </select>
-          </div>
+
+          {/* Класс виден только администратору и учителю */}
+          {(role === 'admin' || role === 'teacher') && (
+            <div>
+              <select
+                value={filters.classId}
+                onChange={(e) => setFilters({ ...filters, classId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="">Класс</option>
+                <option value="10A">10A</option>
+                <option value="10B">10B</option>
+                <option value="11A">11A</option>
+                <option value="11B">11B</option>
+              </select>
+            </div>
+          )}
+
+          {/* Предмет доступен всем */}
           <div>
             <select
               value={filters.subject}
@@ -771,18 +844,24 @@ const SchedulePage: React.FC = () => {
               <option value="Биология">Биология</option>
             </select>
           </div>
-          <div>
-            <select
-              value={filters.teacherId}
-              onChange={(e) => setFilters({ ...filters, teacherId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="">Преподаватель</option>
-              <option value="ivanova">Иванова Л.</option>
-              <option value="petrov">Петров А.</option>
-              <option value="sidorov">Сидоров В.</option>
-            </select>
-          </div>
+
+          {/* Преподаватель виден только администратору */}
+          {role === 'admin' && (
+            <div>
+              <select
+                value={filters.teacherId}
+                onChange={(e) => setFilters({ ...filters, teacherId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="">Преподаватель</option>
+                <option value="ivanova">Иванова Л.</option>
+                <option value="petrov">Петров А.</option>
+                <option value="sidorov">Сидоров В.</option>
+              </select>
+            </div>
+          )}
+
+          {/* Аудитория доступна всем */}
           <div>
             <select
               value={filters.roomId}
@@ -791,10 +870,9 @@ const SchedulePage: React.FC = () => {
             >
               <option value="">Аудитория</option>
               <option value="301">301</option>
-              <option value="405">405</option>
-              <option value="201">201</option>
               <option value="302">302</option>
-              <option value="401">401</option>
+              <option value="303">303</option>
+              <option value="304">304</option>
             </select>
           </div>
         </div>
@@ -836,7 +914,7 @@ const SchedulePage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredSchedule.map((item) => (
+              {getFilteredSchedule().map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {item.day === 'monday' ? 'Понедельник' :
@@ -893,14 +971,15 @@ const SchedulePage: React.FC = () => {
       {viewMode === 'grid' && (
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <WeekGrid
-            schedule={filteredSchedule}
-            onCellClick={handleCellClick}
+            schedule={getFilteredSchedule()}
+            onCellClick={canEditSchedule() ? handleCellClick : undefined}
           />
         </div>
       )}
 
+      {/* Модальные окна показываются только если есть права на редактирование */}
       <AnimatePresence>
-        {isModalOpen && (
+        {isModalOpen && canEditSchedule() && (
           <ScheduleModal
             isOpen={isModalOpen}
             onClose={() => {

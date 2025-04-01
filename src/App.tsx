@@ -34,7 +34,7 @@ import PayrollPage from './pages/finance/PayrollPage';
 import SalariesPage from './pages/finance/SalariesPage';
 import AntiFraudPage from './pages/finance/AntiFraudPage';
 import Login from './pages/Login';
-import { AuthProvider } from './providers/AuthProvider';
+import { AuthProvider, ProtectedRoute } from './providers/AuthProvider';
 import FileManagerPage from './pages/app/FileManagerPage';
 import InventoryPage from './pages/erp/InventoryPage';
 import SupplyPage from './pages/erp/SupplyPage';
@@ -44,26 +44,29 @@ import PermissionsPage from './pages/settings/PermissionsPage';
 import IntegrationsPage from './pages/settings/IntegrationsPage';
 import BrandingPage from './pages/settings/BrandingPage';
 import SystemPage from './pages/settings/SystemPage';
+import HomeworkPage from './pages/HomeworkPage';
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <LanguageProvider>
-        <Router>
+
+    <LanguageProvider>
+      <Router>
+        <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
 
               {/* Academic routes */}
-              <Route path="academic-journal" element={<AcademicJournalPage />} />
-              <Route path="schedule" element={<SchedulePage />} />
-              <Route path="classrooms" element={<ClassroomsPage />} />
-              <Route path="requests" element={<BookingRequestsPage />} />
-              <Route path="requests/new" element={<BookingRequestsPage />} />
-              <Route path="study-plans" element={<StudyPlansPage />} />
-              <Route path="study-plans/:id" element={<StudyPlanDetailPage />} />
-              <Route path="study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
+              <Route path="academic/academic-journal" element={<AcademicJournalPage />} />
+              <Route path="academic/schedule" element={<SchedulePage />} />
+              <Route path="academic/classrooms" element={<ClassroomsPage />} />
+              <Route path="academic/requests" element={<BookingRequestsPage />} />
+              <Route path="academic/requests/new" element={<BookingRequestsPage />} />
+              <Route path="academic/study-plans" element={<StudyPlansPage />} />
+              <Route path="academic/study-plans/:id" element={<StudyPlanDetailPage />} />
+              <Route path="academic/study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
+              <Route path="academic/homework" element={<HomeworkPage />} />
 
               {/* Students routes */}
               <Route path="students" element={<StudentsPage />} />
@@ -79,9 +82,9 @@ const App: React.FC = () => {
               <Route path="app/tasks" element={<TodoPage />} />
               <Route path="app/files" element={<FileManagerPage />} />
               <Route path="app/profile" element={<ProfilePage />} />
-            <Route path="app/erp/inventory" element={<InventoryPage />} />
-            <Route path="app/erp/supply" element={<SupplyPage />} />
-            <Route path="app/erp/security" element={<SecurityPage />} />
+              <Route path="app/erp/inventory" element={<InventoryPage />} />
+              <Route path="app/erp/supply" element={<SupplyPage />} />
+              <Route path="app/erp/security" element={<SecurityPage />} />
 
               {/* HR routes */}
               <Route path="hr/employees" element={<EmployeesPage />} />
@@ -104,11 +107,16 @@ const App: React.FC = () => {
               <Route path="settings/integrations" element={<IntegrationsPage />} />
               <Route path="settings/branding" element={<BrandingPage />} />
               <Route path="settings/system" element={<SystemPage />} />
+
+              {/* Study Plans routes */}
+              <Route path="study-plans" element={<StudyPlansPage />} />
+              <Route path="study-plans/:id" element={<StudyPlanDetailPage />} />
+              <Route path="study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
             </Route>
           </Routes>
-        </Router>
-      </LanguageProvider>
-    </AuthProvider>
+        </AuthProvider>
+      </Router>
+    </LanguageProvider>
   );
 };
 

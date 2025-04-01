@@ -1,237 +1,307 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { FaVideo, FaFile, FaClipboardCheck, FaCheck, FaTimes } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { FaArrowLeft, FaVideo, FaFile, FaClipboardCheck, FaSpinner, FaPlay, FaPause, FaExpand } from 'react-icons/fa';
 
-interface TestQuestion {
-  id: number;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
+interface Lesson {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  videoUrl?: string;
+  presentationUrl?: string;
+  testUrl?: string;
+  scheduledDate: string;
+  presentation?: {
+    slides: Array<{
+      id: number;
+      imageUrl: string;
+      title: string;
+    }>;
+  };
+  test?: {
+    questions: Array<{
+      id: number;
+      question: string;
+      options: string[];
+      correctAnswer: number;
+    }>;
+  };
 }
 
 const LessonDetailPage: React.FC = () => {
+  const navigate = useNavigate();
   const { id, lessonId } = useParams();
-  const [showAnswers, setShowAnswers] = useState<boolean>(false);
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [activeTab, setActiveTab] = useState<'content' | 'video' | 'presentation' | 'test'>('content');
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
 
-  const testQuestions: TestQuestion[] = [
-    {
-      id: 1,
-      question: "Для квадратного уравнения ax² + bx + c = 0, чему равна сумма корней по теореме Виета?",
-      options: ["a/b", "-b/a", "c/a", "-c/b"],
-      correctAnswer: 1,
-      explanation: "По теореме Виета, сумма корней x₁ + x₂ = -b/a"
-    },
-    {
-      id: 2,
-      question: "Чему равно произведение корней квадратного уравнения по теореме Виета?",
-      options: ["b/a", "-b/a", "c/a", "-c/a"],
-      correctAnswer: 2,
-      explanation: "По теореме Виета, произведение корней x₁ · x₂ = c/a"
-    },
-    {
-      id: 3,
-      question: "Для уравнения x² - 7x + 12 = 0, чему равна сумма корней?",
-      options: ["5", "6", "7", "12"],
-      correctAnswer: 2,
-      explanation: "В данном уравнении a=1, b=-7, поэтому сумма корней равна 7"
-    },
-    {
-      id: 4,
-      question: "Для уравнения x² - 7x + 12 = 0, чему равно произведение корней?",
-      options: ["7", "10", "12", "-12"],
-      correctAnswer: 2,
-      explanation: "В данном уравнении a=1, c=12, поэтому произведение корней равно 12"
-    },
-    {
-      id: 5,
-      question: "Если сумма корней квадратного уравнения равна 5, а их произведение равно 6, то какое это уравнение?",
-      options: [
-        "x² + 5x + 6 = 0",
-        "x² - 5x + 6 = 0",
-        "x² + 6x + 5 = 0",
-        "x² - 6x + 5 = 0"
-      ],
-      correctAnswer: 1,
-      explanation: "По теореме Виета: если x₁ + x₂ = 5 и x₁ · x₂ = 6, то уравнение имеет вид x² - 5x + 6 = 0"
+  useEffect(() => {
+    const loadLesson = async () => {
+      setIsLoading(true);
+      try {
+        // Имитация загрузки данных
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Тестовые данные
+        setLesson({
+          id: lessonId || '1',
+          title: 'Теорема Виета',
+          description: 'Связь между корнями квадратного уравнения и его коэффициентами',
+          content: `
+            <h2>Теорема Виета</h2>
+            <p>Если квадратное уравнение ax² + bx + c = 0 имеет корни x₁ и x₂, то:</p>
+            <ul>
+              <li>x₁ + x₂ = -b/a</li>
+              <li>x₁ · x₂ = c/a</li>
+            </ul>
+            <h3>Применение теоремы</h3>
+            <p>Теорема Виета позволяет:</p>
+            <ul>
+              <li>Находить сумму и произведение корней без решения уравнения</li>
+              <li>Составлять квадратное уравнение по известным корням</li>
+              <li>Решать задачи на нахождение корней уравнения</li>
+            </ul>
+            <h3>Примеры решения</h3>
+            <p>Рассмотрим уравнение: x² - 5x + 6 = 0</p>
+            <p>По теореме Виета:</p>
+            <ul>
+              <li>x₁ + x₂ = 5</li>
+              <li>x₁ · x₂ = 6</li>
+            </ul>
+            <p>Отсюда можно определить, что корни уравнения: x₁ = 2 и x₂ = 3</p>
+          `,
+          videoUrl: 'https://example.com/video.mp4',
+          presentationUrl: 'https://example.com/presentation.pdf',
+          testUrl: 'https://example.com/test',
+          scheduledDate: '2024-04-05T12:15:00',
+          presentation: {
+            slides: [
+              { id: 1, imageUrl: '/slides/1.jpg', title: 'Введение в теорему Виета' },
+              { id: 2, imageUrl: '/slides/2.jpg', title: 'Формулировка теоремы' },
+              { id: 3, imageUrl: '/slides/3.jpg', title: 'Примеры применения' },
+              { id: 4, imageUrl: '/slides/4.jpg', title: 'Практические задачи' }
+            ]
+          },
+          test: {
+            questions: [
+              {
+                id: 1,
+                question: 'Чему равна сумма корней уравнения x² - 5x + 6 = 0?',
+                options: ['3', '4', '5', '6'],
+                correctAnswer: 2
+              },
+              {
+                id: 2,
+                question: 'Чему равно произведение корней уравнения x² - 5x + 6 = 0?',
+                options: ['4', '5', '6', '7'],
+                correctAnswer: 2
+              }
+            ]
+          }
+        });
+        setError(null);
+      } catch (err) {
+        setError('Ошибка при загрузке урока');
+        console.error('Error loading lesson:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (lessonId) {
+      loadLesson();
     }
-  ];
+  }, [lessonId]);
 
-  const handleAnswerSelect = (questionId: number, answerIndex: number) => {
-    setSelectedAnswers(prev => ({
-      ...prev,
-      [questionId]: answerIndex
-    }));
+  const handleBack = () => {
+    const basePath = location.pathname.includes('/academic') ? '/academic/study-plans' : '/study-plans';
+    navigate(`${basePath}/${id}`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-6 max-w-[1600px] mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <FaSpinner className="w-8 h-8 text-blue-500 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !lesson) {
+    return (
+      <div className="p-6 max-w-[1600px] mx-auto">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <p>{error || 'Урок не найден'}</p>
+          <button
+            onClick={handleBack}
+            className="mt-2 text-sm text-red-600 hover:text-red-500"
+          >
+            Вернуться к учебному плану
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Теорема Виета</h1>
-        <p className="text-gray-600">Связь между корнями квадратного уравнения и его коэффициентами</p>
+        <button
+          onClick={handleBack}
+          className="flex items-center text-gray-600 hover:text-gray-800"
+        >
+          <FaArrowLeft className="mr-2" />
+          Назад к учебному плану
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
-        {/* Видео */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center">
-              <FaVideo className="w-5 h-5 mr-2 text-blue-600" />
-              Видео
-            </h2>
-          </div>
-          <div className="aspect-w-16 aspect-h-9 bg-gray-100 rounded-lg">
-            <iframe
-              className="w-full h-[500px] rounded-lg"
-              src="https://www.youtube.com/embed/your-video-id"
-              title="Теорема Виета"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-
-        {/* Презентация */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center">
-              <FaFile className="w-5 h-5 mr-2 text-blue-600" />
-              Презентация
-            </h2>
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-gray-600">Презентация "Теорема Виета и её применение"</p>
-            <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-              Скачать презентацию
-            </button>
-          </div>
-        </div>
-
-        {/* Лекция */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Лекция</h2>
-          <div className="prose max-w-none">
-            <h3 className="text-lg font-semibold mb-3">1. Введение</h3>
-            <p className="mb-4">
-              Теорема Виета, названная в честь французского математика Франсуа Виета, является одной из 
-              фундаментальных теорем алгебры. Она устанавливает связь между корнями квадратного уравнения 
-              и его коэффициентами, что делает её мощным инструментом в решении различных алгебраических задач.
-            </p>
-
-            <h3 className="text-lg font-semibold mb-3">2. Формулировка теоремы</h3>
-            <p className="mb-4">
-              Для квадратного уравнения вида ax² + bx + c = 0, где a ≠ 0, с корнями x₁ и x₂, теорема Виета 
-              утверждает:
-            </p>
-            <div className="bg-gray-50 p-4 rounded-lg mb-4">
-              <p className="font-semibold">x₁ + x₂ = -b/a</p>
-              <p className="font-semibold">x₁ · x₂ = c/a</p>
+      <div className="bg-white rounded-lg shadow-md">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h1 className="text-2xl font-bold mb-2">{lesson.title}</h1>
+              <p className="text-gray-600">{lesson.description}</p>
             </div>
-
-            <h3 className="text-lg font-semibold mb-3">3. Частные случаи</h3>
-            <p className="mb-4">
-              Если a = 1 (приведённое квадратное уравнение), формулы упрощаются:
-            </p>
-            <ul className="list-disc pl-6 mb-4">
-              <li>x₁ + x₂ = -b</li>
-              <li>x₁ · x₂ = c</li>
-            </ul>
-
-            <h3 className="text-lg font-semibold mb-3">4. Применение теоремы</h3>
-            <p className="mb-4">Теорема Виета может использоваться для:</p>
-            <ul className="list-disc pl-6 mb-4">
-              <li>Нахождения корней квадратного уравнения без использования дискриминанта</li>
-              <li>Проверки корней квадратного уравнения</li>
-              <li>Составления квадратного уравнения по известным корням</li>
-              <li>Решения систем уравнений особого вида</li>
-              <li>Разложения квадратного трёхчлена на множители</li>
-            </ul>
-
-            <h3 className="text-lg font-semibold mb-3">5. Примеры решения задач</h3>
-            
-            <h4 className="font-semibold mb-2">Пример 1: Нахождение корней</h4>
-            <div className="bg-blue-50 p-4 rounded-lg mb-4">
-              <p>Дано уравнение: x² - 5x + 6 = 0</p>
-              <p>По теореме Виета:</p>
-              <ul className="list-disc pl-6">
-                <li>x₁ + x₂ = 5</li>
-                <li>x₁ · x₂ = 6</li>
-              </ul>
-              <p>Подбором находим: x₁ = 2, x₂ = 3</p>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setActiveTab('video')}
+                className={`flex items-center px-4 py-2 rounded-md ${
+                  activeTab === 'video' ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                }`}
+              >
+                <FaVideo className="mr-2" />
+                <span>Видео</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('presentation')}
+                className={`flex items-center px-4 py-2 rounded-md ${
+                  activeTab === 'presentation' ? 'bg-green-600 text-white' : 'bg-green-50 text-green-600 hover:bg-green-100'
+                }`}
+              >
+                <FaFile className="mr-2" />
+                <span>Презентация</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('test')}
+                className={`flex items-center px-4 py-2 rounded-md ${
+                  activeTab === 'test' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'
+                }`}
+              >
+                <FaClipboardCheck className="mr-2" />
+                <span>Тест</span>
+              </button>
             </div>
-
-            <h4 className="font-semibold mb-2">Пример 2: Составление уравнения</h4>
-            <div className="bg-blue-50 p-4 rounded-lg mb-4">
-              <p>Даны корни: x₁ = -1, x₂ = -4</p>
-              <p>По теореме Виета:</p>
-              <ul className="list-disc pl-6">
-                <li>Сумма корней = -1 + (-4) = -5, значит b = 5</li>
-                <li>Произведение корней = (-1) · (-4) = 4, значит c = 4</li>
-              </ul>
-              <p>Получаем уравнение: x² + 5x + 4 = 0</p>
-            </div>
-
-            <h3 className="text-lg font-semibold mb-3">6. Обратная теорема Виета</h3>
-            <p className="mb-4">
-              Если для двух чисел x₁ и x₂ выполняются соотношения Виета относительно коэффициентов 
-              квадратного уравнения, то эти числа являются корнями данного уравнения.
-            </p>
-
-            <h3 className="text-lg font-semibold mb-3">7. Практические рекомендации</h3>
-            <ul className="list-disc pl-6 mb-4">
-              <li>Всегда проверяйте, приведено ли уравнение к стандартному виду</li>
-              <li>Обращайте внимание на знак перед коэффициентом b</li>
-              <li>При решении систем уравнений используйте обе формулы Виета</li>
-              <li>Помните о возможности применения теоремы для упрощения вычислений</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Тестирование */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center">
-              <FaClipboardCheck className="w-5 h-5 mr-2 text-blue-600" />
-              Тестирование
-            </h2>
-            <button 
-              onClick={() => setShowAnswers(!showAnswers)}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              {showAnswers ? 'Скрыть ответы' : 'Показать ответы'}
-            </button>
           </div>
 
-          <div className="space-y-6">
-            {testQuestions.map((q) => (
-              <div key={q.id} className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-semibold mb-3">{q.id}. {q.question}</p>
-                <div className="space-y-2">
-                  {q.options.map((option, index) => (
-                    <div 
-                      key={index}
-                      className={`p-2 rounded cursor-pointer flex items-center justify-between
-                        ${selectedAnswers[q.id] === index ? 'bg-blue-100' : 'hover:bg-gray-100'}
-                        ${showAnswers && index === q.correctAnswer ? 'bg-green-100' : ''}
-                      `}
-                      onClick={() => handleAnswerSelect(q.id, index)}
+          {activeTab === 'content' && (
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }} />
+          )}
+
+          {activeTab === 'video' && (
+            <div className="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden">
+              <div className="relative">
+                <video
+                  src={lesson.videoUrl}
+                  className="w-full h-full"
+                  controls
+                  poster="/video-poster.jpg"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                  <div className="flex items-center justify-between text-white">
+                    <button
+                      onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+                      className="p-2 hover:bg-white/20 rounded-full"
                     >
-                      <span>{option}</span>
-                      {showAnswers && index === q.correctAnswer && (
-                        <FaCheck className="text-green-600" />
-                      )}
-                    </div>
+                      {isVideoPlaying ? <FaPause /> : <FaPlay />}
+                    </button>
+                    <button className="p-2 hover:bg-white/20 rounded-full">
+                      <FaExpand />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'presentation' && lesson.presentation && (
+            <div className="space-y-4">
+              <div className="aspect-w-16 aspect-h-9 bg-gray-100 rounded-lg overflow-hidden">
+                <img
+                  src={lesson.presentation.slides[currentSlide].imageUrl}
+                  alt={`Слайд ${currentSlide + 1}`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+                  disabled={currentSlide === 0}
+                  className="px-4 py-2 bg-blue-50 text-blue-600 rounded-md disabled:opacity-50"
+                >
+                  Предыдущий слайд
+                </button>
+                <span className="text-gray-600">
+                  Слайд {currentSlide + 1} из {lesson.presentation.slides.length}
+                </span>
+                <button
+                  onClick={() => setCurrentSlide(Math.min(lesson.presentation.slides.length - 1, currentSlide + 1))}
+                  disabled={currentSlide === lesson.presentation.slides.length - 1}
+                  className="px-4 py-2 bg-blue-50 text-blue-600 rounded-md disabled:opacity-50"
+                >
+                  Следующий слайд
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'test' && lesson.test && (
+            <div className="space-y-6">
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4">
+                  Вопрос {currentQuestion + 1} из {lesson.test.questions.length}
+                </h3>
+                <p className="text-lg mb-4">{lesson.test.questions[currentQuestion].question}</p>
+                <div className="space-y-2">
+                  {lesson.test.questions[currentQuestion].options.map((option, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setAnswers({ ...answers, [currentQuestion]: index })}
+                      className={`w-full text-left p-4 rounded-lg border ${
+                        answers[currentQuestion] === index
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-blue-500'
+                      }`}
+                    >
+                      {option}
+                    </button>
                   ))}
                 </div>
-                {showAnswers && (
-                  <div className="mt-2 text-green-700 bg-green-50 p-2 rounded">
-                    <p className="font-semibold">Объяснение:</p>
-                    <p>{q.explanation}</p>
-                  </div>
-                )}
               </div>
-            ))}
-          </div>
+              <div className="flex justify-between">
+                <button
+                  onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
+                  disabled={currentQuestion === 0}
+                  className="px-4 py-2 bg-gray-100 text-gray-600 rounded-md disabled:opacity-50"
+                >
+                  Предыдущий вопрос
+                </button>
+                <button
+                  onClick={() => setCurrentQuestion(Math.min(lesson.test.questions.length - 1, currentQuestion + 1))}
+                  disabled={currentQuestion === lesson.test.questions.length - 1}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50"
+                >
+                  Следующий вопрос
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
