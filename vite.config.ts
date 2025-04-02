@@ -6,6 +6,9 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  preview: {
+    port: 8101
+  },
   resolve: {
     alias: {
       '@': '/src',
