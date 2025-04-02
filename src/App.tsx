@@ -35,6 +35,7 @@ import SalariesPage from './pages/finance/SalariesPage';
 import AntiFraudPage from './pages/finance/AntiFraudPage';
 import Login from './pages/Login';
 import { AuthProvider, ProtectedRoute } from './providers/AuthProvider';
+import TestRealtimeApi from './pages/TestRealtimeApi';
 import FileManagerPage from './pages/app/FileManagerPage';
 import InventoryPage from './pages/erp/InventoryPage';
 import SupplyPage from './pages/erp/SupplyPage';
@@ -112,6 +113,8 @@ const App: React.FC = () => {
               <Route path="study-plans" element={<StudyPlansPage />} />
               <Route path="study-plans/:id" element={<StudyPlanDetailPage />} />
               <Route path="study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
+
+              <Route path='/test/realtime-api' element={<TestRealtimeApi />} />
             </Route>
           </Routes>
         </AuthProvider>
