@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: "https://abai.live",
+    origin: ["https://abai.live", "https://backend.ab-ai.kz"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
