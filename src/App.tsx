@@ -35,6 +35,7 @@ import SalariesPage from './pages/finance/SalariesPage';
 import AntiFraudPage from './pages/finance/AntiFraudPage';
 import Login from './pages/Login';
 import { AuthProvider } from './providers/AuthProvider';
+import TestRealtimeApi from './pages/TestRealtimeApi';
 const App: React.FC = () => {
   return (
     <AuthProvider>
@@ -91,6 +92,8 @@ const App: React.FC = () => {
               <Route path="settings/integrations" element={<SettingsPage />} />
               <Route path="settings/branding" element={<SettingsPage />} />
               <Route path="settings/system" element={<SettingsPage />} />
+
+              <Route path='/test/realtime-api' element={<TestRealtimeApi />} />
             </Route>
           </Routes>
         </Router>
