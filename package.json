@@ -57,8 +57,8 @@
     "vite": "^5.0.12"
   },
   "scripts": {
-    "server:dev": "tsx watch server/index.ts",
-    "server:start": "tsx server/index.ts",
+    "server:dev": "npx tsx watch server/index.ts",
+    "server:start": "npx tsx server/index.ts",
     "client:dev": "vite",
     "dev": "concurrently \"pnpm run client:dev\" \"pnpm run server:dev\"",
     "build": "vite build",
