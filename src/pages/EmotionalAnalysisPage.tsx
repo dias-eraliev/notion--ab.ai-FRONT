@@ -75,7 +75,7 @@ const schoolStats: SchoolStats = {
 
 const classesData: ClassEmotionalState[] = [
   {
-    className: '11 "А"',
+    className: 'МК24-1М',
     averageMood: 85,
     averageStress: 30,
     averageEngagement: 90,
@@ -84,7 +84,7 @@ const classesData: ClassEmotionalState[] = [
     trend: 'up'
   },
   {
-    className: '10 "Б"',
+    className: 'МК24-2М',
     averageMood: 78,
     averageStress: 45,
     averageEngagement: 75,
@@ -93,7 +93,7 @@ const classesData: ClassEmotionalState[] = [
     trend: 'stable'
   },
   {
-    className: '9 "В"',
+    className: 'ПК24-1П',
     averageMood: 72,
     averageStress: 50,
     averageEngagement: 68,
@@ -102,7 +102,7 @@ const classesData: ClassEmotionalState[] = [
     trend: 'down'
   },
   {
-    className: '8 "А"',
+    className: 'ПР24-1Ю',
     averageMood: 88,
     averageStress: 25,
     averageEngagement: 92,
@@ -168,7 +168,7 @@ const studentsAtRisk: StudentAtRisk[] = [
   {
     id: '1',
     name: 'Айсұлтан Нұрланұлы',
-    class: '9 "В"',
+    class: 'ПК24-1П',
     photo: 'https://i.pravatar.cc/100?img=1',
     stress: 85,
     mood: 45,
@@ -181,7 +181,7 @@ const studentsAtRisk: StudentAtRisk[] = [
   {
     id: '2',
     name: 'Мадина Ерланқызы',
-    class: '10 "Б"',
+    class: 'МК24-2М',
     photo: 'https://i.pravatar.cc/100?img=2',
     stress: 75,
     mood: 50,
@@ -194,7 +194,7 @@ const studentsAtRisk: StudentAtRisk[] = [
   {
     id: '3',
     name: 'Нұрлан Серікұлы',
-    class: '11 "А"',
+    class: 'МК24-1М',
     photo: 'https://i.pravatar.cc/100?img=3',
     stress: 80,
     mood: 55,
@@ -207,7 +207,7 @@ const studentsAtRisk: StudentAtRisk[] = [
   {
     id: '4',
     name: 'Айгерім Дінмұхамедқызы',
-    class: '8 "А"',
+    class: 'ПР24-1Ю',
     photo: 'https://i.pravatar.cc/100?img=4',
     stress: 70,
     mood: 60,
@@ -220,7 +220,7 @@ const studentsAtRisk: StudentAtRisk[] = [
   {
     id: '5',
     name: 'Бекзат Асланұлы',
-    class: '10 "А"',
+    class: 'МК24-2М',
     photo: 'https://i.pravatar.cc/100?img=5',
     stress: 78,
     mood: 52,
@@ -234,7 +234,7 @@ const studentsAtRisk: StudentAtRisk[] = [
 
 const EmotionalAnalysisPage: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter'>('week');
-  const [selectedGrade, setSelectedGrade] = useState<string>('all');
+  const [selectedClass, setSelectedClass] = useState<string>('all');
 
   // Функция для генерации данных за разные периоды
   const generateTrendsData = (period: 'week' | 'month' | 'quarter') => {
@@ -281,9 +281,9 @@ const EmotionalAnalysisPage: React.FC = () => {
 
   // Фильтрация данных по классам
   const filteredClassesData = useMemo(() => {
-    if (selectedGrade === 'all') return classesData;
-    return classesData.filter(classData => classData.className.startsWith(selectedGrade));
-  }, [selectedGrade]);
+    if (selectedClass === 'all') return classesData;
+    return classesData.filter(classData => classData.className.startsWith(selectedClass));
+  }, [selectedClass]);
 
   // Генерация данных трендов в зависимости от выбранного периода
   const currentTrends = useMemo(() => {
@@ -292,7 +292,7 @@ const EmotionalAnalysisPage: React.FC = () => {
 
   // Расчет средних показателей на основе отфильтрованных данных
   const filteredStats = useMemo(() => {
-    if (selectedGrade === 'all') return schoolStats;
+    if (selectedClass === 'all') return schoolStats;
 
     const filteredClasses = filteredClassesData;
     const totalStudents = filteredClasses.reduce((sum, c) => sum + c.studentCount, 0);
@@ -313,20 +313,20 @@ const EmotionalAnalysisPage: React.FC = () => {
       averageEngagement: avgEngagement,
       lastUpdate: schoolStats.lastUpdate
     };
-  }, [selectedGrade]);
+  }, [selectedClass]);
 
   // Фильтрация учеников группы риска
   const filteredStudentsAtRisk = useMemo(() => {
-    if (selectedGrade === 'all') return studentsAtRisk;
-    return studentsAtRisk.filter(student => student.class.startsWith(selectedGrade));
-  }, [selectedGrade]);
+    if (selectedClass === 'all') return studentsAtRisk;
+    return studentsAtRisk.filter(student => student.class.startsWith(selectedClass));
+  }, [selectedClass]);
 
   return (
     <div className="p-6 space-y-6 bg-gray-50">
       {/* Заголовок и фильтры */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Эмоциональный анализ школы</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Эмоциональный анализ групп</h1>
           <p className="text-sm text-gray-500">
             Общая статистика эмоционального состояния учащихся | Последнее обновление: {schoolStats.lastUpdate}
           </p>
@@ -334,17 +334,23 @@ const EmotionalAnalysisPage: React.FC = () => {
         <div className="flex gap-4">
           <div className="flex items-center gap-2 bg-white rounded-lg px-4 py-2 shadow-sm">
             <FaFilter className="text-gray-400" />
-            <select 
-              className="bg-transparent border-none text-sm text-gray-600 focus:outline-none"
-              value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
-            >
-              <option value="all">Все классы</option>
-              <option value="11">11 классы</option>
-              <option value="10">10 классы</option>
-              <option value="9">9 классы</option>
-              <option value="8">8 классы</option>
-            </select>
+            <div className="mb-4">
+              <label htmlFor="class-filter" className="block text-sm font-medium text-gray-700">
+                Группа
+              </label>
+              <select
+                id="class-filter"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+              >
+                <option value="all">Все группы</option>
+                <option value="МК24-1М">МК24-1М</option>
+                <option value="МК24-2М">МК24-2М</option>
+                <option value="ПК24-1П">ПК24-1П</option>
+                <option value="ПР24-1Ю">ПР24-1Ю</option>
+              </select>
+            </div>
           </div>
           <div className="flex gap-2">
             <button
@@ -434,7 +440,7 @@ const EmotionalAnalysisPage: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-6">
             Динамика показателей
-            {selectedGrade !== 'all' && ` (${selectedGrade} классы)`}
+            {selectedClass !== 'all' && ` (${selectedClass} группа)`}
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={currentTrends}>
@@ -490,8 +496,8 @@ const EmotionalAnalysisPage: React.FC = () => {
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-6">
-            Статистика по классам
-            {selectedGrade !== 'all' && ` (${selectedGrade} классы)`}
+            Статистика по группам
+            {selectedClass !== 'all' && ` (${selectedClass} группа)`}
           </h3>
           <div className="space-y-4">
             {filteredClassesData.map((classData) => (
@@ -503,7 +509,7 @@ const EmotionalAnalysisPage: React.FC = () => {
                       classData.trend === 'down' ? 'text-red-500' : 
                       'text-yellow-500'
                     }`} />
-                    <span className="font-medium text-gray-900">Класс {classData.className}</span>
+                    <span className="font-medium text-gray-900">Группа {classData.className}</span>
                   </div>
                   <span className="text-sm text-gray-500">{classData.studentCount} учащихся</span>
                 </div>
@@ -555,7 +561,7 @@ const EmotionalAnalysisPage: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-6">
           События и их влияние
-          {selectedGrade !== 'all' && ` (${selectedGrade} классы)`}
+          {selectedClass !== 'all' && ` (${selectedClass} группа)`}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-h-[280px] overflow-y-auto">
           {currentTrends.map((day) => (
@@ -609,7 +615,7 @@ const EmotionalAnalysisPage: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-medium text-gray-900">
             Ученики, требующие внимания
-            {selectedGrade !== 'all' && ` (${selectedGrade} классы)`}
+            {selectedClass !== 'all' && ` (${selectedClass} группа)`}
           </h3>
           <span className="px-3 py-1 bg-red-50 text-red-600 text-sm font-medium rounded-full">
             {filteredStudentsAtRisk.length} учеников
@@ -633,7 +639,7 @@ const EmotionalAnalysisPage: React.FC = () => {
                       'text-yellow-500'
                     }`} />
                   </div>
-                  <p className="text-sm text-gray-500">Класс {student.class}</p>
+                  <p className="text-sm text-gray-500">Группа {student.class}</p>
                 </div>
               </div>
               

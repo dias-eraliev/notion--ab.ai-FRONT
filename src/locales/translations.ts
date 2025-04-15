@@ -170,6 +170,7 @@ export const translations = {
     // Фильтры учебного журнала
     selectSubject: 'Выберите предмет',
     selectClass: 'Выберите класс',
+    selectGroup: 'Выберите группу',
     selectSemester: 'Выберите семестр',
     searchByName: 'Поиск по имени ...',
     semester1: '1 семестр',
@@ -301,6 +302,7 @@ export const translations = {
     // Фильтры учебного журнала
     selectSubject: 'Пәнді таңдаңыз',
     selectClass: 'Сыныпты таңдаңыз',
+    selectGroup: 'Топты таңдаңыз',
     selectSemester: 'Семестрді таңдаңыз',
     searchByName: 'Аты бойынша іздеу ...',
     semester1: '1 семестр',
@@ -424,6 +426,7 @@ export const translations = {
     // Academic Journal Filters
     selectSubject: 'Select subject',
     selectClass: 'Select class',
+    selectGroup: 'Select group',
     selectSemester: 'Select semester',
     searchByName: 'Search by name ...',
     semester1: '1st semester',

@@ -40,7 +40,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'monday',
     startTime: '08:00',
     endTime: '08:45',
-    classId: '10A',
+    classId: 'МК24-1М',
     subject: 'Алгебра',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.',
@@ -54,7 +54,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'monday',
     startTime: '09:00',
     endTime: '09:45',
-    classId: '10B',
+    classId: 'МК24-2М',
     subject: 'Физика',
     teacherId: 'petrov',
     teacherName: 'Петров А.',
@@ -68,7 +68,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'monday',
     startTime: '10:00',
     endTime: '10:45',
-    classId: '11A',
+    classId: 'ПК24-1П',
     subject: 'Химия',
     teacherId: 'sidorov',
     teacherName: 'Сидоров В.',
@@ -82,7 +82,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'tuesday',
     startTime: '08:00',
     endTime: '08:45',
-    classId: '11B',
+    classId: 'ПР24-1Ю',
     subject: 'Биология',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.',
@@ -96,7 +96,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'tuesday',
     startTime: '09:00',
     endTime: '09:45',
-    classId: '10A',
+    classId: 'МК24-1М',
     subject: 'Физика',
     teacherId: 'petrov',
     teacherName: 'Петров А.',
@@ -110,7 +110,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'tuesday',
     startTime: '10:00',
     endTime: '10:45',
-    classId: '10B',
+    classId: 'МК24-2М',
     subject: 'Алгебра',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.',
@@ -124,7 +124,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'wednesday',
     startTime: '08:00',
     endTime: '08:45',
-    classId: '11A',
+    classId: 'ПК24-1П',
     subject: 'Физика',
     teacherId: 'petrov',
     teacherName: 'Петров А.',
@@ -138,7 +138,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'wednesday',
     startTime: '09:00',
     endTime: '09:45',
-    classId: '11B',
+    classId: 'ПР24-1Ю',
     subject: 'Химия',
     teacherId: 'sidorov',
     teacherName: 'Сидоров В.',
@@ -152,7 +152,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'wednesday',
     startTime: '10:00',
     endTime: '10:45',
-    classId: '10A',
+    classId: 'МК24-1М',
     subject: 'Биология',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.',
@@ -166,7 +166,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'thursday',
     startTime: '08:00',
     endTime: '08:45',
-    classId: '10B',
+    classId: 'МК24-2М',
     subject: 'Химия',
     teacherId: 'sidorov',
     teacherName: 'Сидоров В.',
@@ -180,7 +180,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'thursday',
     startTime: '09:00',
     endTime: '09:45',
-    classId: '11A',
+    classId: 'ПК24-1П',
     subject: 'Алгебра',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.',
@@ -194,7 +194,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'thursday',
     startTime: '10:00',
     endTime: '10:45',
-    classId: '11B',
+    classId: 'ПР24-1Ю',
     subject: 'Физика',
     teacherId: 'petrov',
     teacherName: 'Петров А.',
@@ -208,7 +208,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'friday',
     startTime: '08:00',
     endTime: '08:45',
-    classId: '10A',
+    classId: 'МК24-1М',
     subject: 'Химия',
     teacherId: 'sidorov',
     teacherName: 'Сидоров В.',
@@ -222,7 +222,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'friday',
     startTime: '09:00',
     endTime: '09:45',
-    classId: '10B',
+    classId: 'МК24-2М',
     subject: 'Биология',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.',
@@ -236,7 +236,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'friday',
     startTime: '10:00',
     endTime: '10:45',
-    classId: '11A',
+    classId: 'ПК24-1П',
     subject: 'Физика',
     teacherId: 'petrov',
     teacherName: 'Петров А.',
@@ -250,7 +250,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'monday',
     startTime: '11:00',
     endTime: '11:45',
-    classId: '11B',
+    classId: 'ПР24-1Ю',
     subject: 'Алгебра',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.',
@@ -264,7 +264,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'tuesday',
     startTime: '11:00',
     endTime: '11:45',
-    classId: '10A',
+    classId: 'МК24-1М',
     subject: 'Химия',
     teacherId: 'sidorov',
     teacherName: 'Сидоров В.',
@@ -278,7 +278,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'wednesday',
     startTime: '11:00',
     endTime: '11:45',
-    classId: '10B',
+    classId: 'МК24-2М',
     subject: 'Физика',
     teacherId: 'petrov',
     teacherName: 'Петров А.',
@@ -292,7 +292,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'thursday',
     startTime: '11:00',
     endTime: '11:45',
-    classId: '11A',
+    classId: 'ПК24-1П',
     subject: 'Биология',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.',
@@ -306,7 +306,7 @@ const INITIAL_SCHEDULE: Schedule[] = [
     day: 'friday',
     startTime: '11:00',
     endTime: '11:45',
-    classId: '11B',
+    classId: 'ПР24-1Ю',
     subject: 'Химия',
     teacherId: 'sidorov',
     teacherName: 'Сидоров В.',
@@ -408,7 +408,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onSave, 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Класс
+                Группа
               </label>
               <select
                 value={formData.classId}
@@ -416,11 +416,12 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onSave, 
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
               >
-                <option value="">Выберите класс</option>
-                <option value="10A">10A</option>
-                <option value="10B">10B</option>
-                <option value="11A">11A</option>
-                <option value="11B">11B</option>
+                <option value="">Выберите группу</option>
+                <option value="МК24-1М">МК24-1М (Менеджмент)</option>
+                <option value="МК24-2М">МК24-2М (Менеджмент)</option>
+                <option value="ПК24-1П">ПК24-1П (Программирование)</option>
+                <option value="ПР24-1Ю">ПР24-1Ю (Право)</option>
+                <option value="ПР24-2Ю">ПР24-2Ю (Право)</option>
               </select>
             </div>
             <div>
@@ -607,13 +608,13 @@ const SchedulePage: React.FC = () => {
 
     switch (role) {
       case 'student':
-        // Студент видит только расписание своего класса (допустим, он в 10A)
-        filtered = filtered.filter(item => item.classId === '10A');
+        // Студент видит только расписание своей группы (допустим, он в МК24-1М)
+        filtered = filtered.filter(item => item.classId === 'МК24-1М');
         break;
       
       case 'parent':
-        // Родитель видит расписание класса своего ребенка (допустим, 10B)
-        filtered = filtered.filter(item => item.classId === '10B');
+        // Родитель видит расписание группы своего ребенка (допустим, МК24-2М)
+        filtered = filtered.filter(item => item.classId === 'МК24-2М');
         break;
       
       case 'teacher':
@@ -686,7 +687,7 @@ const SchedulePage: React.FC = () => {
           day: row['День недели']?.toLowerCase() || 'monday',
           startTime: row['Время начала'] || '08:00',
           endTime: row['Время окончания'] || '08:45',
-          classId: row['Класс'] || '',
+          classId: row['Группа'] || '',
           subject: row['Предмет'] || '',
           teacherId: row['ID преподавателя'] || 'ivanova',
           teacherName: row['Преподаватель'] || '',
@@ -813,7 +814,7 @@ const SchedulePage: React.FC = () => {
             </select>
           </div>
 
-          {/* Класс виден только администратору и учителю */}
+          {/* Группа видна только администратору и учителю */}
           {(role === 'admin' || role === 'teacher') && (
             <div>
               <select
@@ -821,11 +822,12 @@ const SchedulePage: React.FC = () => {
                 onChange={(e) => setFilters({ ...filters, classId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               >
-                <option value="">Класс</option>
-                <option value="10A">10A</option>
-                <option value="10B">10B</option>
-                <option value="11A">11A</option>
-                <option value="11B">11B</option>
+                <option value="">Выберите группу</option>
+                <option value="МК24-1М">МК24-1М (Менеджмент)</option>
+                <option value="МК24-2М">МК24-2М (Менеджмент)</option>
+                <option value="ПК24-1П">ПК24-1П (Программирование)</option>
+                <option value="ПР24-1Ю">ПР24-1Ю (Право)</option>
+                <option value="ПР24-2Ю">ПР24-2Ю (Право)</option>
               </select>
             </div>
           )}
@@ -891,7 +893,7 @@ const SchedulePage: React.FC = () => {
                   Время
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Класс
+                  Группа
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Предмет

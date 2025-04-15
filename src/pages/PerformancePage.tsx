@@ -78,10 +78,10 @@ const PerformancePage: React.FC = () => {
   ];
 
   const classes: ClassData[] = [
-    { id: '10a', name: '10 А', averageGrade: 4.2, attendance: 92, assignments: 85, studentsCount: 25 },
-    { id: '10b', name: '10 Б', averageGrade: 4.0, attendance: 88, assignments: 82, studentsCount: 23 },
-    { id: '11a', name: '11 А', averageGrade: 4.3, attendance: 94, assignments: 88, studentsCount: 24 },
-    { id: '11b', name: '11 Б', averageGrade: 3.9, attendance: 90, assignments: 84, studentsCount: 22 },
+    { id: '10a', name: 'МК24-1М', averageGrade: 4.2, attendance: 92, assignments: 85, studentsCount: 25 },
+    { id: '10b', name: 'МК24-2М', averageGrade: 4.0, attendance: 88, assignments: 82, studentsCount: 23 },
+    { id: '11a', name: 'ПК24-1П', averageGrade: 4.3, attendance: 94, assignments: 88, studentsCount: 24 },
+    { id: '11b', name: 'ПР24-1Ю', averageGrade: 3.9, attendance: 90, assignments: 84, studentsCount: 22 },
   ];
 
   const filteredData = useMemo(() => {
@@ -113,18 +113,12 @@ const PerformancePage: React.FC = () => {
       {/* Селектор класса */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Успеваемость по классам</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Успеваемость по группам</h1>
         </div>
         <div className="relative">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <button
-              className={`flex items-center justify-center px-6 py-4 rounded-lg text-lg font-medium transition-all
-                ${selectedClass === 'all' 
-                  ? 'bg-blue-500 text-white shadow-lg' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50'}`}
-              onClick={() => setSelectedClass('all')}
-            >
-              Все классы
+            <button className="px-4 py-2 bg-blue-500 text-white rounded-md">
+              Все группы
             </button>
             {classes.map((cls) => (
               <button

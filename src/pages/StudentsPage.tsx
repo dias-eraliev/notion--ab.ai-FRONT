@@ -4,15 +4,18 @@ import { FaSearch, FaUserGraduate, FaPhone, FaEnvelope, FaIdCard } from 'react-i
 
 interface Student {
   id: string;
-  fullName: string;
+  name: string;
   class: string;
-  birthDate: string;
-  phone: string;
-  email: string;
-  address: string;
-  parentName: string;
-  parentPhone: string;
-  photo: string;
+  performance: number;
+  attendance: number;
+  emotionalState: string;
+  payments: string;
+  image: string;
+  phone?: string;
+  email?: string;
+  birthDate?: string;
+  parentName?: string;
+  parentPhone?: string;
 }
 
 interface StudentModalProps {
@@ -31,11 +34,11 @@ const StudentModal: React.FC<StudentModalProps> = ({ student, onClose, onViewDet
           <div className="flex justify-between items-start">
             <div className="flex items-center">
               <div className="w-20 h-20 rounded-full overflow-hidden mr-4">
-                <img src={student.photo} alt={student.fullName} className="w-full h-full object-cover" />
+                <img src={student.image} alt={student.name} className="w-full h-full object-cover" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">{student.fullName}</h2>
-                <p className="text-gray-600">Класс: {student.class}</p>
+                <h2 className="text-2xl font-bold text-gray-800">{student.name}</h2>
+                <p className="text-gray-600">Группа: {student.class}</p>
               </div>
             </div>
             <button
@@ -52,31 +55,41 @@ const StudentModal: React.FC<StudentModalProps> = ({ student, onClose, onViewDet
             <div>
               <h3 className="text-lg font-semibold mb-4">Личная информация</h3>
               <div className="space-y-3">
-                <div className="flex items-center">
-                  <FaIdCard className="w-5 h-5 text-gray-500 mr-3" />
-                  <span>Дата рождения: {student.birthDate}</span>
-                </div>
-                <div className="flex items-center">
-                  <FaPhone className="w-5 h-5 text-gray-500 mr-3" />
-                  <span>{student.phone}</span>
-                </div>
-                <div className="flex items-center">
-                  <FaEnvelope className="w-5 h-5 text-gray-500 mr-3" />
-                  <span>{student.email}</span>
-                </div>
+                {student.birthDate && (
+                  <div className="flex items-center">
+                    <FaIdCard className="w-5 h-5 text-gray-500 mr-3" />
+                    <span>Дата рождения: {student.birthDate}</span>
+                  </div>
+                )}
+                {student.phone && (
+                  <div className="flex items-center">
+                    <FaPhone className="w-5 h-5 text-gray-500 mr-3" />
+                    <span>{student.phone}</span>
+                  </div>
+                )}
+                {student.email && (
+                  <div className="flex items-center">
+                    <FaEnvelope className="w-5 h-5 text-gray-500 mr-3" />
+                    <span>{student.email}</span>
+                  </div>
+                )}
               </div>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Контакты родителей</h3>
               <div className="space-y-3">
-                <div className="flex items-center">
-                  <FaUserGraduate className="w-5 h-5 text-gray-500 mr-3" />
-                  <span>{student.parentName}</span>
-                </div>
-                <div className="flex items-center">
-                  <FaPhone className="w-5 h-5 text-gray-500 mr-3" />
-                  <span>{student.parentPhone}</span>
-                </div>
+                {student.parentName && (
+                  <div className="flex items-center">
+                    <FaUserGraduate className="w-5 h-5 text-gray-500 mr-3" />
+                    <span>{student.parentName}</span>
+                  </div>
+                )}
+                {student.parentPhone && (
+                  <div className="flex items-center">
+                    <FaPhone className="w-5 h-5 text-gray-500 mr-3" />
+                    <span>{student.parentPhone}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -101,196 +114,114 @@ const StudentsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-  // Временные данные для примера
-  const students: Student[] = [
+  // Обновляем классы на группы
+  const classes = [
+    'Все группы',
+    'МК24-1М',
+    'МК24-2М',
+    'ПК24-1П',
+    'ПК24-2П',
+    'ПД24-1Д'
+  ];
+  
+  // Обновляем студентов с группами колледжа
+  const students = [
     {
       id: '1',
-      fullName: 'Алихан Сатыбалды',
-      class: '10A',
-      birthDate: '2008-05-15',
-      phone: '+7 (777) 123-45-67',
+      name: 'Алихан Сатыбалды',
+      class: 'МК24-1М',
+      performance: 87,
+      attendance: 95,
+      emotionalState: 'Хорошее',
+      payments: 'Оплачено',
+      image: 'https://placekitten.com/200/200',
+      phone: '+7 (701) 123-4567',
       email: 'alikhan@example.com',
-      address: 'ул. Абая 123, кв. 45',
-      parentName: 'Сатыбалды Нурлан',
-      parentPhone: '+7 (777) 765-43-21',
-      photo: `https://ui-avatars.com/api/?name=Алихан+Сатыбалды&background=random&size=200`
+      birthDate: '15.05.2006',
+      parentName: 'Сатыбалды А.К.',
+      parentPhone: '+7 (701) 765-4321'
     },
     {
       id: '2',
-      fullName: 'Айсулу Нурланова',
-      class: '10B',
-      birthDate: '2008-07-22',
-      phone: '+7 (777) 234-56-78',
-      email: 'aisulu@example.com',
-      address: 'ул. Жандосова 456, кв. 12',
-      parentName: 'Нурланова Айгуль',
-      parentPhone: '+7 (777) 876-54-32',
-      photo: `https://ui-avatars.com/api/?name=Айсулу+Нурланова&background=random&size=200`
+      name: 'Мария Иванова',
+      class: 'МК24-1М',
+      performance: 92,
+      attendance: 98,
+      emotionalState: 'Отличное',
+      payments: 'Оплачено',
+      image: 'https://placekitten.com/201/201',
+      phone: '+7 (702) 234-5678',
+      email: 'maria@example.com',
+      birthDate: '23.03.2006',
+      parentName: 'Иванова О.П.',
+      parentPhone: '+7 (702) 876-5432'
     },
     {
       id: '3',
-      fullName: 'Бауыржан Ахметов',
-      class: '10A',
-      birthDate: '2008-03-10',
-      phone: '+7 (777) 345-67-89',
-      email: 'bauyrzhan@example.com',
-      address: 'ул. Тимирязева 789, кв. 34',
-      parentName: 'Ахметов Серик',
-      parentPhone: '+7 (777) 987-65-43',
-      photo: `https://ui-avatars.com/api/?name=Бауыржан+Ахметов&background=random&size=200`
+      name: 'Александр Петров',
+      class: 'МК24-2М',
+      performance: 75,
+      attendance: 85,
+      emotionalState: 'Удовлетворительное',
+      payments: 'Задолженность',
+      image: 'https://placekitten.com/202/202',
+      phone: '+7 (703) 345-6789',
+      email: 'alex@example.com',
+      birthDate: '10.10.2005',
+      parentName: 'Петров С.В.',
+      parentPhone: '+7 (703) 987-6543'
     },
     {
       id: '4',
-      fullName: 'Динара Касымова',
-      class: '10B',
-      birthDate: '2008-09-05',
-      phone: '+7 (777) 456-78-90',
-      email: 'dinara@example.com',
-      address: 'ул. Сатпаева 234, кв. 56',
-      parentName: 'Касымова Гульнара',
-      parentPhone: '+7 (777) 098-76-54',
-      photo: `https://ui-avatars.com/api/?name=Динара+Касымова&background=random&size=200`
+      name: 'Анна Сидорова',
+      class: 'ПК24-1П',
+      performance: 95,
+      attendance: 99,
+      emotionalState: 'Отличное',
+      payments: 'Оплачено',
+      image: 'https://placekitten.com/203/203',
+      phone: '+7 (704) 456-7890',
+      email: 'anna@example.com',
+      birthDate: '07.12.2006',
+      parentName: 'Сидорова Е.А.',
+      parentPhone: '+7 (704) 098-7654'
     },
     {
       id: '5',
-      fullName: 'Ерлан Сериков',
-      class: '10C',
-      birthDate: '2008-11-15',
-      phone: '+7 (777) 567-89-01',
+      name: 'Ерлан Ахметов',
+      class: 'ПК24-2П',
+      performance: 68,
+      attendance: 78,
+      emotionalState: 'Нейтральное',
+      payments: 'Задолженность',
+      image: 'https://placekitten.com/204/204',
+      phone: '+7 (705) 567-8901',
       email: 'erlan@example.com',
-      address: 'ул. Достык 567, кв. 78',
-      parentName: 'Сериков Марат',
-      parentPhone: '+7 (777) 109-87-65',
-      photo: `https://ui-avatars.com/api/?name=Ерлан+Сериков&background=random&size=200`
+      birthDate: '18.07.2005',
+      parentName: 'Ахметов Н.Т.',
+      parentPhone: '+7 (705) 109-8765'
     },
     {
       id: '6',
-      fullName: 'Жанар Оспанова',
-      class: '10A',
-      birthDate: '2008-04-20',
-      phone: '+7 (777) 678-90-12',
-      email: 'zhanar@example.com',
-      address: 'ул. Байтурсынова 123, кв. 45',
-      parentName: 'Оспанова Айгуль',
-      parentPhone: '+7 (777) 210-98-76',
-      photo: `https://ui-avatars.com/api/?name=Жанар+Оспанова&background=random&size=200`
-    },
-    {
-      id: '7',
-      fullName: 'Арман Жумабаев',
-      class: '10B',
-      birthDate: '2008-06-25',
-      phone: '+7 (777) 789-01-23',
-      email: 'arman@example.com',
-      address: 'ул. Толе би 456, кв. 89',
-      parentName: 'Жумабаев Даулет',
-      parentPhone: '+7 (777) 321-09-87',
-      photo: `https://ui-avatars.com/api/?name=Арман+Жумабаев&background=random&size=200`
-    },
-    {
-      id: '8',
-      fullName: 'Мадина Сарсенова',
-      class: '10C',
-      birthDate: '2008-08-30',
-      phone: '+7 (777) 890-12-34',
-      email: 'madina@example.com',
-      address: 'ул. Жарокова 789, кв. 12',
-      parentName: 'Сарсенова Айнур',
-      parentPhone: '+7 (777) 432-10-98',
-      photo: `https://ui-avatars.com/api/?name=Мадина+Сарсенова&background=random&size=200`
-    },
-    {
-      id: '9',
-      fullName: 'Нурлан Тулегенов',
-      class: '10A',
-      birthDate: '2008-10-05',
-      phone: '+7 (777) 901-23-45',
-      email: 'nurlan@example.com',
-      address: 'ул. Гагарина 234, кв. 56',
-      parentName: 'Тулегенов Болат',
-      parentPhone: '+7 (777) 543-21-09',
-      photo: `https://ui-avatars.com/api/?name=Нурлан+Тулегенов&background=random&size=200`
-    },
-    {
-      id: '10',
-      fullName: 'Айгерим Бекмухамбетова',
-      class: '10B',
-      birthDate: '2008-12-10',
-      phone: '+7 (777) 012-34-56',
-      email: 'aigerim@example.com',
-      address: 'ул. Розыбакиева 567, кв. 78',
-      parentName: 'Бекмухамбетова Сауле',
-      parentPhone: '+7 (777) 654-32-10',
-      photo: `https://ui-avatars.com/api/?name=Айгерим+Бекмухамбетова&background=random&size=200`
-    },
-    {
-      id: '11',
-      fullName: 'Бекзат Муратов',
-      class: '10C',
-      birthDate: '2008-02-15',
-      phone: '+7 (777) 123-45-67',
-      email: 'bekzat@example.com',
-      address: 'ул. Сейфуллина 890, кв. 23',
-      parentName: 'Муратов Ержан',
-      parentPhone: '+7 (777) 765-43-21',
-      photo: `https://ui-avatars.com/api/?name=Бекзат+Муратов&background=random&size=200`
-    },
-    {
-      id: '12',
-      fullName: 'Гульназ Алимжанова',
-      class: '10A',
-      birthDate: '2008-04-20',
-      phone: '+7 (777) 234-56-78',
-      email: 'gulnaz@example.com',
-      address: 'ул. Маметова 123, кв. 45',
-      parentName: 'Алимжанова Ляззат',
-      parentPhone: '+7 (777) 876-54-32',
-      photo: `https://ui-avatars.com/api/?name=Гульназ+Алимжанова&background=random&size=200`
-    },
-    {
-      id: '13',
-      fullName: 'Дархан Сагынбаев',
-      class: '10B',
-      birthDate: '2008-06-25',
-      phone: '+7 (777) 345-67-89',
-      email: 'darkhan@example.com',
-      address: 'ул. Кабанбай батыра 456, кв. 78',
-      parentName: 'Сагынбаев Нурбол',
-      parentPhone: '+7 (777) 987-65-43',
-      photo: `https://ui-avatars.com/api/?name=Дархан+Сагынбаев&background=random&size=200`
-    },
-    {
-      id: '14',
-      fullName: 'Еркежан Нуржанова',
-      class: '10C',
-      birthDate: '2008-08-30',
-      phone: '+7 (777) 456-78-90',
-      email: 'yerkezhan@example.com',
-      address: 'ул. Байзакова 789, кв. 12',
-      parentName: 'Нуржанова Жанар',
-      parentPhone: '+7 (777) 098-76-54',
-      photo: `https://ui-avatars.com/api/?name=Еркежан+Нуржанова&background=random&size=200`
-    },
-    {
-      id: '15',
-      fullName: 'Жансая Абдрахманова',
-      class: '10A',
-      birthDate: '2008-10-05',
-      phone: '+7 (777) 567-89-01',
-      email: 'zhansaya@example.com',
-      address: 'ул. Шевченко 234, кв. 56',
-      parentName: 'Абдрахманова Айжан',
-      parentPhone: '+7 (777) 109-87-65',
-      photo: `https://ui-avatars.com/api/?name=Жансая+Абдрахманова&background=random&size=200`
+      name: 'Айгуль Нурланова',
+      class: 'ПД24-1Д',
+      performance: 88,
+      attendance: 93,
+      emotionalState: 'Хорошее',
+      payments: 'Оплачено',
+      image: 'https://placekitten.com/205/205',
+      phone: '+7 (706) 678-9012',
+      email: 'aigul@example.com',
+      birthDate: '29.01.2006',
+      parentName: 'Нурланова Г.М.',
+      parentPhone: '+7 (706) 210-9876'
     }
   ];
 
-  const classes = Array.from(new Set(students.map(s => s.class))).sort();
-
   const filteredStudents = students.filter(student => {
-    const matchesClass = !selectedClass || student.class === selectedClass;
+    const matchesClass = !selectedClass || selectedClass === 'Все группы' || student.class === selectedClass;
     const matchesSearch = !searchQuery || 
-      student.fullName.toLowerCase().includes(searchQuery.toLowerCase());
+      student.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesClass && matchesSearch;
   });
 
@@ -320,14 +251,14 @@ const StudentsPage: React.FC = () => {
           </div>
           <div className="w-48">
             <select
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
+              className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Все классы</option>
-              {classes.map((className) => (
-                <option key={className} value={className}>
-                  {className}
+              <option value="">Все группы</option>
+              {classes.slice(1).map(classItem => (
+                <option key={classItem} value={classItem}>
+                  {classItem}
                 </option>
               ))}
             </select>
@@ -343,14 +274,14 @@ const StudentsPage: React.FC = () => {
             >
               <div className="aspect-w-4 aspect-h-3">
                 <img
-                  src={student.photo}
-                  alt={student.fullName}
+                  src={student.image}
+                  alt={student.name}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">{student.fullName}</h3>
-                <p className="text-sm text-gray-600">Класс: {student.class}</p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">{student.name}</h3>
+                <p className="text-sm text-gray-600">Группа: {student.class}</p>
                 <div className="mt-2 flex items-center text-sm text-gray-500">
                   <FaPhone className="w-4 h-4 mr-2" />
                   <span>{student.phone}</span>

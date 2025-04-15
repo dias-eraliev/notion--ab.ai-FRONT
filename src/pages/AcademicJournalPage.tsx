@@ -7,15 +7,22 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useAuthContext, UserRole } from '../providers/AuthProvider';
 
+// Обновляем интерфейс для поддержки двух оценок
+interface GradeItem {
+  value: number; // Изменено на 100-балльную систему
+  type: string;
+  comment?: string;
+  createdAt?: string;
+}
+
 interface Student {
   id: number;
   name: string;
   grades: {
     [date: string]: {
-      value: number;
-      type?: string;
-      comment?: string;
-      createdAt?: string;
+      classwork?: GradeItem;
+      homework?: GradeItem;
+      average?: number; // Среднее арифметическое двух оценок
     } | null;
   };
 }
@@ -23,26 +30,45 @@ interface Student {
 interface GradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (grade: number, type: string, comment: string) => void;
+  initialData?: {
+    classwork?: GradeItem;
+    homework?: GradeItem;
+  };
+  onSave: (classworkGrade: GradeItem | null, homeworkGrade: GradeItem | null) => void;
 }
 
 interface GradeInfo {
-  value: number;
-  type: string;
-  comment?: string;
+  classwork?: GradeItem;
+  homework?: GradeItem;
   date: string;
-  createdAt?: string;
+  average?: number;
 }
 
-const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, onSave }) => {
-  const [grade, setGrade] = useState<string>('');
-  const [type, setType] = useState<string>('');
-  const [comment, setComment] = useState<string>('');
+// Обновленный модальный компонент для двух оценок
+const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, onSave }) => {
+  const [classworkGrade, setClassworkGrade] = useState<GradeItem>({
+    value: initialData?.classwork?.value || 0,
+    type: 'classwork',
+    comment: initialData?.classwork?.comment || ''
+  });
+  
+  const [homeworkGrade, setHomeworkGrade] = useState<GradeItem>({
+    value: initialData?.homework?.value || 0,
+    type: 'homework',
+    comment: initialData?.homework?.comment || ''
+  });
+  
+  const [classworkEnabled, setClassworkEnabled] = useState<boolean>(!!initialData?.classwork);
+  const [homeworkEnabled, setHomeworkEnabled] = useState<boolean>(!!initialData?.homework);
+  
   const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(Number(grade), type, comment);
+    onSave(
+      classworkEnabled ? classworkGrade : null,
+      homeworkEnabled ? homeworkGrade : null
+    );
     onClose();
   };
 
@@ -54,60 +80,111 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, onSave }) => {
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[400px]"
+        className="bg-white rounded-lg p-6 w-[500px]"
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Редактирование оценки</h3>
+          <h3 className="text-lg font-medium">Редактирование оценок</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <FaTimes />
           </button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Оценка <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">0</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
+          {/* Секция классной работы */}
+          <div className="mb-6 p-4 border border-gray-200 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-md font-medium">Классная работа</h4>
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={classworkEnabled}
+                  onChange={(e) => setClassworkEnabled(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <span className="ml-3 text-sm font-medium text-gray-700">{classworkEnabled ? 'Активно' : 'Неактивно'}</span>
+              </label>
+            </div>
+            
+            {classworkEnabled && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Оценка <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={classworkGrade.value}
+                    onChange={(e) => setClassworkGrade({...classworkGrade, value: Number(e.target.value)})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required={classworkEnabled}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Комментарий
+                  </label>
+                  <textarea
+                    value={classworkGrade.comment || ''}
+                    onChange={(e) => setClassworkGrade({...classworkGrade, comment: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Тип оценки <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Выберите тип</option>
-              <option value="homework">Домашняя работа</option>
-              <option value="classwork">Классная работа</option>
-              <option value="test">Контрольная работа</option>
-              <option value="exam">Экзамен</option>
-            </select>
+          
+          {/* Секция домашней работы */}
+          <div className="mb-6 p-4 border border-gray-200 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-md font-medium">Домашняя работа</h4>
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={homeworkEnabled}
+                  onChange={(e) => setHomeworkEnabled(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <span className="ml-3 text-sm font-medium text-gray-700">{homeworkEnabled ? 'Активно' : 'Неактивно'}</span>
+              </label>
+            </div>
+            
+            {homeworkEnabled && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Оценка <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={homeworkGrade.value}
+                    onChange={(e) => setHomeworkGrade({...homeworkGrade, value: Number(e.target.value)})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required={homeworkEnabled}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Комментарий
+                  </label>
+                  <textarea
+                    value={homeworkGrade.comment || ''}
+                    onChange={(e) => setHomeworkGrade({...homeworkGrade, comment: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Комментарий
-            </label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
-            />
-          </div>
+          
           <div className="flex justify-end space-x-2">
             <button
               type="button"
@@ -129,60 +206,94 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, onSave }) => {
   );
 };
 
+// Обновленный компонент информации об оценке
 const GradeInfoModal: React.FC<{
   grade: GradeInfo;
   onClose: () => void;
 }> = ({ grade, onClose }) => {
-  const getGradeTypeName = (type: string) => {
-    switch (type) {
-      case 'homework': return 'Домашняя работа';
-      case 'classwork': return 'Классная работа';
-      case 'test': return 'Контрольная работа';
-      case 'exam': return 'Экзамен';
-      default: return type;
-    }
-  };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[400px] shadow-xl"
+        className="bg-white rounded-lg p-6 w-[500px] shadow-xl"
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Информация об оценке</h3>
+          <h3 className="text-lg font-medium">Информация об оценках</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <FaTimes />
           </button>
         </div>
-        <div className="space-y-4">
-          <div>
-            <div className="text-sm text-gray-500">Оценка</div>
-            <div className="text-lg font-medium">{grade.value}</div>
+        
+        <div className="mb-4">
+          <div className="text-sm text-gray-500">Дата</div>
+          <div className="font-medium">{grade.date}</div>
+        </div>
+        
+        {grade.average !== undefined && (
+          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+            <div className="text-sm text-gray-500">Средний балл</div>
+            <div className="text-xl font-bold text-blue-600">{grade.average} / 100</div>
           </div>
-          <div>
-            <div className="text-sm text-gray-500">Тип работы</div>
-            <div className="font-medium">{getGradeTypeName(grade.type)}</div>
-          </div>
-          <div>
-            <div className="text-sm text-gray-500">Дата</div>
-            <div className="font-medium">{grade.date}</div>
-          </div>
-          {grade.createdAt && (
-            <div>
-              <div className="text-sm text-gray-500">Поставлена</div>
-              <div className="font-medium">{grade.createdAt}</div>
+        )}
+        
+        <div className="grid grid-cols-2 gap-4">
+          {/* Классная работа */}
+          {grade.classwork && (
+            <div className="p-4 border border-gray-200 rounded-lg">
+              <div className="text-sm font-medium text-gray-800 mb-3">Классная работа</div>
+              <div className="space-y-3">
+                <div>
+                  <div className="text-sm text-gray-500">Оценка</div>
+                  <div className="text-lg font-medium text-green-600">{grade.classwork.value} / 100</div>
+                </div>
+                
+                {grade.classwork.createdAt && (
+                  <div>
+                    <div className="text-sm text-gray-500">Поставлена</div>
+                    <div className="text-sm">{grade.classwork.createdAt}</div>
+                  </div>
+                )}
+                
+                {grade.classwork.comment && (
+                  <div>
+                    <div className="text-sm text-gray-500">Комментарий</div>
+                    <div className="text-sm">{grade.classwork.comment}</div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
-          {grade.comment && (
-            <div>
-              <div className="text-sm text-gray-500">Комментарий</div>
-              <div className="font-medium">{grade.comment}</div>
+          
+          {/* Домашняя работа */}
+          {grade.homework && (
+            <div className="p-4 border border-gray-200 rounded-lg">
+              <div className="text-sm font-medium text-gray-800 mb-3">Домашняя работа</div>
+              <div className="space-y-3">
+                <div>
+                  <div className="text-sm text-gray-500">Оценка</div>
+                  <div className="text-lg font-medium text-green-600">{grade.homework.value} / 100</div>
+                </div>
+                
+                {grade.homework.createdAt && (
+                  <div>
+                    <div className="text-sm text-gray-500">Поставлена</div>
+                    <div className="text-sm">{grade.homework.createdAt}</div>
+                  </div>
+                )}
+                
+                {grade.homework.comment && (
+                  <div>
+                    <div className="text-sm text-gray-500">Комментарий</div>
+                    <div className="text-sm">{grade.homework.comment}</div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
+        
         <div className="mt-6 flex justify-end">
           <button
             onClick={onClose}
@@ -192,47 +303,6 @@ const GradeInfoModal: React.FC<{
           </button>
         </div>
       </motion.div>
-    </div>
-  );
-};
-
-// Компонент переключателя ролей
-const RoleSwitcher: React.FC = () => {
-  const { role, setRole } = useAuthContext();
-  
-  return (
-    <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-      <div className="flex items-center gap-4">
-        <span className="text-sm font-medium text-yellow-800">
-          Тестовый режим просмотра:
-        </span>
-        <div className="flex gap-2">
-          {(['admin', 'teacher', 'student', 'parent'] as UserRole[]).map((r) => (
-            <button
-              key={r}
-              onClick={() => setRole(r)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors
-                ${role === r 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                }`}
-            >
-              {r === 'admin' && 'Администратор'}
-              {r === 'teacher' && 'Учитель'}
-              {r === 'student' && 'Ученик'}
-              {r === 'parent' && 'Родитель'}
-            </button>
-          ))}
-        </div>
-        <span className="text-xs text-yellow-600">
-          Текущая роль: {
-            role === 'admin' ? 'Администратор' :
-            role === 'teacher' ? 'Учитель' :
-            role === 'student' ? 'Ученик' :
-            'Родитель'
-          }
-        </span>
-      </div>
     </div>
   );
 };
@@ -256,78 +326,154 @@ const AcademicJournalPage: React.FC = () => {
   // Даты для колонок (в реальном приложении это должно быть динамическим)
   const dates = ['27.02', '28.02', '01.03', '02.03', '05.03', '06.03'];
 
-  // Пример данных студентов
+  // Обновленные тестовые данные с 100-балльной системой
   const students: Student[] = [
     {
       id: 1,
       name: 'Абдуллаев Арман',
       grades: {
-        '27.02': { value: 5, type: 'classwork', createdAt: '27.02.2024 14:30', comment: 'Отличная работа на уроке' },
-        '01.03': { value: 4, type: 'homework', createdAt: '01.03.2024 09:15', comment: 'Небольшие неточности в решении' },
-        '05.03': { value: 5, type: 'test', createdAt: '05.03.2024 11:45', comment: 'Все задачи решены верно' },
+        '27.02': {
+          classwork: { value: 85, type: 'classwork', createdAt: '27.02.2024 14:30', comment: 'Отличная работа на уроке' },
+          homework: { value: 78, type: 'homework', createdAt: '27.02.2024 18:45', comment: 'Небольшие неточности в решении' },
+          average: 82
+        },
+        '01.03': {
+          classwork: { value: 92, type: 'classwork', createdAt: '01.03.2024 09:15' },
+          average: 92
+        },
+        '05.03': {
+          classwork: { value: 88, type: 'classwork', createdAt: '05.03.2024 11:45', comment: 'Хорошая работа' },
+          homework: { value: 94, type: 'homework', createdAt: '05.03.2024 15:30', comment: 'Все задачи решены верно' },
+          average: 91
+        },
       }
     },
     {
       id: 2,
       name: 'Бекенов Дамир',
       grades: {
-        '27.02': { value: 4, type: 'classwork' },
-        '01.03': { value: 3, type: 'homework' },
-        '05.03': { value: 4, type: 'test' },
+        '27.02': {
+          classwork: { value: 76, type: 'classwork' },
+          homework: { value: 68, type: 'homework' },
+          average: 72
+        },
+        '01.03': {
+          classwork: { value: 65, type: 'classwork' },
+          average: 65
+        },
+        '05.03': {
+          classwork: { value: 82, type: 'classwork' },
+          average: 82
+        },
       }
     },
     {
       id: 3,
       name: 'Васильев Александр',
       grades: {
-        '28.02': { value: 5, type: 'test' },
-        '02.03': { value: 4, type: 'homework' },
-        '06.03': { value: 5, type: 'classwork' },
+        '28.02': { 
+          classwork: { value: 90, type: 'classwork' },
+          average: 90
+        },
+        '02.03': { 
+          homework: { value: 85, type: 'homework' },
+          average: 85
+        },
+        '06.03': { 
+          classwork: { value: 95, type: 'classwork' },
+          average: 95
+        },
       }
     },
     {
       id: 4,
       name: 'Галимова Алия',
       grades: {
-        '27.02': { value: 4, type: 'classwork' },
-        '01.03': { value: 5, type: 'homework' },
-        '05.03': { value: 4, type: 'test' },
+        '27.02': { 
+          classwork: { value: 78, type: 'classwork' },
+          average: 78
+        },
+        '01.03': { 
+          homework: { value: 88, type: 'homework' },
+          average: 88
+        },
+        '05.03': { 
+          classwork: { value: 82, type: 'classwork' },
+          average: 82
+        },
       }
     },
     {
       id: 5,
       name: 'Дмитриев Кирилл',
       grades: {
-        '28.02': { value: 3, type: 'classwork' },
-        '02.03': { value: 4, type: 'test' },
-        '06.03': { value: 4, type: 'homework' },
+        '28.02': { 
+          classwork: { value: 60, type: 'classwork' },
+          average: 60
+        },
+        '02.03': { 
+          homework: { value: 75, type: 'homework' },
+          average: 75
+        },
+        '06.03': { 
+          classwork: { value: 80, type: 'classwork' },
+          average: 80
+        },
       }
     },
     {
       id: 6,
       name: 'Ержанов Тимур',
       grades: {
-        '27.02': { value: 5, type: 'test' },
-        '01.03': { value: 5, type: 'classwork' },
-        '05.03': { value: 4, type: 'homework' },
+        '27.02': { 
+          classwork: { value: 95, type: 'classwork' },
+          average: 95
+        },
+        '01.03': { 
+          homework: { value: 93, type: 'homework' },
+          average: 93
+        },
+        '05.03': { 
+          classwork: { value: 88, type: 'classwork' },
+          homework: { value: 90, type: 'homework' },
+          average: 89
+        },
       }
     },
     {
       id: 7,
       name: 'Жумабаева Айгерим',
       grades: {
-        '28.02': { value: 4, type: 'homework' },
-        '02.03': { value: 5, type: 'test' },
-        '06.03': { value: 5, type: 'classwork' },
+        '28.02': { 
+          homework: { value: 85, type: 'homework' },
+          average: 85
+        },
+        '02.03': { 
+          classwork: { value: 92, type: 'classwork' },
+          average: 92
+        },
+        '06.03': { 
+          classwork: { value: 94, type: 'classwork' },
+          average: 94
+        },
       }
     },
     {
       id: 8,
       name: 'Иванов Максим',
       grades: {
-        '27.02': { value: 3, type: 'classwork' },
-        '01.03': { value: 4, type: 'test' },
-        '05.03': { value: 4, type: 'homework' },
+        '27.02': { 
+          classwork: { value: 65, type: 'classwork' },
+          average: 65
+        },
+        '01.03': { 
+          homework: { value: 78, type: 'homework' },
+          average: 78
+        },
+        '05.03': { 
+          classwork: { value: 80, type: 'classwork' },
+          average: 80
+        },
       }
     }
   ];
@@ -376,22 +522,51 @@ const AcademicJournalPage: React.FC = () => {
   };
 
   const handleGradeClick = (studentId: number, date: string) => {
-    setSelectedGradeInfo({ studentId, date });
-    setIsModalOpen(true);
-  };
-
-  const handleGradeSave = (grade: number, type: string, comment: string) => {
-    // Здесь должна быть логика сохранения оценки
-    console.log('Saving grade:', { grade, type, comment, selectedGradeInfo });
-  };
-
-  const getGradeColor = (grade: number) => {
-    switch (grade) {
-      case 5: return 'bg-green-500';
-      case 4: return 'bg-yellow-500';
-      case 3: return 'bg-red-500';
-      default: return 'bg-gray-500';
+    const student = students.find(s => s.id === studentId);
+    const gradeData = student?.grades[date];
+    
+    if (gradeData) {
+      setSelectedGrade({
+        classwork: gradeData.classwork,
+        homework: gradeData.homework,
+        average: gradeData.average,
+        date
+      });
+    } else {
+      setSelectedGradeInfo({ studentId, date });
+      setIsModalOpen(true);
     }
+  };
+
+  const handleGradeSave = (classworkGrade: GradeItem | null, homeworkGrade: GradeItem | null) => {
+    if (!selectedGradeInfo) return;
+    
+    const now = new Date().toLocaleString();
+    let newGrades = {
+      classwork: classworkGrade ? { ...classworkGrade, createdAt: now } : undefined,
+      homework: homeworkGrade ? { ...homeworkGrade, createdAt: now } : undefined
+    };
+    
+    // Расчет среднего арифметического
+    if (classworkGrade && homeworkGrade) {
+      const average = Math.round((classworkGrade.value + homeworkGrade.value) / 2);
+      newGrades = { ...newGrades, average };
+    } else if (classworkGrade) {
+      newGrades = { ...newGrades, average: classworkGrade.value };
+    } else if (homeworkGrade) {
+      newGrades = { ...newGrades, average: homeworkGrade.value };
+    }
+    
+    console.log('Saving grades:', { newGrades, selectedGradeInfo });
+    // Здесь должна быть логика сохранения оценок в базе данных
+  };
+
+  // Функция для определения цвета оценки в 100-балльной системе
+  const getGradeColor = (value: number) => {
+    if (value >= 85) return 'bg-green-500'; // Отлично
+    if (value >= 70) return 'bg-blue-500';  // Хорошо
+    if (value >= 50) return 'bg-yellow-500'; // Удовлетворительно
+    return 'bg-red-500'; // Неудовлетворительно
   };
 
   const handleDateChange = (start: Date | null, end: Date | null) => {
@@ -401,8 +576,6 @@ const AcademicJournalPage: React.FC = () => {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
-      <RoleSwitcher />
-      
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
           {role === 'student' ? 'Мои оценки' :
@@ -438,11 +611,12 @@ const AcademicJournalPage: React.FC = () => {
               onChange={(e) => setSelectedClass(e.target.value)}
               className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
             >
-              <option value="">{t('selectClass')}</option>
-              <option value="10A">10A</option>
-              <option value="10B">10B</option>
-              <option value="11A">11A</option>
-              <option value="11B">11B</option>
+              <option value="">{t('selectGroup')}</option>
+              <option value="МК24-1М">МК24-1М (Менеджмент)</option>
+              <option value="МК24-2М">МК24-2М (Менеджмент)</option>
+              <option value="ПК24-1П">ПК24-1П (Программирование)</option>
+              <option value="ПР24-1Ю">ПР24-1Ю (Право)</option>
+              <option value="ПР24-2Ю">ПР24-2Ю (Право)</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
               <FaCaretDown className="text-gray-400" />
@@ -529,7 +703,7 @@ const AcademicJournalPage: React.FC = () => {
           />
         </div>
       )}
-
+      
       {/* Таблица журнала */}
       <div className="mt-6 bg-white rounded-lg shadow overflow-hidden border border-gray-200">
         <div className="overflow-x-auto">
@@ -558,24 +732,26 @@ const AcademicJournalPage: React.FC = () => {
                         {student.grades[date] ? (
                           <div className="relative group">
                             <button
-                              onClick={() => setSelectedGrade({
-                                value: student.grades[date]!.value,
-                                type: student.grades[date]!.type || 'classwork',
-                                comment: student.grades[date]!.comment,
-                                createdAt: student.grades[date]!.createdAt,
-                                date
-                              })}
-                              className={`inline-flex items-center justify-center w-9 h-9 rounded-full text-white font-medium ${getGradeColor(student.grades[date]!.value)} hover:opacity-90 transition-opacity`}
+                              onClick={() => handleGradeClick(student.id, date)}
+                              className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-white font-medium ${
+                                getGradeColor(student.grades[date]!.average || 0)
+                              } hover:opacity-90 transition-opacity`}
                             >
-                              {student.grades[date]!.value}
+                              {student.grades[date]!.average}
                             </button>
-                            {/* Тултип при наведении */}
+                            
+                            {/* Тултип при наведении показывает обе оценки */}
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
                               <div className="bg-gray-900 text-white text-sm rounded-lg py-2 px-3 whitespace-nowrap shadow-lg">
-                                <div>{student.grades[date]!.type === 'homework' ? 'Домашняя работа' : 
-                                     student.grades[date]!.type === 'classwork' ? 'Классная работа' :
-                                     student.grades[date]!.type === 'test' ? 'Контрольная работа' : 'Экзамен'}</div>
-                                <div className="text-xs text-gray-300 mt-1">{student.grades[date]!.createdAt}</div>
+                                {student.grades[date]!.classwork && (
+                                  <div>Классная работа: {student.grades[date]!.classwork.value}</div>
+                                )}
+                                {student.grades[date]!.homework && (
+                                  <div>Домашняя работа: {student.grades[date]!.homework.value}</div>
+                                )}
+                                <div className="text-xs text-gray-300 mt-1">
+                                  Средний: {student.grades[date]!.average}
+                                </div>
                               </div>
                               <div className="border-8 border-transparent border-t-gray-900 absolute left-1/2 transform -translate-x-1/2 -bottom-2"></div>
                             </div>
@@ -584,7 +760,7 @@ const AcademicJournalPage: React.FC = () => {
                           canEditGrades() && (
                             <button
                               onClick={() => handleGradeClick(student.id, date)}
-                              className="w-9 h-9 rounded-full border-2 border-dashed border-gray-300 text-gray-400 flex items-center justify-center hover:border-blue-500 hover:text-blue-600 transition-colors"
+                              className="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 text-gray-400 flex items-center justify-center hover:border-blue-500 hover:text-blue-600 transition-colors"
                             >
                               <span className="text-xl leading-none">+</span>
                             </button>

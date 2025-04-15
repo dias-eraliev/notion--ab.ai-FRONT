@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { 
   FaDownload, 
-  FaFilter, 
   FaSearch, 
   FaFileExport, 
   FaSortAmountDown, 
   FaCalendarAlt,
   FaClock,
-  FaChevronDown
+  FaChevronDown,
+  FaUser
 } from 'react-icons/fa';
 import {
   BarChart,
@@ -26,7 +26,6 @@ import {
 interface TeacherWorkload {
   id: string;
   name: string;
-  department: string;
   position: string;
   standardHours: number;
   actualHours: number;
@@ -58,7 +57,6 @@ const initialTeachers: TeacherWorkload[] = [
   {
     id: '001',
     name: 'Сатпаев Арман Болатович',
-    department: 'Кафедра математики',
     position: 'Учитель математики',
     standardHours: 720,
     actualHours: 680,
@@ -109,7 +107,6 @@ const initialTeachers: TeacherWorkload[] = [
   {
     id: '002',
     name: 'Петрова Мария Сергеевна',
-    department: 'Кафедра филологии',
     position: 'Учитель русского языка',
     standardHours: 680,
     actualHours: 700,
@@ -155,7 +152,6 @@ const initialTeachers: TeacherWorkload[] = [
   {
     id: '003',
     name: 'Сидоров Алексей Петрович',
-    department: 'Кафедра естественных наук',
     position: 'Учитель физики',
     standardHours: 640,
     actualHours: 620,
@@ -205,21 +201,16 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 const WorkloadPage: React.FC = () => {
   const [teachers, setTeachers] = useState<TeacherWorkload[]>(initialTeachers);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherWorkload | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [periodType, setPeriodType] = useState<'month' | 'quarter' | 'year'>('year');
   const [selectedPeriod, setSelectedPeriod] = useState<number>(new Date().getMonth() + 1);
 
-  const departments = [...new Set(teachers.map(t => t.department))];
-
   const filteredTeachers = teachers.filter(teacher => {
     const matchesSearch = teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           teacher.position.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesDepartment = selectedDepartment === null || teacher.department === selectedDepartment;
-    
-    return matchesSearch && matchesDepartment;
+    return matchesSearch;
   });
 
   const getMonthName = (month: number): string => {
@@ -254,22 +245,14 @@ const WorkloadPage: React.FC = () => {
     }
   };
 
-  // Обновляем агрегированные данные с учетом выбранного периода
-  const departmentWorkload = departments.map(dept => {
-    const teachersInDept = teachers.filter(t => t.department === dept);
-    const periodTotals = teachersInDept.reduce((sum, teacher) => {
-      const periodData = getPeriodData(teacher);
-      return {
-        standardHours: sum.standardHours + periodData.standardHours,
-        actualHours: sum.actualHours + periodData.actualHours
-      };
-    }, { standardHours: 0, actualHours: 0 });
-    
+  // Данные для диаграммы нагрузки преподавателей
+  const teacherWorkloadData = filteredTeachers.map(teacher => {
+    const periodData = getPeriodData(teacher);
     return {
-      name: dept,
-      standardHours: periodTotals.standardHours,
-      actualHours: periodTotals.actualHours,
-      difference: periodTotals.actualHours - periodTotals.standardHours
+      name: teacher.name.split(' ')[0] + ' ' + teacher.name.split(' ')[1].charAt(0) + '.',
+      standardHours: periodData.standardHours,
+      actualHours: periodData.actualHours,
+      difference: periodData.actualHours - periodData.standardHours
     };
   });
 
@@ -368,11 +351,11 @@ const WorkloadPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-xl shadow-md p-4">
-          <h2 className="text-lg font-semibold mb-4">Нагрузка по кафедрам</h2>
+          <h2 className="text-lg font-semibold mb-4">Нагрузка преподавателей</h2>
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={departmentWorkload}
+                data={teacherWorkloadData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -502,19 +485,6 @@ const WorkloadPage: React.FC = () => {
             />
             <FaSearch className="absolute left-3 top-3 text-gray-400" />
           </div>
-          <div className="relative">
-            <select
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-64 appearance-none"
-              value={selectedDepartment || ''}
-              onChange={(e) => setSelectedDepartment(e.target.value || null)}
-            >
-              <option value="">Все кафедры</option>
-              {departments.map(dept => (
-                <option key={dept} value={dept}>{dept}</option>
-              ))}
-            </select>
-            <FaFilter className="absolute left-3 top-3 text-gray-400" />
-          </div>
         </div>
       </div>
 
@@ -524,9 +494,6 @@ const WorkloadPage: React.FC = () => {
             <tr>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Преподаватель
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Кафедра
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Нормативная нагрузка
@@ -551,9 +518,6 @@ const WorkloadPage: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{teacher.name}</div>
                     <div className="text-sm text-gray-500">{teacher.position}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {teacher.department}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {periodData.standardHours} ч.
@@ -596,7 +560,7 @@ const WorkloadPage: React.FC = () => {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">{selectedTeacher.name}</h2>
-                  <p className="text-gray-600">{selectedTeacher.position} • {selectedTeacher.department}</p>
+                  <p className="text-gray-600">{selectedTeacher.position}</p>
                 </div>
                 <button 
                   className="text-gray-500 hover:text-gray-700"

@@ -322,7 +322,7 @@ const StudentDetailPage: React.FC = () => {
   const student = {
     id,
     fullName: 'Алихан Сатыбалды',
-    class: '10A',
+    class: 'МК24-1М',
     birthDate: '2008-05-15',
     phone: '+7 (777) 123-45-67',
     email: 'alikhan@example.com',
@@ -445,7 +445,7 @@ const StudentDetailPage: React.FC = () => {
       name: 'Ахметова Динара',
       phone: '+7 (777) 999-00-11',
       email: 'akhmetova@example.com',
-      occupation: 'Куратор 10А класса',
+      occupation: 'Куратор группы МК24-1М',
       workPlace: 'Школа №1',
       address: 'ул. Абая 1',
       id: 'curator_1'
@@ -758,7 +758,7 @@ const StudentDetailPage: React.FC = () => {
       dueDate: '10 Май 2024',
       status: 'оплачено',
       type: 'apr-month-fees',
-      description: 'Класс 1 Общие (Плата за Апрель)',
+      description: 'Группа МК24-1М Общие (Плата за Апрель)',
       discount: 10,
       paymentMethod: 'Наличные'
     },
@@ -769,7 +769,7 @@ const StudentDetailPage: React.FC = () => {
       dueDate: '10 Янв 2024',
       status: 'оплачено',
       type: 'dec-month-fees',
-      description: 'Класс 1 Общие (Плата за Декабрь)',
+      description: 'Группа МК24-1М Общие (Плата за Декабрь)',
       discount: 10,
       paymentMethod: 'Наличные'
     },
@@ -780,7 +780,7 @@ const StudentDetailPage: React.FC = () => {
       dueDate: '10 Apr 2024',
       status: 'оплачено',
       type: 'jul-month-fees',
-      description: 'Класс 1 Общие (Плата за Июль)',
+      description: 'Группа МК24-1М Общие (Плата за Июль)',
       discount: 10,
       penalty: 200,
       paymentMethod: 'Наличные'
@@ -1497,7 +1497,7 @@ const StudentDetailPage: React.FC = () => {
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <FaBriefcase className="w-4 h-4 mr-2" />
-                    <span>Куратор 10А класса<br />Школа №1</span>
+                    <span>Куратор группы МК24-1М<br />Школа №1</span>
                   </div>
                 </div>
               </div>

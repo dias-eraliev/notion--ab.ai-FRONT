@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   FaPlus, 
   FaFilter, 
@@ -9,7 +9,11 @@ import {
   FaExclamationTriangle,
   FaCheck,
   FaClock,
-  FaTimes
+  FaTimes,
+  FaPaperclip,
+  FaFileUpload,
+  FaFileDownload,
+  FaFilePdf
 } from 'react-icons/fa';
 
 // Типы данных
@@ -30,7 +34,12 @@ interface Vacation {
   substituteId?: string;
   substituteName?: string;
   comment?: string;
-  documents?: string[];
+  documents?: {
+    name: string;
+    url: string;
+    size: number;
+    uploadDate: string;
+  }[];
 }
 
 interface VacationSummary {
@@ -83,7 +92,15 @@ const initialVacations: Vacation[] = [
     endDate: '2024-03-17',
     days: 8,
     status: 'completed',
-    comment: 'Больничный лист №12345'
+    comment: 'Больничный лист №12345',
+    documents: [
+      {
+        name: 'Больничный лист.pdf',
+        url: '/documents/sick-leave-12345.pdf',
+        size: 1024 * 1024 * 2, // 2MB
+        uploadDate: '2024-03-09'
+      }
+    ]
   },
   {
     id: 'v004',
@@ -109,7 +126,15 @@ const initialVacations: Vacation[] = [
     endDate: '2024-02-28',
     days: 14,
     status: 'completed',
-    comment: 'Больничный лист №67890'
+    comment: 'Больничный лист №67890',
+    documents: [
+      {
+        name: 'Больничный лист 67890.pdf',
+        url: '/documents/sick-leave-67890.pdf',
+        size: 1024 * 1024 * 1.5, // 1.5MB
+        uploadDate: '2024-02-14'
+      }
+    ]
   }
 ];
 
@@ -164,7 +189,29 @@ const VacationPage: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('current-year');
   const [selectedVacation, setSelectedVacation] = useState<Vacation | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewVacationModalOpen, setIsNewVacationModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'current' | 'summary'>('current');
+  
+  // Состояние для новой заявки
+  const [newVacation, setNewVacation] = useState<{
+    type: VacationType;
+    startDate: string;
+    endDate: string;
+    employeeId: string;
+    substituteId?: string;
+    comment?: string;
+    document?: File | null;
+  }>({
+    type: 'vacation',
+    startDate: '',
+    endDate: '',
+    employeeId: '',
+    substituteId: '',
+    comment: '',
+    document: null
+  });
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Типы отпусков и замен для интерфейса
   const vacationTypes = [
@@ -271,6 +318,145 @@ const VacationPage: React.FC = () => {
     }
   };
 
+  // Обработчики для новой заявки
+  const handleNewVacationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setNewVacation(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    
+    if (file) {
+      // Проверка формата и размера файла
+      if (file.type !== 'application/pdf') {
+        alert('Пожалуйста, загрузите файл в формате PDF');
+        return;
+      }
+      
+      if (file.size > 10 * 1024 * 1024) { // 10MB
+        alert('Размер файла не должен превышать 10MB');
+        return;
+      }
+      
+      setNewVacation(prev => ({
+        ...prev,
+        document: file
+      }));
+    }
+  };
+
+  const handleSubmitNewVacation = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Проверка обязательных полей
+    if (!newVacation.type || !newVacation.startDate || !newVacation.endDate) {
+      alert('Пожалуйста, заполните все обязательные поля');
+      return;
+    }
+    
+    // Проверка наличия документа для больничного и декретного отпуска
+    if ((newVacation.type === 'sick-leave' || newVacation.type === 'maternity-leave') && !newVacation.document) {
+      alert('Пожалуйста, прикрепите документ подтверждения');
+      return;
+    }
+    
+    // Расчет количества дней
+    const start = new Date(newVacation.startDate);
+    const end = new Date(newVacation.endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Создание новой заявки
+    const newVacationEntry: Vacation = {
+      id: `v${Date.now()}`,
+      employeeId: newVacation.employeeId || '001', // В реальном приложении будет ID текущего пользователя
+      employeeName: 'Текущий пользователь', // В реальном приложении будет имя текущего пользователя
+      department: 'Кафедра', // В реальном приложении будет отдел текущего пользователя
+      position: 'Должность', // В реальном приложении будет должность текущего пользователя
+      type: newVacation.type,
+      startDate: newVacation.startDate,
+      endDate: newVacation.endDate,
+      days: diffDays,
+      status: 'pending',
+      substituteId: newVacation.substituteId,
+      substituteName: newVacation.substituteId ? 'Выбранный сотрудник' : undefined, // В реальном приложении будет имя выбранного сотрудника
+      comment: newVacation.comment
+    };
+    
+    // Добавление документа, если он есть
+    if (newVacation.document) {
+      newVacationEntry.documents = [
+        {
+          name: newVacation.document.name,
+          url: URL.createObjectURL(newVacation.document), // В реальном приложении будет URL сохраненного файла
+          size: newVacation.document.size,
+          uploadDate: new Date().toISOString().split('T')[0]
+        }
+      ];
+    }
+    
+    // Добавление новой заявки в список
+    setVacations(prev => [newVacationEntry, ...prev]);
+    
+    // Сброс формы и закрытие модального окна
+    setNewVacation({
+      type: 'vacation',
+      startDate: '',
+      endDate: '',
+      employeeId: '',
+      substituteId: '',
+      comment: '',
+      document: null
+    });
+    setIsNewVacationModalOpen(false);
+  };
+
+  // Функция для открытия окна выбора файла
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // Функция для форматирования размера файла
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) {
+      return bytes + ' B';
+    } else if (bytes < 1024 * 1024) {
+      return (bytes / 1024).toFixed(1) + ' KB';
+    } else {
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+  };
+
+  // Функция для отображения документов
+  const renderDocuments = (documents?: Vacation['documents']) => {
+    if (!documents || documents.length === 0) {
+      return <span className="text-gray-400">—</span>;
+    }
+
+    return (
+      <div className="flex flex-col gap-1">
+        {documents.map((doc, index) => (
+          <a 
+            key={index}
+            href={doc.url}
+            className="flex items-center text-blue-600 hover:text-blue-800 text-sm"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaFilePdf className="mr-1" />
+            <span className="underline">{doc.name}</span>
+          </a>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -279,7 +465,10 @@ const VacationPage: React.FC = () => {
           <p className="text-sm text-gray-500">Управление отпусками, больничными и заменами преподавателей</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center">
+          <button 
+            className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center"
+            onClick={() => setIsNewVacationModalOpen(true)}
+          >
             <FaPlus className="mr-2" />
             Новая заявка
           </button>
@@ -399,6 +588,9 @@ const VacationPage: React.FC = () => {
                     Замена
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Документы
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Статус
                   </th>
                 </tr>
@@ -430,6 +622,9 @@ const VacationPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {vacation.substituteName || '—'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {renderDocuments(vacation.documents)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(vacation.status)}`}>
@@ -587,6 +782,37 @@ const VacationPage: React.FC = () => {
                 </div>
               )}
 
+              {selectedVacation.documents && selectedVacation.documents.length > 0 && (
+                <div className="mb-6">
+                  <div className="text-sm text-gray-500 mb-1">Прикрепленные документы</div>
+                  <div className="space-y-2">
+                    {selectedVacation.documents.map((doc, idx) => (
+                      <div key={idx} className="p-3 bg-gray-50 rounded-lg flex items-center justify-between">
+                        <div className="flex items-center">
+                          <FaFilePdf className="text-red-500 mr-2" />
+                          <div>
+                            <div className="font-medium">{doc.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {formatFileSize(doc.size)} • Загружен {formatDate(doc.uploadDate)}
+                            </div>
+                          </div>
+                        </div>
+                        <a 
+                          href={doc.url} 
+                          download={doc.name}
+                          className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <FaFileDownload />
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-end pt-4 border-t">
                 {selectedVacation.status === 'pending' && (
                   <>
@@ -614,6 +840,185 @@ const VacationPage: React.FC = () => {
                   </button>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно создания новой заявки */}
+      {isNewVacationModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Новая заявка</h2>
+                <button 
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => setIsNewVacationModalOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmitNewVacation}>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Тип отпуска <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="type"
+                      value={newVacation.type}
+                      onChange={handleNewVacationChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    >
+                      {vacationTypes.map(type => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Дата начала <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        name="startDate"
+                        value={newVacation.startDate}
+                        onChange={handleNewVacationChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Дата окончания <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        name="endDate"
+                        value={newVacation.endDate}
+                        onChange={handleNewVacationChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Сотрудник на замену
+                    </label>
+                    <select
+                      name="substituteId"
+                      value={newVacation.substituteId}
+                      onChange={handleNewVacationChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Выберите сотрудника</option>
+                      <option value="001">Иванов Иван Иванович</option>
+                      <option value="002">Петрова Мария Сергеевна</option>
+                      <option value="003">Сидоров Алексей Петрович</option>
+                      <option value="005">Смирнов Дмитрий Игоревич</option>
+                    </select>
+                  </div>
+
+                  {/* Поле загрузки документа появляется только для больничного и декретного отпуска */}
+                  {(newVacation.type === 'sick-leave' || newVacation.type === 'maternity-leave') && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Прикрепить документ (.pdf) <span className="text-red-500">*</span>
+                      </label>
+                      <div 
+                        className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md ${
+                          newVacation.document ? 'border-green-300 bg-green-50' : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <div className="space-y-1 text-center">
+                          {newVacation.document ? (
+                            <div className="flex flex-col items-center">
+                              <FaFilePdf className="h-12 w-12 text-red-500" />
+                              <span className="text-sm text-gray-900">{newVacation.document.name}</span>
+                              <span className="text-xs text-gray-500">{formatFileSize(newVacation.document.size)}</span>
+                            </div>
+                          ) : (
+                            <>
+                              <FaFileUpload className="mx-auto h-12 w-12 text-gray-400" />
+                              <div className="flex text-sm text-gray-600">
+                                <label
+                                  htmlFor="file-upload"
+                                  className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                                >
+                                  <span>Загрузите файл</span>
+                                  <input 
+                                    id="file-upload" 
+                                    name="file-upload" 
+                                    type="file" 
+                                    className="sr-only" 
+                                    accept=".pdf"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                  />
+                                </label>
+                                <p className="pl-1">или перетащите</p>
+                              </div>
+                              <p className="text-xs text-gray-500">
+                                PDF до 10MB
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {newVacation.document && (
+                        <div className="mt-2 flex justify-end">
+                          <button
+                            type="button"
+                            className="text-sm text-red-600 hover:text-red-800"
+                            onClick={() => setNewVacation(prev => ({ ...prev, document: null }))}
+                          >
+                            Удалить файл
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Комментарий
+                    </label>
+                    <textarea
+                      name="comment"
+                      value={newVacation.comment}
+                      onChange={handleNewVacationChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      rows={3}
+                      placeholder="Например: После обследования в поликлинике №4"
+                    />
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t">
+                    <button
+                      type="button"
+                      className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-3"
+                      onClick={() => setIsNewVacationModalOpen(false)}
+                    >
+                      Отмена
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                    >
+                      Подать заявку
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
