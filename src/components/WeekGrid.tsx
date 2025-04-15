@@ -14,7 +14,7 @@ interface WeekGridProps {
     teacherName: string;
     roomId: string;
   }>;
-  onCellClick: (day: DayOfWeek, time: string) => void;
+  onCellClick?: (day: DayOfWeek, time: string) => void;
 }
 
 const WeekGrid: React.FC<WeekGridProps> = ({ schedule, onCellClick }) => {
@@ -65,7 +65,7 @@ const WeekGrid: React.FC<WeekGridProps> = ({ schedule, onCellClick }) => {
               <div
                 key={`${day.id}-${time}`}
                 className="h-24 border-b border-r border-gray-200 relative group"
-                onClick={() => !item && onCellClick(day.id, time)}
+                onClick={() => !item && onCellClick && onCellClick(day.id, time)}
               >
                 {item ? (
                   <motion.div

@@ -527,47 +527,6 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onSave, 
   );
 };
 
-// Компонент переключателя ролей (такой же, как в AcademicJournalPage)
-const RoleSwitcher: React.FC = () => {
-  const { role, setRole } = useAuthContext();
-  
-  return (
-    <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-      <div className="flex items-center gap-4">
-        <span className="text-sm font-medium text-yellow-800">
-          Тестовый режим просмотра:
-        </span>
-        <div className="flex gap-2">
-          {(['admin', 'teacher', 'student', 'parent'] as UserRole[]).map((r) => (
-            <button
-              key={r}
-              onClick={() => setRole(r)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors
-                ${role === r 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                }`}
-            >
-              {r === 'admin' && 'Администратор'}
-              {r === 'teacher' && 'Учитель'}
-              {r === 'student' && 'Ученик'}
-              {r === 'parent' && 'Родитель'}
-            </button>
-          ))}
-        </div>
-        <span className="text-xs text-yellow-600">
-          Текущая роль: {
-            role === 'admin' ? 'Администратор' :
-            role === 'teacher' ? 'Учитель' :
-            role === 'student' ? 'Ученик' :
-            'Родитель'
-          }
-        </span>
-      </div>
-    </div>
-  );
-};
-
 const SchedulePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const roomFilter = searchParams.get('room');
@@ -585,12 +544,7 @@ const SchedulePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCell, setSelectedCell] = useState<{ day: Schedule['day']; startTime: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedClassroom, setSelectedClassroom] = useState<{
-    id: string;
-    number: string;
-    capacity: number;
-    equipment: string[];
-  } | null>(null);
+  const [selectedClassroom, setSelectedClassroom] = useState<null>(null);
   const { role } = useAuthContext();
 
   useEffect(() => {
@@ -719,20 +673,12 @@ const SchedulePage: React.FC = () => {
   };
 
   const handleRoomClick = (roomId: string) => {
-    // Временные данные для примера
-    setSelectedClassroom({
-      id: roomId,
-      number: roomId,
-      capacity: 30,
-      equipment: ['Проектор', 'Компьютер', 'Интерактивная доска']
-    });
+    // Временно отключаем функциональность с ClassroomModal
+    console.log(`Выбрана аудитория ${roomId}`);
   };
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
-      {/* Добавляем переключатель ролей */}
-      <RoleSwitcher />
-
       {/* Заголовок и кнопки */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">
@@ -990,16 +936,6 @@ const SchedulePage: React.FC = () => {
             }}
             onSave={handleScheduleSave}
             initialData={selectedCell || undefined}
-          />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {selectedClassroom && (
-          <ClassroomModal
-            isOpen={true}
-            onClose={() => setSelectedClassroom(null)}
-            classroom={selectedClassroom}
           />
         )}
       </AnimatePresence>

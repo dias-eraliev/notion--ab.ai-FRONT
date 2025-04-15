@@ -44,6 +44,7 @@ interface Homework {
       size: number;
     }[];
     comment?: string;
+    submittedAt?: string;
   };
   teacherId: string;
   teacherName: string;
@@ -592,33 +593,6 @@ const HomeworkDetailsModal: React.FC<{
   );
 };
 
-const RoleSwitcher: React.FC = () => {
-  const { role, setRole } = useAuthContext();
-
-  return (
-    <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
-      <div className="text-sm font-medium text-gray-500 mb-2">Тестовый режим - Переключение ролей</div>
-      <div className="flex space-x-2">
-        {(['admin', 'teacher', 'student', 'parent'] as UserRole[]).map((r) => (
-          <button
-            key={r}
-            onClick={() => setRole(r)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-              ${role === r 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            {r === 'admin' && 'Администратор'}
-            {r === 'teacher' && 'Учитель'}
-            {r === 'student' && 'Ученик'}
-            {r === 'parent' && 'Родитель'}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 const HomeworkPage: React.FC = () => {
   const { role } = useAuthContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -672,8 +646,6 @@ const HomeworkPage: React.FC = () => {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
-      <RoleSwitcher />
-      
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
           {role === 'student' ? 'Мои задания' :

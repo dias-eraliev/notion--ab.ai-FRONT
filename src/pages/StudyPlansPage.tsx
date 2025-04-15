@@ -173,7 +173,7 @@ const StudyPlansPage: React.FC = () => {
               onChange={(e) => setFilters({ ...filters, class: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             >
-              <option value="">Класс</option>
+              <option value="">Группа</option>
               <option value="10A">10A</option>
               <option value="8Б">8Б</option>
               <option value="11Б">11Б</option>
@@ -200,7 +200,7 @@ const StudyPlansPage: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">№</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Класс</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Группа</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Предмет</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Преподаватель</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Кол-во уроков</th>
