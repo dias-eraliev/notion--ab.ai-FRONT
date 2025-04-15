@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaFilter, FaPlus, FaTimes, FaCalendar, FaTable, FaFileExcel, FaRobot } from 'react-icons/fa';
-import { useLanguage } from '../hooks/useLanguage';
-import WeekGrid from '../components/WeekGrid';
-import ClassroomModal from '../components/ClassroomModal';
+import { useLanguage } from '../../hooks/useLanguage';
+import WeekGrid from '../../components/WeekGrid';
+import ClassroomModal from '../../components/ClassroomModal';
 import * as XLSX from 'xlsx';
 import { useSearchParams } from 'react-router-dom';
-import { useAuthContext, UserRole } from '../providers/AuthProvider';
+import { useAuthContext, UserRole } from '../../providers/AuthProvider';
 
 // Типы данных
 interface Schedule {

@@ -17,7 +17,7 @@ import {
   FaUsers,
   FaStar
 } from 'react-icons/fa';
-import { useAuthContext, UserRole } from '../providers/AuthProvider';
+import { useAuthContext, UserRole } from '../../providers/AuthProvider';
 
 interface Homework {
   id: string;

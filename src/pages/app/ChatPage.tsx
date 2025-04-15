@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  FaSearch, 
-  FaEllipsisV, 
-  FaPaperclip, 
-  FaSmile, 
+import {
+  FaSearch,
+  FaEllipsisV,
+  FaPaperclip,
+  FaSmile,
   FaPaperPlane,
   FaVideo,
   FaPhone,
@@ -70,7 +70,7 @@ const ChatPage: React.FC = () => {
       status: 'read'
     }
   ]);
-  
+
   // Демо-данные
   const chats: Chat[] = [
     {
@@ -113,7 +113,7 @@ const ChatPage: React.FC = () => {
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
-    
+
     const message: Message = {
       id: Date.now().toString(),
       sender: 'user',
@@ -121,7 +121,7 @@ const ChatPage: React.FC = () => {
       timestamp: new Date(),
       status: 'sent'
     };
-    
+
     setMessages([...messages, message]);
     setNewMessage('');
   };
@@ -169,9 +169,8 @@ const ChatPage: React.FC = () => {
             <div
               key={chat.id}
               onClick={() => setSelectedChat(chat.id)}
-              className={`flex items-center p-4 hover:bg-gray-50 cursor-pointer ${
-                selectedChat === chat.id ? 'bg-blue-50' : ''
-              }`}
+              className={`flex items-center p-4 hover:bg-gray-50 cursor-pointer ${selectedChat === chat.id ? 'bg-blue-50' : ''
+                }`}
             >
               <div className="relative">
                 <img
@@ -250,11 +249,10 @@ const ChatPage: React.FC = () => {
                   className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[70%] ${
-                      msg.sender === 'user'
+                    className={`max-w-[70%] ${msg.sender === 'user'
                         ? 'bg-blue-500 text-white rounded-l-lg rounded-br-lg'
                         : 'bg-white text-gray-800 rounded-r-lg rounded-bl-lg'
-                    } p-4 shadow-sm`}
+                      } p-4 shadow-sm`}
                   >
                     {msg.attachments?.length === 1 ? (
                       <div className="flex items-center space-x-3">
@@ -282,9 +280,8 @@ const ChatPage: React.FC = () => {
                       </div>
                     ) : null}
                     <div
-                      className={`flex items-center justify-end mt-1 space-x-1 text-xs ${
-                        msg.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
-                      }`}
+                      className={`flex items-center justify-end mt-1 space-x-1 text-xs ${msg.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                        }`}
                     >
                       <span>{msg.timestamp.toLocaleTimeString()}</span>
                       {msg.sender === 'user' && getStatusIcon(msg.status)}
@@ -328,9 +325,8 @@ const ChatPage: React.FC = () => {
               ) : (
                 <button
                   onClick={() => setIsRecording(!isRecording)}
-                  className={`${
-                    isRecording ? 'bg-red-500' : 'text-gray-500'
-                  } p-2 rounded-full hover:bg-gray-100`}
+                  className={`${isRecording ? 'bg-red-500' : 'text-gray-500'
+                    } p-2 rounded-full hover:bg-gray-100`}
                 >
                   <FaMicrophone className="w-5 h-5" />
                 </button>

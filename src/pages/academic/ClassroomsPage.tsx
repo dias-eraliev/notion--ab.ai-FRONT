@@ -11,7 +11,7 @@ import {
   FaFileExport,
   FaChartBar
 } from 'react-icons/fa';
-import ClassroomModal from '../components/ClassroomModal';
+import ClassroomModal from '../../components/ClassroomModal';
 
 // Типы данных
 type RoomType = 'lecture' | 'computer' | 'laboratory' | 'conference' | 'cabinet';

@@ -195,14 +195,6 @@ export const Sidebar: React.FC = () => {
                   <FaChartLine className="w-4 h-4 mr-3" />
                   <span>Успеваемость</span>
                 </Link>
-
-                <Link 
-                  to="/students/emotional-analysis"
-                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all duration-150"
-                >
-                  <FaSmile className="w-4 h-4 mr-3" />
-                  <span>Эмоциональный анализ</span>
-                </Link>
               </div>
             )}
           </div>
@@ -386,4 +378,4 @@ export const Sidebar: React.FC = () => {
   );
 };
 
-export default Sidebar; 
+export default Sidebar;

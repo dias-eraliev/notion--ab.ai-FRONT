@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaFilter, FaPlus, FaEllipsisH, FaCalendar, FaCaretDown, FaTimes } from 'react-icons/fa';
-import { useLanguage } from '../hooks/useLanguage';
-import DateRangePicker from '../components/DateRangePicker';
+import { useLanguage } from '../../hooks/useLanguage';
+import DateRangePicker from '../../components/DateRangePicker';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { useAuthContext, UserRole } from '../providers/AuthProvider';
+import { useAuthContext, UserRole } from '../../providers/AuthProvider';
 
 interface Student {
   id: number;

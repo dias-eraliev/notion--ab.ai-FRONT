@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  FaFileAlt, 
-  FaDownload, 
-  FaFilter, 
-  FaSortAmountDown, 
+import {
+  FaFileAlt,
+  FaDownload,
+  FaFilter,
+  FaSortAmountDown,
   FaChartBar,
   FaCalendarAlt,
   FaFileExport,
@@ -200,6 +200,33 @@ const expensesByCategory = [
   { name: 'Прочее', value: 700000 }
 ];
 
+// Данные повторных покупок
+const repeatPurchaseData = [
+  { group: 'Группа A', repetition: 85, direction: 'Программирование', teacher: 'Бекетова А.М.' },
+  { group: 'Группа B', repetition: 72, direction: 'Английский язык', teacher: 'Каримова Н.С.' },
+  { group: 'Группа C', repetition: 93, direction: 'Математика', teacher: 'Бекетова А.М.' },
+  { group: 'Группа D', repetition: 65, direction: 'Физика', teacher: 'Каримова Н.С.' },
+  { group: 'Группа E', repetition: 78, direction: 'Программирование', teacher: 'Мырзахметов К.А.' },
+];
+
+// Средний процент повторных покупок по направлениям
+const directionRepeatPurchase = [
+  { name: 'Программирование', value: 82 },
+  { name: 'Английский язык', value: 72 },
+  { name: 'Математика', value: 93 },
+  { name: 'Физика', value: 65 },
+  { name: 'Химия', value: 68 },
+];
+
+// Средний процент повторных покупок по преподавателям
+const teacherRepeatPurchase = [
+  { name: 'Бекетова А.М.', value: 89 },
+  { name: 'Каримова Н.С.', value: 69 },
+  { name: 'Мырзахметов К.А.', value: 78 },
+  { name: 'Сейтжанов Т.Р.', value: 75 },
+  { name: 'Алиева Г.К.', value: 81 },
+];
+
 const ReportsPage: React.FC = () => {
   // Состояния
   const [reports, setReports] = useState<FinancialReport[]>(initialReports);
@@ -211,6 +238,10 @@ const ReportsPage: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState<FinancialReport | null>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+
+  // Новое состояние для переключения вкладок в блоке статистики
+  const [activeTab, setActiveTab] = useState<'revenue' | 'repeatPurchase'>('revenue');
+  const [repeatPurchaseView, setRepeatPurchaseView] = useState<'groups' | 'directions' | 'teachers'>('groups');
 
   // Вычисляемые данные
   const filteredReports = useMemo(() => {
@@ -229,9 +260,9 @@ const ReportsPage: React.FC = () => {
       .length * 1000000; // Демо-данные
 
     const avgPayment = totalIncome / (filteredReports.length || 1);
-    
+
     const activeStudents = Math.floor(totalIncome / 50000); // Демо-расчет
-    
+
     const growthRate = 2; // Демо-данные
 
     return {
@@ -246,11 +277,11 @@ const ReportsPage: React.FC = () => {
   const chartData = useMemo(() => {
     const currentDate = new Date();
     const monthNames = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
-    
+
     return monthlyRevenueData.map((data, index) => {
-      const isCurrentPeriod = filters.period === 'all' || 
+      const isCurrentPeriod = filters.period === 'all' ||
         (filters.period === monthNames[index]);
-      
+
       return {
         ...data,
         value: isCurrentPeriod ? data.value : data.value * (Math.random() * 0.4 + 0.8)
@@ -295,7 +326,7 @@ const ReportsPage: React.FC = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h3 className="text-lg font-semibold mb-4">Фильтры</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Тип отчета</label>
           <select
@@ -311,7 +342,7 @@ const ReportsPage: React.FC = () => {
             <option value="custom">Пользовательский отчет</option>
           </select>
         </div>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Период</label>
           <select
@@ -341,7 +372,7 @@ const ReportsPage: React.FC = () => {
             <option value="final">Финальный</option>
           </select>
         </div>
-        
+
         <div className="flex justify-end space-x-3">
           <button
             className="px-4 py-2 border border-gray-300 rounded-md text-sm"
@@ -465,11 +496,11 @@ const ReportsPage: React.FC = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Финансовые отчеты</h1>
-      
+
       {/* Фильтры и действия */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-3">
-          <button 
+          <button
             className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center"
             onClick={() => setShowFilterModal(true)}
           >
@@ -520,43 +551,159 @@ const ReportsPage: React.FC = () => {
           </div>
           <div className="text-2xl font-bold mt-2">+{stats.growthRate}%</div>
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-            <div 
-              className="bg-blue-600 h-2.5 rounded-full" 
+            <div
+              className="bg-blue-600 h-2.5 rounded-full"
               style={{ width: `${stats.growthRate}%` }}
             ></div>
           </div>
         </div>
       </div>
 
-      {/* График доходов */}
-      <div className="bg-white p-6 rounded-xl shadow-sm mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Динамика доходов и расходов</h2>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip 
-                formatter={(value: number) => `${value.toLocaleString()} KZT`}
-                labelStyle={{ color: '#1F2937' }}
-                contentStyle={{ 
-                  backgroundColor: 'white',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '0.5rem'
-                }}
-              />
-              <Legend />
-              <Bar 
-                dataKey="value" 
-                name="Доходы" 
-                fill="#3B82F6" 
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      {/* Вкладки для переключения между графиками */}
+      <div className="flex border-b border-gray-200 mb-4">
+        <button
+          className={`py-2 px-4 font-medium text-sm ${activeTab === 'revenue'
+            ? 'text-blue-500 border-b-2 border-blue-500'
+            : 'text-gray-500 hover:text-gray-700'}`}
+          onClick={() => setActiveTab('revenue')}
+        >
+          Динамика доходов
+        </button>
+        <button
+          className={`py-2 px-4 font-medium text-sm ${activeTab === 'repeatPurchase'
+            ? 'text-blue-500 border-b-2 border-blue-500'
+            : 'text-gray-500 hover:text-gray-700'}`}
+          onClick={() => setActiveTab('repeatPurchase')}
+        >
+          Повторные покупки
+        </button>
       </div>
+
+      {/* Контент в зависимости от выбранной вкладки */}
+      {activeTab === 'revenue' ? (
+        <div className="bg-white p-6 rounded-xl shadow-sm mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Динамика доходов и расходов</h2>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip
+                  formatter={(value: number) => `${value.toLocaleString()} KZT`}
+                  labelStyle={{ color: '#1F2937' }}
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '0.5rem'
+                  }}
+                />
+                <Legend />
+                <Bar
+                  dataKey="value"
+                  name="Доходы"
+                  fill="#3B82F6"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white p-6 rounded-xl shadow-sm mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">Анализ повторных покупок</h2>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setRepeatPurchaseView('groups')}
+                className={`px-3 py-1 text-sm rounded-md ${repeatPurchaseView === 'groups'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+              >
+                По группам
+              </button>
+              <button
+                onClick={() => setRepeatPurchaseView('directions')}
+                className={`px-3 py-1 text-sm rounded-md ${repeatPurchaseView === 'directions'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+              >
+                По направлениям
+              </button>
+              <button
+                onClick={() => setRepeatPurchaseView('teachers')}
+                className={`px-3 py-1 text-sm rounded-md ${repeatPurchaseView === 'teachers'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+              >
+                По учителям
+              </button>
+            </div>
+          </div>
+          <div className="text-sm text-gray-600 mb-4">
+            Процент студентов, продолживших обучение после завершения курса или семестра
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              {repeatPurchaseView === 'groups' ? (
+                <BarChart data={repeatPurchaseData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="group" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip
+                    formatter={(value: number) => `${value}%`}
+                    labelStyle={{ color: '#1F2937' }}
+                  />
+                  <Legend />
+                  <Bar
+                    dataKey="repetition"
+                    name="Процент повторных покупок"
+                    fill="#10B981"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              ) : repeatPurchaseView === 'directions' ? (
+                <BarChart data={directionRepeatPurchase}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip
+                    formatter={(value: number) => `${value}%`}
+                    labelStyle={{ color: '#1F2937' }}
+                  />
+                  <Legend />
+                  <Bar
+                    dataKey="value"
+                    name="Средний % повторных покупок"
+                    fill="#8B5CF6"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              ) : (
+                <BarChart data={teacherRepeatPurchase}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip
+                    formatter={(value: number) => `${value}%`}
+                    labelStyle={{ color: '#1F2937' }}
+                  />
+                  <Legend />
+                  <Bar
+                    dataKey="value"
+                    name="Средний % повторных покупок"
+                    fill="#F59E0B"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              )}
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Таблица отчетов */}
       <div className="bg-white rounded-lg shadow">
@@ -579,8 +726,8 @@ const ReportsPage: React.FC = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredReports.map((report) => (
-              <tr 
-                key={report.id} 
+              <tr
+                key={report.id}
                 className="hover:bg-gray-50 cursor-pointer"
                 onClick={() => {
                   setSelectedReport(report);
@@ -614,4 +761,4 @@ const ReportsPage: React.FC = () => {
   );
 };
 
-export default ReportsPage; 
+export default ReportsPage;

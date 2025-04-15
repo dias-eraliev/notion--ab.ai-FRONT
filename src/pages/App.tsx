@@ -1,51 +1,49 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import DashboardLayout from './components/DashboardLayout';
-import Dashboard from './pages/Dashboard';
-import AcademicJournalPage from './pages/AcademicJournalPage';
-import SchedulePage from './pages/SchedulePage';
-import ClassroomsPage from './pages/ClassroomsPage';
-import BookingRequestsPage from './pages/BookingRequestsPage';
-import StudyPlansPage from './pages/StudyPlansPage';
-import StudyPlanDetailPage from './pages/StudyPlanDetailPage';
-import LessonDetailPage from './pages/LessonDetailPage';
-import { LanguageProvider } from './providers/LanguageProvider';
-import StudentsPage from './pages/StudentsPage';
-import StudentDetailPage from './pages/StudentDetailPage';
-import ChatPage from './pages/app/ChatPage';
-import AIChatPage from './pages/app/AIChatPage';
-import CalendarPage from './pages/app/CalendarPage';
-import EmailPage from './pages/app/EmailPage';
-import TodoPage from './pages/app/TodoPage';
-import FilesPage from './pages/app/FilesPage';
-import SettingsPage from './pages/app/SettingsPage';
-import ProfilePage from './pages/app/ProfilePage';
-import PerformancePage from './pages/PerformancePage';
-import EmotionalAnalysisPage from './pages/EmotionalAnalysisPage';
-import EmployeesPage from './pages/hr/EmployeesPage';
-import WorkloadPage from './pages/hr/WorkloadPage';
-import KpiPage from './pages/hr/KpiPage';
-import VacationPage from './pages/hr/VacationPage';
-import FakePositionsPage from './pages/hr/FakePositionsPage';
-import PaymentsPage from './pages/finance/PaymentsPage';
-import ReportsPage from './pages/finance/ReportsPage';
-import BudgetPage from './pages/finance/BudgetPage';
-import PayrollPage from './pages/finance/PayrollPage';
-import SalariesPage from './pages/finance/SalariesPage';
-import AntiFraudPage from './pages/finance/AntiFraudPage';
-import Login from './pages/Login';
-import { AuthProvider, ProtectedRoute } from './providers/AuthProvider';
-import TestRealtimeApi from './pages/TestRealtimeApi';
-import FileManagerPage from './pages/app/FileManagerPage';
-import InventoryPage from './pages/erp/InventoryPage';
-import SupplyPage from './pages/erp/SupplyPage';
-import SecurityPage from './pages/erp/SecurityPage';
-import UsersPage from './pages/settings/UsersPage';
-import PermissionsPage from './pages/settings/PermissionsPage';
-import IntegrationsPage from './pages/settings/IntegrationsPage';
-import BrandingPage from './pages/settings/BrandingPage';
-import SystemPage from './pages/settings/SystemPage';
-import HomeworkPage from './pages/HomeworkPage';
+import DashboardLayout from '../components/DashboardLayout';
+import Dashboard from './Dashboard';
+import AcademicJournalPage from './academic/AcademicJournalPage';
+import SchedulePage from './academic/SchedulePage';
+import ClassroomsPage from './academic/ClassroomsPage';
+import BookingRequestsPage from './academic/BookingRequestsPage';
+import StudyPlansPage from './academic/StudyPlansPage';
+import StudyPlanDetailPage from './academic/StudyPlanDetailPage';
+import LessonDetailPage from './academic/LessonDetailPage';
+import { LanguageProvider } from '../providers/LanguageProvider';
+import StudentsPage from './students/StudentsPage';
+import StudentDetailPage from './students/StudentDetailPage';
+import ChatPage from './app/ChatPage';
+import AIChatPage from './app/AIChatPage';
+import CalendarPage from './app/CalendarPage';
+import EmailPage from './app/EmailPage';
+import TodoPage from './app/TodoPage';
+import FilesPage from './app/FilesPage';
+import SettingsPage from './app/SettingsPage';
+import ProfilePage from './app/ProfilePage';
+import PerformancePage from './students/PerformancePage';
+import EmployeesPage from './hr/EmployeesPage';
+import WorkloadPage from './hr/WorkloadPage';
+import KpiPage from './hr/KpiPage';
+import VacationPage from './hr/VacationPage';
+import FakePositionsPage from './hr/FakePositionsPage';
+import PaymentsPage from './finance/PaymentsPage';
+import ReportsPage from './finance/ReportsPage';
+import BudgetPage from './finance/BudgetPage';
+import PayrollPage from './finance/PayrollPage';
+import SalariesPage from './finance/SalariesPage';
+import AntiFraudPage from './finance/AntiFraudPage';
+import Login from './Login';
+import { AuthProvider, ProtectedRoute } from '../providers/AuthProvider';
+import FileManagerPage from './app/FileManagerPage';
+import InventoryPage from './erp/InventoryPage';
+import SupplyPage from './erp/SupplyPage';
+import SecurityPage from './erp/SecurityPage';
+import UsersPage from './settings/UsersPage';
+import PermissionsPage from './settings/PermissionsPage';
+import IntegrationsPage from './settings/IntegrationsPage';
+import BrandingPage from './settings/BrandingPage';
+import SystemPage from './settings/SystemPage';
+import HomeworkPage from './academic/HomeworkPage';
 
 const App: React.FC = () => {
   return (
@@ -72,7 +70,6 @@ const App: React.FC = () => {
               {/* Students routes */}
               <Route path="students" element={<StudentsPage />} />
               <Route path="students/:id" element={<StudentDetailPage />} />
-              <Route path="students/emotional-analysis" element={<EmotionalAnalysisPage />} />
               <Route path="performance" element={<PerformancePage />} />
 
               {/* Applications routes */}
@@ -113,8 +110,6 @@ const App: React.FC = () => {
               <Route path="study-plans" element={<StudyPlansPage />} />
               <Route path="study-plans/:id" element={<StudyPlanDetailPage />} />
               <Route path="study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
-
-              <Route path='/test/realtime-api' element={<TestRealtimeApi />} />
             </Route>
           </Routes>
         </AuthProvider>
@@ -123,4 +118,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App; 
+export default App;
