@@ -12,12 +12,12 @@ interface BrandingSettings {
 }
 
 const initialSettings: BrandingSettings = {
-  schoolName: 'Школа имени Абая',
+  schoolName: 'UIB College Ai',
   logo: '/logo.png',
   favicon: '/favicon.ico',
-  primaryColor: '#2563eb',
-  secondaryColor: '#1e40af',
-  accentColor: '#3b82f6',
+  primaryColor: '#1C7E66',
+  secondaryColor: '#fff',
+  accentColor: '#1C7E66',
   fontFamily: 'Inter'
 };
 
@@ -44,7 +44,7 @@ const BrandingPage: React.FC = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Настройки брендинга</h1>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button className="bg-corporate-primary hover:bg-corporate-primary/80 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <FaSave /> Сохранить изменения
         </button>
       </div>

@@ -17,6 +17,7 @@ import AIChatPage from './pages/app/AIChatPage';
 import CalendarPage from './pages/app/CalendarPage';
 import EmailPage from './pages/app/EmailPage';
 import TodoPage from './pages/app/TodoPage';
+import NeuroAbaiPage from './pages/app/NeuroAbaiPage';
 import FilesPage from './pages/app/FilesPage';
 import SettingsPage from './pages/app/SettingsPage';
 import ProfilePage from './pages/app/ProfilePage';
@@ -86,7 +87,7 @@ const App: React.FC = () => {
               <Route path="app/erp/inventory" element={<InventoryPage />} />
               <Route path="app/erp/supply" element={<SupplyPage />} />
               <Route path="app/erp/security" element={<SecurityPage />} />
-
+              <Route path="app/neuro-abai" element={<NeuroAbaiPage />} />
               {/* HR routes */}
               <Route path="hr/employees" element={<EmployeesPage />} />
               <Route path="hr/workload" element={<WorkloadPage />} />

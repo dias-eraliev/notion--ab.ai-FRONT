@@ -37,7 +37,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const letters = "AB.AI".split("");
+  const letters = "UIB College Ai".split("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,7 +220,7 @@ const Login: React.FC = () => {
           transition={{ delay: 1.2 }}
           className="mt-8 text-center text-sm text-corporate-primary/70"
         >
-          Copyright © 2024 - AB.AI
+          Copyright © 2024 - UIB College Ai
         </motion.p>
       </div>
     </div>

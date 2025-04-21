@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  FaChartLine, 
-  FaHeart, 
-  FaGraduationCap, 
+import {
+  FaChartLine,
+  FaHeart,
+  FaGraduationCap,
   FaExclamationCircle,
   FaArrowUp,
   FaArrowDown
@@ -72,7 +72,7 @@ const AIAnalytics: React.FC = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="px-4 py-2 bg-corporate-primary text-white rounded-lg text-sm"
+          className="px-4 py-2" style={{ backgroundColor: '#1C7E66', color: 'white', borderRadius: '0.5rem', fontSize: '0.875rem' }}
         >
           Обновить данные
         </motion.button>
@@ -105,7 +105,7 @@ const AIAnalytics: React.FC = () => {
               initial={{ height: 0 }}
               animate={{ height: `${value}%` }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="w-8 bg-corporate-primary/20 rounded-t-lg relative"
+              className="w-8 rounded-t-lg relative" style={{ backgroundColor: '#1C7E661A' }}
             >
               <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-600">
                 {value}%
