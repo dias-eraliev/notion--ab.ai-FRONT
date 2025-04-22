@@ -51,24 +51,29 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
     type: 'classwork',
     comment: initialData?.classwork?.comment || ''
   });
-  
+
   const [homeworkGrade, setHomeworkGrade] = useState<GradeItem>({
     value: initialData?.homework?.value || 0,
     type: 'homework',
     comment: initialData?.homework?.comment || ''
   });
-  
+
   const [classworkEnabled, setClassworkEnabled] = useState<boolean>(!!initialData?.classwork);
   const [homeworkEnabled, setHomeworkEnabled] = useState<boolean>(!!initialData?.homework);
-  
+  const [absent, setAbsent] = useState<boolean>(false);
+
   const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(
-      classworkEnabled ? classworkGrade : null,
-      homeworkEnabled ? homeworkGrade : null
-    );
+    if (absent) {
+      onSave(null, null);
+    } else {
+      onSave(
+        classworkEnabled ? classworkGrade : null,
+        homeworkEnabled ? homeworkGrade : null
+      );
+    }
     onClose();
   };
 
@@ -89,8 +94,21 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
           </button>
         </div>
         <form onSubmit={handleSubmit}>
+          {/* Чекбокс отсутствия */}
+          <div className="mb-4 flex items-center">
+            <input
+              type="checkbox"
+              id="absent-checkbox"
+              checked={absent}
+              onChange={e => setAbsent(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="absent-checkbox" className="text-sm font-medium text-gray-700">
+              Отсутствовал
+            </label>
+          </div>
           {/* Секция классной работы */}
-          <div className="mb-6 p-4 border border-gray-200 rounded-lg">
+          <div className={`mb-6 p-4 border border-gray-200 rounded-lg ${absent ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-md font-medium">Классная работа</h4>
               <label className="inline-flex items-center cursor-pointer">
@@ -99,12 +117,12 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
                   checked={classworkEnabled}
                   onChange={(e) => setClassworkEnabled(e.target.checked)}
                   className="sr-only peer"
+                  disabled={absent}
                 />
                 <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 <span className="ml-3 text-sm font-medium text-gray-700">{classworkEnabled ? 'Активно' : 'Неактивно'}</span>
               </label>
             </div>
-            
             {classworkEnabled && (
               <div className="space-y-4">
                 <div>
@@ -116,29 +134,29 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
                     min="0"
                     max="100"
                     value={classworkGrade.value}
-                    onChange={(e) => setClassworkGrade({...classworkGrade, value: Number(e.target.value)})}
+                    onChange={(e) => setClassworkGrade({ ...classworkGrade, value: Number(e.target.value) })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required={classworkEnabled}
+                    disabled={absent}
                   />
                 </div>
-                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Комментарий
                   </label>
                   <textarea
                     value={classworkGrade.comment || ''}
-                    onChange={(e) => setClassworkGrade({...classworkGrade, comment: e.target.value})}
+                    onChange={(e) => setClassworkGrade({ ...classworkGrade, comment: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={2}
+                    disabled={absent}
                   />
                 </div>
               </div>
             )}
           </div>
-          
           {/* Секция домашней работы */}
-          <div className="mb-6 p-4 border border-gray-200 rounded-lg">
+          <div className={`mb-6 p-4 border border-gray-200 rounded-lg ${absent ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-md font-medium">Домашняя работа</h4>
               <label className="inline-flex items-center cursor-pointer">
@@ -147,12 +165,12 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
                   checked={homeworkEnabled}
                   onChange={(e) => setHomeworkEnabled(e.target.checked)}
                   className="sr-only peer"
+                  disabled={absent}
                 />
                 <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 <span className="ml-3 text-sm font-medium text-gray-700">{homeworkEnabled ? 'Активно' : 'Неактивно'}</span>
               </label>
             </div>
-            
             {homeworkEnabled && (
               <div className="space-y-4">
                 <div>
@@ -164,27 +182,27 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
                     min="0"
                     max="100"
                     value={homeworkGrade.value}
-                    onChange={(e) => setHomeworkGrade({...homeworkGrade, value: Number(e.target.value)})}
+                    onChange={(e) => setHomeworkGrade({ ...homeworkGrade, value: Number(e.target.value) })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required={homeworkEnabled}
+                    disabled={absent}
                   />
                 </div>
-                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Комментарий
                   </label>
                   <textarea
                     value={homeworkGrade.comment || ''}
-                    onChange={(e) => setHomeworkGrade({...homeworkGrade, comment: e.target.value})}
+                    onChange={(e) => setHomeworkGrade({ ...homeworkGrade, comment: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={2}
+                    disabled={absent}
                   />
                 </div>
               </div>
             )}
           </div>
-          
           <div className="flex justify-end space-x-2">
             <button
               type="button"
@@ -225,19 +243,19 @@ const GradeInfoModal: React.FC<{
             <FaTimes />
           </button>
         </div>
-        
+
         <div className="mb-4">
           <div className="text-sm text-gray-500">Дата</div>
           <div className="font-medium">{grade.date}</div>
         </div>
-        
+
         {grade.average !== undefined && (
           <div className="mb-6 p-4 bg-blue-50 rounded-lg">
             <div className="text-sm text-gray-500">Средний балл</div>
             <div className="text-xl font-bold text-blue-600">{grade.average} / 100</div>
           </div>
         )}
-        
+
         <div className="grid grid-cols-2 gap-4">
           {/* Классная работа */}
           {grade.classwork && (
@@ -248,14 +266,14 @@ const GradeInfoModal: React.FC<{
                   <div className="text-sm text-gray-500">Оценка</div>
                   <div className="text-lg font-medium text-green-600">{grade.classwork.value} / 100</div>
                 </div>
-                
+
                 {grade.classwork.createdAt && (
                   <div>
                     <div className="text-sm text-gray-500">Поставлена</div>
                     <div className="text-sm">{grade.classwork.createdAt}</div>
                   </div>
                 )}
-                
+
                 {grade.classwork.comment && (
                   <div>
                     <div className="text-sm text-gray-500">Комментарий</div>
@@ -265,7 +283,7 @@ const GradeInfoModal: React.FC<{
               </div>
             </div>
           )}
-          
+
           {/* Домашняя работа */}
           {grade.homework && (
             <div className="p-4 border border-gray-200 rounded-lg">
@@ -275,14 +293,14 @@ const GradeInfoModal: React.FC<{
                   <div className="text-sm text-gray-500">Оценка</div>
                   <div className="text-lg font-medium text-green-600">{grade.homework.value} / 100</div>
                 </div>
-                
+
                 {grade.homework.createdAt && (
                   <div>
                     <div className="text-sm text-gray-500">Поставлена</div>
                     <div className="text-sm">{grade.homework.createdAt}</div>
                   </div>
                 )}
-                
+
                 {grade.homework.comment && (
                   <div>
                     <div className="text-sm text-gray-500">Комментарий</div>
@@ -293,7 +311,7 @@ const GradeInfoModal: React.FC<{
             </div>
           )}
         </div>
-        
+
         <div className="mt-6 flex justify-end">
           <button
             onClick={onClose}
@@ -371,15 +389,15 @@ const AcademicJournalPage: React.FC = () => {
       id: 3,
       name: 'Васильев Александр',
       grades: {
-        '28.02': { 
+        '28.02': {
           classwork: { value: 90, type: 'classwork' },
           average: 90
         },
-        '02.03': { 
+        '02.03': {
           homework: { value: 85, type: 'homework' },
           average: 85
         },
-        '06.03': { 
+        '06.03': {
           classwork: { value: 95, type: 'classwork' },
           average: 95
         },
@@ -389,15 +407,15 @@ const AcademicJournalPage: React.FC = () => {
       id: 4,
       name: 'Галимова Алия',
       grades: {
-        '27.02': { 
+        '27.02': {
           classwork: { value: 78, type: 'classwork' },
           average: 78
         },
-        '01.03': { 
+        '01.03': {
           homework: { value: 88, type: 'homework' },
           average: 88
         },
-        '05.03': { 
+        '05.03': {
           classwork: { value: 82, type: 'classwork' },
           average: 82
         },
@@ -407,15 +425,15 @@ const AcademicJournalPage: React.FC = () => {
       id: 5,
       name: 'Дмитриев Кирилл',
       grades: {
-        '28.02': { 
+        '28.02': {
           classwork: { value: 60, type: 'classwork' },
           average: 60
         },
-        '02.03': { 
+        '02.03': {
           homework: { value: 75, type: 'homework' },
           average: 75
         },
-        '06.03': { 
+        '06.03': {
           classwork: { value: 80, type: 'classwork' },
           average: 80
         },
@@ -425,15 +443,15 @@ const AcademicJournalPage: React.FC = () => {
       id: 6,
       name: 'Ержанов Тимур',
       grades: {
-        '27.02': { 
+        '27.02': {
           classwork: { value: 95, type: 'classwork' },
           average: 95
         },
-        '01.03': { 
+        '01.03': {
           homework: { value: 93, type: 'homework' },
           average: 93
         },
-        '05.03': { 
+        '05.03': {
           classwork: { value: 88, type: 'classwork' },
           homework: { value: 90, type: 'homework' },
           average: 89
@@ -444,15 +462,15 @@ const AcademicJournalPage: React.FC = () => {
       id: 7,
       name: 'Жумабаева Айгерим',
       grades: {
-        '28.02': { 
+        '28.02': {
           homework: { value: 85, type: 'homework' },
           average: 85
         },
-        '02.03': { 
+        '02.03': {
           classwork: { value: 92, type: 'classwork' },
           average: 92
         },
-        '06.03': { 
+        '06.03': {
           classwork: { value: 94, type: 'classwork' },
           average: 94
         },
@@ -462,15 +480,15 @@ const AcademicJournalPage: React.FC = () => {
       id: 8,
       name: 'Иванов Максим',
       grades: {
-        '27.02': { 
+        '27.02': {
           classwork: { value: 65, type: 'classwork' },
           average: 65
         },
-        '01.03': { 
+        '01.03': {
           homework: { value: 78, type: 'homework' },
           average: 78
         },
-        '05.03': { 
+        '05.03': {
           classwork: { value: 80, type: 'classwork' },
           average: 80
         },
@@ -495,19 +513,19 @@ const AcademicJournalPage: React.FC = () => {
         // Студент видит только свои оценки (допустим, его ID = 1)
         filtered = filtered.filter(student => student.id === 1);
         break;
-      
+
       case 'parent':
         // Родитель видит оценки только своего ребенка (допустим, ID ребенка = 2)
         filtered = filtered.filter(student => student.id === 2);
         break;
-      
+
       case 'teacher':
         // Учитель видит всех студентов выбранного класса
         if (selectedClass) {
           filtered = filtered.filter(student => true); // Здесь должна быть фильтрация по классу
         }
         break;
-      
+
       case 'admin':
         // Администратор видит всех
         break;
@@ -524,7 +542,7 @@ const AcademicJournalPage: React.FC = () => {
   const handleGradeClick = (studentId: number, date: string) => {
     const student = students.find(s => s.id === studentId);
     const gradeData = student?.grades[date];
-    
+
     if (gradeData) {
       setSelectedGrade({
         classwork: gradeData.classwork,
@@ -540,13 +558,13 @@ const AcademicJournalPage: React.FC = () => {
 
   const handleGradeSave = (classworkGrade: GradeItem | null, homeworkGrade: GradeItem | null) => {
     if (!selectedGradeInfo) return;
-    
+
     const now = new Date().toLocaleString();
     let newGrades = {
       classwork: classworkGrade ? { ...classworkGrade, createdAt: now } : undefined,
       homework: homeworkGrade ? { ...homeworkGrade, createdAt: now } : undefined
     };
-    
+
     // Расчет среднего арифметического
     if (classworkGrade && homeworkGrade) {
       const average = Math.round((classworkGrade.value + homeworkGrade.value) / 2);
@@ -556,7 +574,7 @@ const AcademicJournalPage: React.FC = () => {
     } else if (homeworkGrade) {
       newGrades = { ...newGrades, average: homeworkGrade.value };
     }
-    
+
     console.log('Saving grades:', { newGrades, selectedGradeInfo });
     // Здесь должна быть логика сохранения оценок в базе данных
   };
@@ -579,9 +597,9 @@ const AcademicJournalPage: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
           {role === 'student' ? 'Мои оценки' :
-           role === 'parent' ? 'Оценки ребенка' :
-           role === 'teacher' ? 'Журнал успеваемости' :
-           'Электронный журнал'}
+            role === 'parent' ? 'Оценки ребенка' :
+              role === 'teacher' ? 'Журнал успеваемости' :
+                'Электронный журнал'}
         </h1>
       </div>
 
@@ -703,7 +721,7 @@ const AcademicJournalPage: React.FC = () => {
           />
         </div>
       )}
-      
+
       {/* Таблица журнала */}
       <div className="mt-6 bg-white rounded-lg shadow overflow-hidden border border-gray-200">
         <div className="overflow-x-auto">
@@ -733,13 +751,12 @@ const AcademicJournalPage: React.FC = () => {
                           <div className="relative group">
                             <button
                               onClick={() => handleGradeClick(student.id, date)}
-                              className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-white font-medium ${
-                                getGradeColor(student.grades[date]!.average || 0)
-                              } hover:opacity-90 transition-opacity`}
+                              className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-white font-medium ${getGradeColor(student.grades[date]!.average || 0)
+                                } hover:opacity-90 transition-opacity`}
                             >
                               {student.grades[date]!.average}
                             </button>
-                            
+
                             {/* Тултип при наведении показывает обе оценки */}
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
                               <div className="bg-gray-900 text-white text-sm rounded-lg py-2 px-3 whitespace-nowrap shadow-lg">
