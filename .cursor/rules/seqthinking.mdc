@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+call sequentionalthinking
+- You can @ files here
+- You can use markdown but dont have to
