@@ -15,14 +15,11 @@ import StudentDetailPage from './pages/StudentDetailPage';
 import ChatPage from './pages/app/ChatPage';
 import AIChatPage from './pages/app/AIChatPage';
 import CalendarPage from './pages/app/CalendarPage';
-import EmailPage from './pages/app/EmailPage';
 import TodoPage from './pages/app/TodoPage';
 import NeuroAbaiPage from './pages/app/NeuroAbaiPage';
-import FilesPage from './pages/app/FilesPage';
 import SettingsPage from './pages/app/SettingsPage';
 import ProfilePage from './pages/app/ProfilePage';
 import PerformancePage from './pages/PerformancePage';
-import EmotionalAnalysisPage from './pages/EmotionalAnalysisPage';
 import EmployeesPage from './pages/hr/EmployeesPage';
 import WorkloadPage from './pages/hr/WorkloadPage';
 import KpiPage from './pages/hr/KpiPage';
@@ -34,13 +31,13 @@ import BudgetPage from './pages/finance/BudgetPage';
 import PayrollPage from './pages/finance/PayrollPage';
 import SalariesPage from './pages/finance/SalariesPage';
 import AntiFraudPage from './pages/finance/AntiFraudPage';
+import ACLPage from './pages/finance/ACLPage';
 import Login from './pages/Login';
 import { AuthProvider, ProtectedRoute } from './providers/AuthProvider';
 import TestRealtimeApi from './pages/TestRealtimeApi';
-import FileManagerPage from './pages/app/FileManagerPage';
+
 import InventoryPage from './pages/erp/InventoryPage';
 import SupplyPage from './pages/erp/SupplyPage';
-import SecurityPage from './pages/erp/SecurityPage';
 import UsersPage from './pages/settings/UsersPage';
 import PermissionsPage from './pages/settings/PermissionsPage';
 import IntegrationsPage from './pages/settings/IntegrationsPage';
@@ -73,21 +70,18 @@ const App: React.FC = () => {
               {/* Students routes */}
               <Route path="students" element={<StudentsPage />} />
               <Route path="students/:id" element={<StudentDetailPage />} />
-              <Route path="students/emotional-analysis" element={<EmotionalAnalysisPage />} />
               <Route path="performance" element={<PerformancePage />} />
 
               {/* Applications routes */}
               <Route path="app/chat" element={<ChatPage />} />
               <Route path="app/ai-chat" element={<AIChatPage />} />
               <Route path="app/calendar" element={<CalendarPage />} />
-              <Route path="app/email" element={<EmailPage />} />
               <Route path="app/tasks" element={<TodoPage />} />
-              <Route path="app/files" element={<FileManagerPage />} />
               <Route path="app/profile" element={<ProfilePage />} />
               <Route path="app/erp/inventory" element={<InventoryPage />} />
               <Route path="app/erp/supply" element={<SupplyPage />} />
-              <Route path="app/erp/security" element={<SecurityPage />} />
               <Route path="app/neuro-abai" element={<NeuroAbaiPage />} />
+
               {/* HR routes */}
               <Route path="hr/employees" element={<EmployeesPage />} />
               <Route path="hr/workload" element={<WorkloadPage />} />
@@ -99,6 +93,7 @@ const App: React.FC = () => {
               <Route path="finance/payments" element={<PaymentsPage />} />
               <Route path="finance/reports" element={<ReportsPage />} />
               <Route path="finance/budget" element={<BudgetPage />} />
+              <Route path="finance/acl" element={<ACLPage />} />
               <Route path="finance/payroll" element={<PayrollPage />} />
               <Route path="finance/salaries" element={<SalariesPage />} />
               <Route path="finance/antifraud" element={<AntiFraudPage />} />

@@ -34,6 +34,7 @@ interface Vacation {
   substituteId?: string;
   substituteName?: string;
   comment?: string;
+  lectureTopics?: string;
   documents?: {
     name: string;
     url: string;
@@ -200,6 +201,7 @@ const VacationPage: React.FC = () => {
     employeeId: string;
     substituteId?: string;
     comment?: string;
+    lectureTopics?: string;
     document?: File | null;
   }>({
     type: 'vacation',
@@ -208,6 +210,7 @@ const VacationPage: React.FC = () => {
     employeeId: '',
     substituteId: '',
     comment: '',
+    lectureTopics: '',
     document: null
   });
   
@@ -373,18 +376,19 @@ const VacationPage: React.FC = () => {
     // Создание новой заявки
     const newVacationEntry: Vacation = {
       id: `v${Date.now()}`,
-      employeeId: newVacation.employeeId || '001', // В реальном приложении будет ID текущего пользователя
-      employeeName: 'Текущий пользователь', // В реальном приложении будет имя текущего пользователя
-      department: 'Кафедра', // В реальном приложении будет отдел текущего пользователя
-      position: 'Должность', // В реальном приложении будет должность текущего пользователя
+      employeeId: newVacation.employeeId || '001',
+      employeeName: 'Текущий пользователь',
+      department: 'Кафедра',
+      position: 'Должность',
       type: newVacation.type,
       startDate: newVacation.startDate,
       endDate: newVacation.endDate,
       days: diffDays,
       status: 'pending',
       substituteId: newVacation.substituteId,
-      substituteName: newVacation.substituteId ? 'Выбранный сотрудник' : undefined, // В реальном приложении будет имя выбранного сотрудника
-      comment: newVacation.comment
+      substituteName: newVacation.substituteId ? 'Выбранный сотрудник' : undefined,
+      comment: newVacation.comment,
+      lectureTopics: newVacation.lectureTopics
     };
     
     // Добавление документа, если он есть
@@ -410,6 +414,7 @@ const VacationPage: React.FC = () => {
       employeeId: '',
       substituteId: '',
       comment: '',
+      lectureTopics: '',
       document: null
     });
     setIsNewVacationModalOpen(false);
@@ -927,6 +932,24 @@ const VacationPage: React.FC = () => {
                       <option value="005">Смирнов Дмитрий Игоревич</option>
                     </select>
                   </div>
+
+                  {/* Добавляем поле для тем лекций, которое появляется только при выборе замещающего сотрудника */}
+                  {newVacation.substituteId && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Темы лекций для заместителя <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        name="lectureTopics"
+                        value={newVacation.lectureTopics}
+                        onChange={handleNewVacationChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows={3}
+                        placeholder="Укажите темы лекций, которые должен провести заместитель"
+                        required={!!newVacation.substituteId}
+                      />
+                    </div>
+                  )}
 
                   {/* Поле загрузки документа появляется только для больничного и декретного отпуска */}
                   {(newVacation.type === 'sick-leave' || newVacation.type === 'maternity-leave') && (

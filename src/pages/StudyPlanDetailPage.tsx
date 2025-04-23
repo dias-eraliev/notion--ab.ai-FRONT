@@ -1,3 +1,143 @@
+/**
+ * @page StudyPlanDetailPage
+ * @description Страница детального просмотра и редактирования учебного плана
+ * 
+ * @backend_requirements
+ * 
+ * 1. API Endpoints:
+ * 
+ * GET /api/v1/study-plans/{planId}
+ * - Получение детальной информации об учебном плане
+ * - Включает:
+ *   - Основную информацию о плане
+ *   - Список уроков
+ *   - Материалы
+ *   - Тесты и задания
+ * 
+ * PUT /api/v1/study-plans/{planId}
+ * - Обновление учебного плана
+ * - Body:
+ *   - title: string
+ *   - description: string
+ *   - subject: string
+ *   - grade: number
+ *   - academicYear: string
+ *   - status: 'draft' | 'published' | 'archived'
+ * 
+ * POST /api/v1/study-plans/{planId}/lessons
+ * - Добавление нового урока в план
+ * - Body:
+ *   - title: string
+ *   - description: string
+ *   - duration: number
+ *   - materials: Array<{
+ *       type: 'video' | 'presentation' | 'document'
+ *       url: string
+ *       title: string
+ *     }>
+ * 
+ * PUT /api/v1/study-plans/{planId}/lessons/{lessonId}
+ * - Обновление урока
+ * - Body: аналогично POST запросу
+ * 
+ * DELETE /api/v1/study-plans/{planId}/lessons/{lessonId}
+ * - Удаление урока из плана
+ * 
+ * POST /api/v1/study-plans/{planId}/lessons/{lessonId}/tests
+ * - Добавление теста к уроку
+ * - Body:
+ *   - title: string
+ *   - description?: string
+ *   - duration: number
+ *   - questions: Array<{
+ *       text: string
+ *       type: 'single' | 'multiple' | 'text'
+ *       options?: string[]
+ *       correctAnswers: string[]
+ *       points: number
+ *     }>
+ * 
+ * 2. Модели данных:
+ * 
+ * interface StudyPlan {
+ *   id: string;
+ *   title: string;
+ *   description: string;
+ *   subject: string;
+ *   grade: number;
+ *   academicYear: string;
+ *   status: 'draft' | 'published' | 'archived';
+ *   createdAt: string;
+ *   updatedAt: string;
+ *   createdBy: {
+ *     id: string;
+ *     name: string;
+ *   };
+ *   lessons: Lesson[];
+ * }
+ * 
+ * interface Lesson {
+ *   id: string;
+ *   title: string;
+ *   description: string;
+ *   duration: number;
+ *   materials: Material[];
+ *   tests: Test[];
+ *   order: number;
+ * }
+ * 
+ * interface Material {
+ *   id: string;
+ *   type: 'video' | 'presentation' | 'document';
+ *   url: string;
+ *   title: string;
+ *   fileSize?: number;
+ *   duration?: number;
+ * }
+ * 
+ * interface Test {
+ *   id: string;
+ *   title: string;
+ *   description?: string;
+ *   duration: number;
+ *   questions: Question[];
+ *   totalPoints: number;
+ * }
+ * 
+ * interface Question {
+ *   id: string;
+ *   text: string;
+ *   type: 'single' | 'multiple' | 'text';
+ *   options?: string[];
+ *   correctAnswers: string[];
+ *   points: number;
+ * }
+ * 
+ * 3. Интеграции:
+ * - Система хранения файлов для загрузки материалов
+ * - Система тестирования для управления тестами
+ * - Система уведомлений для оповещения учителей об изменениях
+ * 
+ * 4. Требования к безопасности:
+ * - Проверка прав доступа к учебному плану
+ * - Валидация загружаемых файлов
+ * - Ограничение размера загружаемых файлов
+ * - Защита от XSS в описаниях и заданиях
+ * 
+ * 5. Кэширование:
+ * - Кэширование учебного плана на 5 минут
+ * - Кэширование материалов на 1 час
+ * 
+ * 6. Дополнительные требования:
+ * - Поддержка версионности учебных планов
+ * - Автосохранение изменений
+ * - Возможность экспорта в PDF
+ * - Поддержка drag-and-drop для переупорядочивания уроков
+ * 
+ * @author Your Name
+ * @last_updated 2024-03-23
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FaVideo, FaFile, FaClipboardCheck, FaArrowLeft, FaSpinner } from 'react-icons/fa';
@@ -138,11 +278,11 @@ const StudyPlanDetailPage: React.FC = () => {
   if (error) {
     return (
       <div className="p-6 max-w-[1600px] mx-auto">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
           <p>{error}</p>
           <button
             onClick={handleBack}
-            className="mt-2 text-sm text-red-600 hover:text-red-500"
+            className="mt-2 text-sm text-blue-600 hover:text-blue-500"
           >
             Вернуться к списку учебных планов
           </button>
@@ -359,7 +499,7 @@ const StudyPlanDetailPage: React.FC = () => {
                         <div className="font-medium">{q.question}</div>
                         <ul className="ml-4 list-disc">
                           {q.options.map((opt, i) => (
-                            <li key={i} className={q.correct === i ? 'text-green-600 font-semibold' : ''}>{opt}</li>
+                            <li key={i} className={`${q.correct === i ? 'text-blue-600 font-semibold' : 'text-gray-500'}`}>{opt}</li>
                           ))}
                         </ul>
                       </div>

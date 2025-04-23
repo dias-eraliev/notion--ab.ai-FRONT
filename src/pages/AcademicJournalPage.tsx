@@ -1,3 +1,127 @@
+/**
+ * @page AcademicJournalPage
+ * @description Страница академического журнала с оценками и посещаемостью
+ * 
+ * @backend_requirements
+ * 
+ * 1. API Endpoints:
+ * 
+ * GET /api/v1/academic-journal
+ * - Получение данных журнала
+ * - Параметры запроса:
+ *   - classId: string
+ *   - subjectId: string
+ *   - startDate?: string (YYYY-MM-DD)
+ *   - endDate?: string (YYYY-MM-DD)
+ *   - page?: number
+ *   - limit?: number
+ * 
+ * GET /api/v1/academic-journal/students
+ * - Получение списка студентов для журнала
+ * - Параметры запроса:
+ *   - classId: string
+ *   - subjectId: string
+ * 
+ * POST /api/v1/academic-journal/grades
+ * - Добавление/обновление оценок
+ * - Body:
+ *   - studentId: string
+ *   - lessonId: string
+ *   - grade: number | null
+ *   - type: 'regular' | 'exam' | 'homework'
+ *   - comment?: string
+ * 
+ * POST /api/v1/academic-journal/attendance
+ * - Отметка посещаемости
+ * - Body:
+ *   - studentId: string
+ *   - lessonId: string
+ *   - status: 'present' | 'absent' | 'late'
+ *   - reason?: string
+ * 
+ * GET /api/v1/academic-journal/statistics
+ * - Получение статистики успеваемости
+ * - Параметры запроса:
+ *   - classId: string
+ *   - subjectId: string
+ *   - period: 'quarter' | 'year'
+ * 
+ * 2. Модели данных:
+ * 
+ * interface JournalEntry {
+ *   id: string;
+ *   studentId: string;
+ *   studentName: string;
+ *   grades: Array<{
+ *     id: string;
+ *     lessonId: string;
+ *     value: number;
+ *     type: 'regular' | 'exam' | 'homework';
+ *     date: string;
+ *     comment?: string;
+ *   }>;
+ *   attendance: Array<{
+ *     id: string;
+ *     lessonId: string;
+ *     date: string;
+ *     status: 'present' | 'absent' | 'late';
+ *     reason?: string;
+ *   }>;
+ *   averageGrade: number;
+ *   attendancePercentage: number;
+ * }
+ * 
+ * interface Lesson {
+ *   id: string;
+ *   date: string;
+ *   topic: string;
+ *   type: 'lecture' | 'practice' | 'exam';
+ *   homework?: string;
+ * }
+ * 
+ * interface Statistics {
+ *   classAverageGrade: number;
+ *   attendanceRate: number;
+ *   gradeDistribution: {
+ *     excellent: number;
+ *     good: number;
+ *     satisfactory: number;
+ *     unsatisfactory: number;
+ *   };
+ *   topStudents: Array<{
+ *     studentId: string;
+ *     studentName: string;
+ *     averageGrade: number;
+ *   }>;
+ * }
+ * 
+ * 3. Интеграции:
+ * - Система управления классами
+ * - Система расписания
+ * - Система уведомлений для родителей
+ * 
+ * 4. Требования к безопасности:
+ * - Доступ только для учителей и администраторов
+ * - Запрет на изменение оценок задним числом (более 3 дней)
+ * - Логирование всех изменений оценок
+ * - Защита от массового изменения данных
+ * 
+ * 5. Кэширование:
+ * - Кэширование списка студентов на 1 час
+ * - Кэширование статистики на 30 минут
+ * 
+ * 6. Дополнительные требования:
+ * - Автоматический расчет итоговых оценок
+ * - Экспорт журнала в Excel
+ * - Уведомления родителям об оценках и пропусках
+ * - История изменений оценок
+ * - Комментарии к оценкам
+ * - Поддержка различных систем оценивания
+ * 
+ * @author Your Name
+ * @last_updated 2024-03-23
+ */
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaFilter, FaPlus, FaEllipsisH, FaCalendar, FaCaretDown, FaTimes } from 'react-icons/fa';

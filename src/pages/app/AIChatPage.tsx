@@ -1,4 +1,88 @@
+/**
+ * @page AIChatPage
+ * @description Страница чата с AI-ассистентом с поддержкой голосового ввода
+ * @author [Ваше имя]
+ * @last_updated 2024-03-23
+ * 
+ * @features
+ * 1. Текстовый чат с AI
+ * 2. Голосовой ввод с real-time транскрипцией
+ * 3. История диалогов
+ * 4. Поддержка кода и изображений
+ * 
+ * @api_requirements
+ * 
+ * 1. WebRTC API для голосового ввода:
+ * - Инициализация peer connection
+ * - Управление медиа-потоками
+ * - Обработка событий data channel
+ * 
+ * 2. SPS Chat API:
+ * - Аутентификация и получение токенов
+ * - Отправка и получение сообщений
+ * - Управление сессиями
+ * 
+ * 3. Realtime API:
+ * - Транскрипция голоса в текст
+ * - Потоковая обработка ответов модели
+ * - Управление состоянием сессии
+ * 
+ * @data_models
+ * 
+ * interface Message {
+ *   id: string;
+ *   text: string;
+ *   time: string;
+ *   isAI: boolean;
+ *   type: 'text' | 'code' | 'image';
+ *   codeLanguage?: string;
+ *   imageUrl?: string;
+ * }
+ * 
+ * interface Conversation {
+ *   id: string;
+ *   title: string;
+ *   lastMessage: string;
+ *   time: string;
+ *   messages: Message[];
+ * }
+ * 
+ * @websocket_events
+ * 
+ * 1. Транскрипция:
+ * - text.delta: обновление текущей транскрипции
+ * - response.audio_transcript.done: завершение транскрипции
+ * 
+ * 2. Ответы модели:
+ * - response.create: инициализация ответа
+ * - response.done: завершение ответа
+ * 
+ * @security
+ * 
+ * 1. Аутентификация:
+ * - Использование эфемерных токенов
+ * - Проверка прав доступа
+ * 
+ * 2. Безопасность данных:
+ * - Шифрование WebRTC соединения
+ * - Защита от XSS
+ * - Валидация входных данных
+ * 
+ * @performance
+ * 
+ * 1. Оптимизация:
+ * - Ленивая загрузка истории
+ * - Кэширование сообщений
+ * - Оптимизация ре-рендеринга
+ * 
+ * 2. Состояние:
+ * - Управление состоянием сессии
+ * - Обработка ошибок соединения
+ * - Восстановление сессии
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
+import type { IconType } from 'react-icons';
 import {
   FaRobot,
   FaPaperPlane,
@@ -87,6 +171,16 @@ interface ModelResponse {
     }>
   }
 }
+
+// Обновляем компонент-обертку для иконок с правильной типизацией
+const IconWrapper = ({ icon: Icon, className = '' }: { icon: IconType; className?: string }) => {
+  const IconComponent = Icon as React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  return (
+    <span className={className}>
+      <IconComponent />
+    </span>
+  );
+};
 
 const AIChatPage: React.FC = () => {
   const [conversations, setConversations] = useState<Conversation[]>([
@@ -487,12 +581,12 @@ const AIChatPage: React.FC = () => {
     }
   };
 
-  // Компонент индикатора записи
-  const RecordingIndicator = () => {
-    const dots = '.'.repeat(recordingAnimation + 1);
+  // Обновляем компонент RecordingIndicator
+  const RecordingIndicator: React.FC<{ animation: number }> = ({ animation }) => {
+    const dots = '.'.repeat(animation + 1);
     return (
       <div className="flex items-center text-red-500 mt-2 animate-pulse">
-        <FaVolumeUp className="mr-2" />
+        <IconWrapper icon={FaVolumeUp} className="mr-2" />
         <span>Запись{dots}</span>
       </div>
     );
@@ -571,14 +665,14 @@ const AIChatPage: React.FC = () => {
             className="bg-gray-600 w-16 h-16 rounded-full flex items-center justify-center text-white"
             onClick={() => closeRealtimeSession()}
           >
-            <FaSquare className="text-xl" />
+            <IconWrapper icon={FaSquare} className="text-xl" />
           </button>
 
           <button
             className="bg-red-500 w-16 h-16 rounded-full flex items-center justify-center text-white"
             onClick={() => closeRealtimeSession()}
           >
-            <FaTimes className="text-xl" />
+            <IconWrapper icon={FaTimes} className="text-xl" />
           </button>
         </div>
 
@@ -601,7 +695,7 @@ const AIChatPage: React.FC = () => {
       <div className="w-80 border-r border-gray-200 bg-white flex flex-col">
         <div className="p-4 border-b border-gray-200">
           <h1 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-            <FaRobot className="mr-2 text-blue-500" />
+            <IconWrapper icon={FaRobot} className="mr-2 text-blue-500" />
             AI Чат
           </h1>
           <button
@@ -636,9 +730,9 @@ const AIChatPage: React.FC = () => {
             onClick={() => setShowSettings(!showSettings)}
             className="flex items-center text-gray-700 hover:text-blue-500 transition-colors"
           >
-            <FaCog className="mr-2" />
+            <IconWrapper icon={FaCog} className="mr-2" />
             Настройки
-            <FaChevronDown className={`ml-auto transform ${showSettings ? 'rotate-180' : ''}`} />
+            <IconWrapper icon={FaChevronDown} className={`ml-auto transform ${showSettings ? 'rotate-180' : ''}`} />
           </button>
           {showSettings && (
             <div className="mt-2 space-y-2">
@@ -661,7 +755,7 @@ const AIChatPage: React.FC = () => {
         {/* Заголовок чата */}
         <div className="p-4 bg-white border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center">
-            <FaRobot className="text-blue-500 mr-2" />
+            <IconWrapper icon={FaRobot} className="text-blue-500 mr-2" />
             <h2 className="font-semibold text-gray-800">
               {selectedConversation
                 ? conversations.find(c => c.id === selectedConversation)?.title
@@ -669,12 +763,12 @@ const AIChatPage: React.FC = () => {
             </h2>
           </div>
           <div className="flex items-center space-x-4">
-            {isRecording && <RecordingIndicator />}
+            {isRecording && <RecordingIndicator animation={recordingAnimation} />}
             <button className="text-gray-500 hover:text-blue-500 transition-colors">
-              <FaRegBookmark />
+              <IconWrapper icon={FaRegBookmark} />
             </button>
             <button className="text-gray-500 hover:text-blue-500 transition-colors">
-              <FaEraser />
+              <IconWrapper icon={FaEraser} />
             </button>
           </div>
         </div>
@@ -702,7 +796,7 @@ const AIChatPage: React.FC = () => {
                       className="absolute top-2 right-2 text-gray-400 hover:text-white"
                       onClick={() => navigator.clipboard.writeText(msg.text)}
                     >
-                      <FaRegCopy />
+                      <IconWrapper icon={FaRegCopy} />
                     </button>
                   </div>
                 )}
@@ -735,7 +829,7 @@ const AIChatPage: React.FC = () => {
               className="p-2 text-gray-500 hover:text-blue-500 transition-colors"
               disabled={isRealtimeActive}
             >
-              <FaImage />
+              <IconWrapper icon={FaImage} />
             </button>
             <div className="flex-1 relative">
               <textarea
@@ -755,7 +849,7 @@ const AIChatPage: React.FC = () => {
                 : 'text-gray-500 hover:text-blue-500'} transition-colors`}
               title={isRecording ? "Остановить запись" : "Начать запись"}
             >
-              {isRecording ? <FaStop /> : <FaMicrophone />}
+              {isRecording ? <IconWrapper icon={FaStop} /> : <IconWrapper icon={FaMicrophone} />}
             </button>
             <button
               onClick={handleSendMessage}
@@ -765,12 +859,12 @@ const AIChatPage: React.FC = () => {
                 : 'text-gray-400'
                 } transition-colors`}
             >
-              <FaPaperPlane />
+              <IconWrapper icon={FaPaperPlane} />
             </button>
           </div>
           <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center">
-              <FaRegLightbulb className="mr-1" />
+              <IconWrapper icon={FaRegLightbulb} className="mr-1" />
               <span>
                 {isRealtimeActive
                   ? "Голосовой режим активен. Говорите в микрофон."
@@ -778,7 +872,7 @@ const AIChatPage: React.FC = () => {
               </span>
             </div>
             <div className="flex items-center">
-              <FaHistory className="mr-1" />
+              <IconWrapper icon={FaHistory} className="mr-1" />
               <span>{isRealtimeActive ? "Нажмите на микрофон для завершения" : "История сохраняется автоматически"}</span>
             </div>
           </div>

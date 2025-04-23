@@ -1,0 +1,125 @@
+groups:
+- name: nabai_alerts
+  rules:
+  # Алерты для API
+  - alert: APIHighRequestLatency
+    expr: http_request_duration_seconds{quantile="0.9"} > 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Высокая латентность API"
+      description: "90-й процентиль времени ответа API превышает 1 секунду"
+
+  - alert: APIHighErrorRate
+    expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.01
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Высокий процент ошибок API"
+      description: "Более 1% запросов завершаются с ошибкой 5xx"
+
+  # Алерты для базы данных
+  - alert: PostgreSQLHighConnections
+    expr: pg_stat_activity_count > pg_settings_max_connections * 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Высокое количество подключений к PostgreSQL"
+      description: "Количество подключений превышает 80% от максимального"
+
+  - alert: PostgreSQLSlowQueries
+    expr: pg_stat_activity_max_tx_duration > 60
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Медленные запросы в PostgreSQL"
+      description: "Обнаружены запросы, выполняющиеся более 60 секунд"
+
+  # Алерты для Redis
+  - alert: RedisHighMemoryUsage
+    expr: redis_memory_used_bytes / redis_total_system_memory_bytes > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Высокое использование памяти Redis"
+      description: "Redis использует более 80% доступной памяти"
+
+  - alert: RedisKeyEviction
+    expr: rate(redis_evicted_keys_total[5m]) > 0
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Вытеснение ключей в Redis"
+      description: "Redis начал вытеснять ключи из-за нехватки памяти"
+
+  # Алерты для RabbitMQ
+  - alert: RabbitMQHighMemoryUsage
+    expr: rabbitmq_process_resident_memory_bytes / rabbitmq_resident_memory_limit_bytes > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Высокое использование памяти RabbitMQ"
+      description: "RabbitMQ использует более 80% доступной памяти"
+
+  - alert: RabbitMQQueueGrowing
+    expr: rabbitmq_queue_messages > 10000
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Растущая очередь в RabbitMQ"
+      description: "Количество сообщений в очереди превышает 10000"
+
+  # Системные алерты
+  - alert: HighCPUUsage
+    expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Высокая загрузка CPU"
+      description: "Загрузка CPU превышает 80%"
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Высокое использование памяти"
+      description: "Использование памяти превышает 80%"
+
+  - alert: HighDiskUsage
+    expr: 100 - ((node_filesystem_avail_bytes * 100) / node_filesystem_size_bytes) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Высокое использование диска"
+      description: "Использование дискового пространства превышает 80%"
+
+  # Алерты для WebSocket
+  - alert: WebSocketConnectionDrop
+    expr: rate(websocket_connections_total{type="disconnect"}[5m]) > rate(websocket_connections_total{type="connect"}[5m])
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Массовое отключение WebSocket клиентов"
+      description: "Количество отключений превышает количество подключений"
+
+  - alert: WebSocketHighLatency
+    expr: websocket_message_duration_seconds{quantile="0.9"} > 0.1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Высокая латентность WebSocket"
+      description: "90-й процентиль времени доставки сообщений превышает 100мс" 

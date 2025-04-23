@@ -1,3 +1,132 @@
+/**
+ * @page DashboardPage
+ * @description Главная страница системы с виджетами и общей статистикой
+ * @author Бурабай Диас
+ * @last_updated 2024-03-23
+ * 
+ * @backend_requirements
+ * 
+ * 1. API Endpoints:
+ * 
+ * GET /api/v1/dashboard/stats
+ * - Получение общей статистики для дашборда
+ * - Параметры запроса:
+ *   - period?: 'day' | 'week' | 'month' | 'year'
+ *   - startDate?: string (YYYY-MM-DD)
+ *   - endDate?: string (YYYY-MM-DD)
+ * 
+ * GET /api/v1/dashboard/widgets
+ * - Получение списка доступных виджетов и их настроек
+ * - Параметры запроса:
+ *   - userId: string
+ *   - role: string
+ * 
+ * PUT /api/v1/dashboard/widgets/layout
+ * - Сохранение расположения виджетов
+ * - Body:
+ *   - userId: string
+ *   - layout: Array<{
+ *       id: string;
+ *       x: number;
+ *       y: number;
+ *       w: number;
+ *       h: number;
+ *     }>
+ * 
+ * GET /api/v1/dashboard/notifications
+ * - Получение уведомлений для дашборда
+ * - Параметры запроса:
+ *   - limit?: number
+ *   - offset?: number
+ *   - type?: 'system' | 'academic' | 'financial'
+ * 
+ * 2. Модели данных:
+ * 
+ * interface DashboardStats {
+ *   students: {
+ *     total: number;
+ *     active: number;
+ *     newToday: number;
+ *     attendance: number;
+ *   };
+ *   teachers: {
+ *     total: number;
+ *     present: number;
+ *     substitutions: number;
+ *   };
+ *   classes: {
+ *     total: number;
+ *     today: number;
+ *     completed: number;
+ *     upcoming: number;
+ *   };
+ *   finances: {
+ *     monthlyRevenue: number;
+ *     outstandingPayments: number;
+ *     projectedIncome: number;
+ *   };
+ * }
+ * 
+ * interface Widget {
+ *   id: string;
+ *   type: string;
+ *   title: string;
+ *   settings: {
+ *     refreshInterval?: number;
+ *     dataSource?: string;
+ *     display?: {
+ *       type: 'chart' | 'table' | 'metric';
+ *       options?: any;
+ *     };
+ *   };
+ *   layout: {
+ *     x: number;
+ *     y: number;
+ *     w: number;
+ *     h: number;
+ *   };
+ * }
+ * 
+ * interface Notification {
+ *   id: string;
+ *   type: 'system' | 'academic' | 'financial';
+ *   title: string;
+ *   message: string;
+ *   severity: 'info' | 'warning' | 'error';
+ *   timestamp: string;
+ *   read: boolean;
+ *   actionUrl?: string;
+ * }
+ * 
+ * 3. Интеграции:
+ * - Система уведомлений для real-time обновлений
+ * - Система аналитики для сбора метрик
+ * - Система авторизации для проверки прав доступа
+ * 
+ * 4. Требования к безопасности:
+ * - Проверка прав доступа к виджетам
+ * - Фильтрация данных по роли пользователя
+ * - Защита от XSS в уведомлениях
+ * - Rate limiting для API endpoints
+ * 
+ * 5. Кэширование:
+ * - Кэширование общей статистики на 5 минут
+ * - Кэширование настроек виджетов на 1 час
+ * - Кэширование расположения виджетов на 24 часа
+ * 
+ * 6. WebSocket события:
+ * - dashboard:stats:update - обновление статистики
+ * - dashboard:notification:new - новое уведомление
+ * - dashboard:widget:update - обновление данных виджета
+ * 
+ * 7. Дополнительные требования:
+ * - Поддержка динамического добавления виджетов
+ * - Автоматическое обновление данных
+ * - Экспорт данных в Excel/PDF
+ * - Поддержка мобильной версии
+ * - Персонализация дашборда для каждого пользователя
+ */
+
 import React from 'react';
 import {
   FaGraduationCap,

@@ -1,4 +1,113 @@
+/**
+ * @page FakePositionsPage
+ * @description Страница контроля фиктивных ставок с использованием AI
+ * 
+ * @backend_requirements
+ * 
+ * 1. API Endpoints:
+ * 
+ * GET /api/v1/fake-positions/alerts
+ * - Получение списка уведомлений о потенциальных нарушениях
+ * - Параметры запроса:
+ *   - status?: 'new' | 'investigating' | 'resolved' | 'dismissed'
+ *   - riskLevel?: 'high' | 'medium' | 'low' | 'none'
+ *   - search?: string
+ *   - page?: number
+ *   - limit?: number
+ * 
+ * GET /api/v1/fake-positions/presence
+ * - Получение данных о присутствии сотрудников
+ * - Параметры запроса:
+ *   - date: string (YYYY-MM-DD)
+ *   - employeeId?: string
+ * 
+ * POST /api/v1/fake-positions/presence
+ * - Регистрация присутствия сотрудника
+ * - Body:
+ *   - employeeId: string
+ *   - date: string (YYYY-MM-DD)
+ *   - time: string (HH:mm)
+ *   - photo: File
+ *   - location: string
+ * 
+ * PUT /api/v1/fake-positions/alerts/{alertId}
+ * - Обновление статуса уведомления
+ * - Body:
+ *   - status: 'investigating' | 'resolved' | 'dismissed'
+ *   - resolutionNote?: string
+ *   - assignedTo?: string
+ * 
+ * POST /api/v1/fake-positions/scan
+ * - Запуск AI проверки для обнаружения фиктивных ставок
+ * - Body:
+ *   - dateRange?: { start: string, end: string }
+ *   - departments?: string[]
+ * 
+ * 2. Модели данных:
+ * 
+ * interface FakePositionAlert {
+ *   id: string;
+ *   employeeId: string;
+ *   employeeName: string;
+ *   position: string;
+ *   department: string;
+ *   riskLevel: 'high' | 'medium' | 'low' | 'none';
+ *   anomalyType: 'no_presence' | 'schedule_conflict' | 'workload_excess' | 
+ *                'qualification_mismatch' | 'document_inconsistency';
+ *   description: string;
+ *   detectedDate: string;
+ *   status: 'new' | 'investigating' | 'resolved' | 'dismissed';
+ *   evidences: Array<{
+ *     type: string;
+ *     description: string;
+ *     confidenceScore: number;
+ *   }>;
+ *   aiConfidence: number;
+ *   resolutionNote?: string;
+ *   assignedTo?: string;
+ * }
+ * 
+ * interface Presence {
+ *   id: string;
+ *   employeeId: string;
+ *   employeeName: string;
+ *   date: string;
+ *   time: string;
+ *   photo: string;
+ *   location: string;
+ *   terminalLog?: {
+ *     entryTime: string;
+ *     exitTime?: string;
+ *   };
+ *   status: 'confirmed' | 'pending' | 'absent';
+ * }
+ * 
+ * 3. Интеграции:
+ * - Система контроля доступа для получения данных о входе/выходе
+ * - Система видеонаблюдения для верификации присутствия
+ * - HR система для получения данных о сотрудниках и ставках
+ * 
+ * 4. Требования к безопасности:
+ * - Доступ только для сотрудников HR с соответствующими правами
+ * - Логирование всех действий с уведомлениями
+ * - Шифрование персональных данных
+ * - Rate limiting для API endpoints
+ * 
+ * 5. Кэширование:
+ * - Кэширование списка уведомлений на 5 минут
+ * - Кэширование данных о присутствии на текущий день на 1 минуту
+ * 
+ * 6. Уведомления:
+ * - WebSocket для real-time обновлений статусов
+ * - Email уведомления ответственным лицам при новых алертах
+ * 
+ * @author Your Name
+ * @last_updated 2024-03-23
+ */
+
 import React, { useState } from 'react';
+import { IconType } from 'react-icons';
+import { IconBaseProps } from 'react-icons/lib';
 import { 
   FaRobot, 
   FaFilter, 
@@ -11,24 +120,13 @@ import {
   FaThumbsUp,
   FaThumbsDown,
   FaFingerprint,
-  FaUserCheck
+  FaUserCheck,
+  FaCamera,
+  FaClock,
+  FaImage,
+  FaHistory,
+  FaMapMarkerAlt
 } from 'react-icons/fa';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  Area
-} from 'recharts';
 
 // Типы данных
 type RiskLevel = 'high' | 'medium' | 'low' | 'none';
@@ -38,6 +136,12 @@ type AnomalyType =
   | 'workload_excess' 
   | 'qualification_mismatch'
   | 'document_inconsistency';
+
+interface Evidence {
+  type: string;
+  description: string;
+  confidenceScore: number;
+}
 
 interface FakePositionAlert {
   id: string;
@@ -50,14 +154,25 @@ interface FakePositionAlert {
   description: string;
   detectedDate: string;
   status: 'new' | 'investigating' | 'resolved' | 'dismissed';
-  evidences: {
-    type: string;
-    description: string;
-    confidenceScore: number;
-  }[];
+  evidences: Evidence[];
   aiConfidence: number;
   resolutionNote?: string;
   assignedTo?: string;
+}
+
+interface Presence {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  date: string;
+  time: string;
+  photo: string;
+  location: string;
+  terminalLog?: {
+    entryTime: string;
+    exitTime?: string;
+  };
+  status: 'confirmed' | 'pending' | 'absent';
 }
 
 // Данные для демонстрации
@@ -225,6 +340,56 @@ const initialAlerts: FakePositionAlert[] = [
   }
 ];
 
+const initialPresenceData: Presence[] = [
+  {
+    id: '1',
+    employeeId: '101',
+    employeeName: 'Сатпаев Арман',
+    date: new Date().toISOString().split('T')[0],
+    time: '08:45',
+    photo: 'https://placehold.co/200x200',
+    location: 'Главный корпус, 203 кабинет',
+    terminalLog: {
+      entryTime: '08:30',
+      exitTime: '17:15'
+    },
+    status: 'confirmed'
+  },
+  {
+    id: '2',
+    employeeId: '102',
+    employeeName: 'Алиева Динара',
+    date: new Date().toISOString().split('T')[0],
+    time: '08:55',
+    photo: 'https://placehold.co/200x200',
+    location: 'Главный корпус, 305 кабинет',
+    terminalLog: {
+      entryTime: '08:45'
+    },
+    status: 'confirmed'
+  },
+  {
+    id: '3',
+    employeeId: '103',
+    employeeName: 'Нурланов Азамат',
+    date: new Date().toISOString().split('T')[0],
+    time: '09:15',
+    photo: 'https://placehold.co/200x200',
+    location: 'Главный корпус, 401 кабинет',
+    status: 'pending'
+  }
+];
+
+interface IconComponentProps {
+  icon: IconType;
+  className?: string;
+}
+
+const IconComponent = ({ icon: Icon, className }: IconComponentProps) => {
+  const Component = Icon as React.ComponentType<{ className?: string }>;
+  return <Component className={className} />;
+};
+
 // Компонент
 const FakePositionsPage: React.FC = () => {
   const [alerts, setAlerts] = useState<FakePositionAlert[]>(initialAlerts);
@@ -233,6 +398,11 @@ const FakePositionsPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<FakePositionAlert['status'] | 'all'>('all');
   const [selectedAlert, setSelectedAlert] = useState<FakePositionAlert | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [presenceData, setPresenceData] = useState<Presence[]>(initialPresenceData);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
   
   // Фильтрация данных
   const filteredAlerts = alerts.filter(alert => {
@@ -246,33 +416,6 @@ const FakePositionsPage: React.FC = () => {
     
     return matchesSearch && matchesRisk && matchesStatus;
   });
-
-  // Статистические данные
-  const riskLevelStats = [
-    { name: 'Высокий', value: alerts.filter(a => a.riskLevel === 'high').length },
-    { name: 'Средний', value: alerts.filter(a => a.riskLevel === 'medium').length },
-    { name: 'Низкий', value: alerts.filter(a => a.riskLevel === 'low').length },
-    { name: 'Нет', value: alerts.filter(a => a.riskLevel === 'none').length }
-  ];
-
-  const statusStats = [
-    { name: 'Новые', value: alerts.filter(a => a.status === 'new').length },
-    { name: 'Расследуются', value: alerts.filter(a => a.status === 'investigating').length },
-    { name: 'Решены', value: alerts.filter(a => a.status === 'resolved').length },
-    { name: 'Отклонены', value: alerts.filter(a => a.status === 'dismissed').length }
-  ];
-
-  const anomalyStats = anomalyTypes.map(type => ({
-    name: type.label,
-    value: alerts.filter(a => a.anomalyType === type.value).length
-  }));
-
-  const trendData = [
-    { month: 'Янв', alerts: 2 },
-    { month: 'Фев', alerts: 4 },
-    { month: 'Мар', alerts: 7 },
-    { month: 'Апр', alerts: 3 }
-  ];
 
   // Вспомогательные функции
   const getRiskLevelColor = (level: RiskLevel) => {
@@ -314,6 +457,48 @@ const FakePositionsPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  // Обработка выбора фото
+  const handlePhotoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setSelectedImage(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  // Подтверждение присутствия
+  const confirmPresence = () => {
+    if (selectedImage) {
+      const newPresence: Presence = {
+        id: Date.now().toString(),
+        employeeId: '101', // В реальном приложении брать из контекста авторизации
+        employeeName: 'Текущий пользователь',
+        date: selectedDate.toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString(),
+        photo: previewUrl,
+        location: 'Определено автоматически',
+        terminalLog: {
+          entryTime: new Date().toLocaleTimeString()
+        },
+        status: 'confirmed'
+      };
+
+      setPresenceData([...presenceData, newPresence]);
+      setShowPhotoModal(false);
+      setSelectedImage(null);
+      setPreviewUrl('');
+    }
+  };
+
+  // Форматирование даты
+  const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -323,150 +508,143 @@ const FakePositionsPage: React.FC = () => {
         </div>
         <div className="flex gap-2">
           <button className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center">
-            <FaRobot className="mr-2" />
+            <IconComponent icon={FaRobot} className="mr-2" />
             Запустить проверку
           </button>
           <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md flex items-center">
-            <FaFileExport className="mr-2" />
+            <IconComponent icon={FaFileExport} className="mr-2" />
             Экспорт
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow-md p-4">
-          <div className="text-sm text-gray-500">Всего уведомлений</div>
-          <div className="text-2xl font-bold text-gray-900 mt-1">{alerts.length}</div>
-          <div className="mt-2 flex items-center">
-            <span className="text-sm text-green-600">+3 за последний месяц</span>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-md p-4">
-          <div className="text-sm text-gray-500">Новые</div>
-          <div className="text-2xl font-bold text-blue-600 mt-1">{alerts.filter(a => a.status === 'new').length}</div>
-          <div className="mt-2 flex items-center">
-            <span className="text-sm text-gray-500">Требуют проверки</span>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-md p-4">
-          <div className="text-sm text-gray-500">В процессе</div>
-          <div className="text-2xl font-bold text-yellow-600 mt-1">{alerts.filter(a => a.status === 'investigating').length}</div>
-          <div className="mt-2 flex items-center">
-            <span className="text-sm text-gray-500">Расследуются</span>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-md p-4">
-          <div className="text-sm text-gray-500">Потенциальная экономия</div>
-          <div className="text-2xl font-bold text-green-600 mt-1">₸ 2,450,000</div>
-          <div className="mt-2 flex items-center">
-            <span className="text-sm text-gray-500">На основе неподтвержденных ставок</span>
-          </div>
-        </div>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold mb-4">Распределение по уровню риска</h2>
-          <ResponsiveContainer width="100%" height={240}>
-            <PieChart>
-              <Pie
-                data={riskLevelStats}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {riskLevelStats.map((entry, index) => {
-                  const colors = {
-                    'Высокий': '#EF4444',
-                    'Средний': '#F59E0B',
-                    'Низкий': '#3B82F6',
-                    'Нет': '#10B981'
-                  };
-                  return (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={colors[entry.name as keyof typeof colors]} 
-                      stroke="none"
-                    />
-                  );
-                })}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  padding: '8px 12px'
-                }}
-                formatter={(value: number, name: string) => [
-                  `${value} уведомлений`,
-                  name
-                ]}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            {riskLevelStats.map((entry, index) => {
-              const colors = {
-                'Высокий': 'bg-red-500',
-                'Средний': 'bg-yellow-500',
-                'Низкий': 'bg-blue-500',
-                'Нет': 'bg-green-500'
-              };
-              const textColors = {
-                'Высокий': 'text-red-700',
-                'Средний': 'text-yellow-700',
-                'Низкий': 'text-blue-700',
-                'Нет': 'text-green-700'
-              };
-              return (
-                <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${colors[entry.name as keyof typeof colors]}`} />
-                    <span className="text-sm text-gray-600">{entry.name}</span>
-                  </div>
-                  <span className={`text-sm font-medium ${textColors[entry.name as keyof typeof textColors]}`}>
-                    {entry.value}
-                  </span>
+        {/* Календарь */}
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-lg font-semibold mb-4">Календарь присутствия</h2>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="grid grid-cols-7 gap-1">
+              {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
+                <div key={day} className="text-center text-sm text-gray-600 font-medium p-2">
+                  {day}
                 </div>
-              );
-            })}
+              ))}
+              {Array.from({ length: 35 }, (_, i) => {
+                const date = new Date(2025, 3, i - 5); // Апрель 2025
+                return (
+                  <div
+                    key={i}
+                    className={`text-center p-2 rounded-lg cursor-pointer hover:bg-blue-50 
+                      ${date.getMonth() === 3 ? 'text-gray-900' : 'text-gray-400'}
+                      ${date.toDateString() === selectedDate.toDateString() ? 'bg-blue-100' : ''}`}
+                    onClick={() => setSelectedDate(new Date(date))}
+                  >
+                    {date.getDate()}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-4">
+            <button
+              onClick={() => setShowPhotoModal(true)}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-md flex items-center justify-center gap-2"
+            >
+              <IconComponent icon={FaCamera} className="w-4 h-4" />
+              Подтвердить присутствие
+            </button>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-md p-4">
-          <h2 className="text-lg font-semibold mb-4">Типы аномалий</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart
-              data={anomalyStats}
-              layout="vertical"
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={150} />
-              <Tooltip />
-              <Bar dataKey="value" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
+
+        {/* Статистика за день */}
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            Статистика за {new Date(selectedDate).toLocaleDateString('ru-RU', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <IconComponent icon={FaUserCheck} className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Присутствуют</div>
+                  <div className="text-2xl font-bold text-green-600">24</div>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500">85%</div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <IconComponent icon={FaClock} className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Опоздали</div>
+                  <div className="text-2xl font-bold text-yellow-600">3</div>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500">10%</div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <IconComponent icon={FaHistory} className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Отсутствуют</div>
+                  <div className="text-2xl font-bold text-red-600">2</div>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500">5%</div>
+            </div>
+          </div>
         </div>
-        <div className="bg-white rounded-xl shadow-md p-4">
-          <h2 className="text-lg font-semibold mb-4">Динамика обнаружений</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart
-              data={trendData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="alerts" stroke="#8884d8" activeDot={{ r: 8 }} />
-            </LineChart>
-          </ResponsiveContainer>
+
+        {/* Журнал присутствия */}
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-lg font-semibold mb-4">Журнал присутствия</h2>
+          <div className="space-y-4">
+            {presenceData
+              .filter(p => p.date === selectedDate.toISOString().split('T')[0])
+              .map(presence => (
+                <div key={presence.id} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-200">
+                    <img
+                      src={presence.photo}
+                      alt="Фото присутствия"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium">{presence.employeeName}</div>
+                    <div className="text-sm text-gray-500 flex items-center gap-2">
+                      <IconComponent icon={FaClock} className="w-4 h-4" />
+                      {presence.time}
+                    </div>
+                    <div className="text-sm text-gray-500 flex items-center gap-2">
+                      <IconComponent icon={FaMapMarkerAlt} className="w-4 h-4" />
+                      {presence.location}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium
+                      ${presence.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                        presence.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'}`}>
+                      {presence.status === 'confirmed' ? 'Подтверждено' :
+                        presence.status === 'pending' ? 'Ожидает' : 'Отсутствует'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
         </div>
       </div>
 
@@ -480,7 +658,7 @@ const FakePositionsPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <FaSearch className="absolute left-3 top-3 text-gray-400" />
+            <IconComponent icon={FaSearch} className="absolute left-3 top-3 text-gray-400" />
           </div>
           <div className="relative">
             <select
@@ -494,7 +672,7 @@ const FakePositionsPage: React.FC = () => {
               <option value="low">Низкий риск</option>
               <option value="none">Без риска</option>
             </select>
-            <FaFilter className="absolute left-3 top-3 text-gray-400" />
+            <IconComponent icon={FaFilter} className="absolute left-3 top-3 text-gray-400" />
           </div>
           <div className="relative">
             <select
@@ -508,7 +686,7 @@ const FakePositionsPage: React.FC = () => {
               <option value="resolved">Решены</option>
               <option value="dismissed">Отклонены</option>
             </select>
-            <FaFilter className="absolute left-3 top-3 text-gray-400" />
+            <IconComponent icon={FaFilter} className="absolute left-3 top-3 text-gray-400" />
           </div>
         </div>
       </div>
@@ -598,7 +776,7 @@ const FakePositionsPage: React.FC = () => {
                       handleAlertClick(alert);
                     }}
                   >
-                    <FaEye />
+                    <IconComponent icon={FaEye} />
                   </button>
                 </td>
               </tr>
@@ -620,7 +798,7 @@ const FakePositionsPage: React.FC = () => {
                     selectedAlert.riskLevel === 'low' ? 'bg-blue-100 text-blue-800' : 
                     'bg-green-100 text-green-800'
                   }`}>
-                    <FaExclamationTriangle className="w-8 h-8" />
+                    <IconComponent icon={FaExclamationTriangle} className="w-8 h-8" />
                   </div>
                   <div>
                     <div className="flex items-center">
@@ -659,7 +837,7 @@ const FakePositionsPage: React.FC = () => {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-500 mb-1">ID сотрудника</div>
                   <div className="flex items-center">
-                    <FaFingerprint className="text-blue-500 mr-2" />
+                    <IconComponent icon={FaFingerprint} className="text-blue-500 mr-2" />
                     <span className="text-base font-medium text-gray-900">{selectedAlert.employeeId}</span>
                   </div>
                 </div>
@@ -717,7 +895,7 @@ const FakePositionsPage: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-3 border-b pb-2">Назначено</h3>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center">
-                      <FaUserCheck className="text-blue-500 mr-2" />
+                      <IconComponent icon={FaUserCheck} className="text-blue-500 mr-2" />
                       <span className="font-medium">{selectedAlert.assignedTo}</span>
                     </div>
                   </div>
@@ -729,7 +907,7 @@ const FakePositionsPage: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-3 border-b pb-2">Примечание по разрешению</h3>
                   <div className="p-4 bg-green-50 rounded-lg">
                     <div className="flex items-start">
-                      <FaInfoCircle className="text-green-500 mr-2 mt-0.5" />
+                      <IconComponent icon={FaInfoCircle} className="text-green-500 mr-2 mt-0.5" />
                       <p className="text-green-800">{selectedAlert.resolutionNote}</p>
                     </div>
                   </div>
@@ -740,11 +918,11 @@ const FakePositionsPage: React.FC = () => {
                 {selectedAlert.status === 'new' && (
                   <>
                     <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md mr-2 flex items-center">
-                      <FaThumbsDown className="mr-2" />
+                      <IconComponent icon={FaThumbsDown} className="mr-2" />
                       Отклонить
                     </button>
                     <button className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-md mr-2 flex items-center">
-                      <FaInfoCircle className="mr-2" />
+                      <IconComponent icon={FaInfoCircle} className="mr-2" />
                       Начать расследование
                     </button>
                   </>
@@ -752,22 +930,71 @@ const FakePositionsPage: React.FC = () => {
                 {selectedAlert.status === 'investigating' && (
                   <>
                     <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md mr-2 flex items-center">
-                      <FaThumbsDown className="mr-2" />
+                      <IconComponent icon={FaThumbsDown} className="mr-2" />
                       Отклонить как ложное
                     </button>
                     <button className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center">
-                      <FaThumbsUp className="mr-2" />
+                      <IconComponent icon={FaThumbsUp} className="mr-2" />
                       Подтвердить нарушение
                     </button>
                   </>
                 )}
                 {(selectedAlert.status === 'resolved' || selectedAlert.status === 'dismissed') && (
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center">
-                    <FaFileExport className="mr-2" />
+                    <IconComponent icon={FaFileExport} className="mr-2" />
                     Экспорт отчета
                   </button>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно для загрузки фото */}
+      {showPhotoModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Подтверждение присутствия</h3>
+            <div className="mb-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="max-h-48 mx-auto rounded-lg"
+                  />
+                ) : (
+                  <div className="space-y-2">
+                    <IconComponent icon={FaImage} className="w-12 h-12 mx-auto text-gray-400" />
+                    <div className="text-sm text-gray-500">
+                      Нажмите для выбора фото или перетащите файл
+                    </div>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoSelect}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowPhotoModal(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={confirmPresence}
+                disabled={!selectedImage}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center gap-2 disabled:opacity-50"
+              >
+                <IconComponent icon={FaCheck} className="w-4 h-4" />
+                Подтвердить
+              </button>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'corporate-primary': '#1C7E66',
+        'corporate-primary': '#1e40af',
         'corporate-secondary': '#fff',
         'corporate-bg': '#f8fafc',
         'notion-gray': {

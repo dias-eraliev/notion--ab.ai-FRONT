@@ -336,17 +336,17 @@ const StudyPlansPage: React.FC = () => {
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasVideo ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasVideo ? 'bg-blue-100 text-blue-600' : 'bg-red-100 text-red-600'}`}>
                               {lesson.hasVideo ? '✓' : '×'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasPresentation ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasPresentation ? 'bg-blue-100 text-blue-600' : 'bg-red-100 text-red-600'}`}>
                               {lesson.hasPresentation ? '✓' : '×'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasTest ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasTest ? 'bg-blue-100 text-blue-600' : 'bg-red-100 text-red-600'}`}>
                               {lesson.hasTest ? '✓' : '×'}
                             </span>
                           </td>

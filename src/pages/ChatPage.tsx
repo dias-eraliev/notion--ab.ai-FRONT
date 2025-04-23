@@ -1,3 +1,123 @@
+/**
+ * @page ChatPage
+ * @description Страница чата для общения между пользователями системы
+ * @author Бурабай Диас
+ * @last_updated 2024-03-23
+ * 
+ * @backend_requirements
+ * 
+ * 1. API Endpoints:
+ * 
+ * GET /api/v1/chat/conversations
+ * - Получение списка чатов пользователя
+ * - Параметры запроса:
+ *   - type?: 'private' | 'group'
+ *   - limit?: number
+ *   - offset?: number
+ * 
+ * GET /api/v1/chat/messages/{conversationId}
+ * - Получение сообщений чата
+ * - Параметры запроса:
+ *   - before?: string (timestamp)
+ *   - limit?: number
+ * 
+ * POST /api/v1/chat/messages
+ * - Отправка нового сообщения
+ * - Body:
+ *   - conversationId: string
+ *   - content: string
+ *   - type: 'text' | 'file' | 'image'
+ *   - attachments?: Array<{
+ *       type: string;
+ *       url: string;
+ *       name: string;
+ *       size: number;
+ *     }>
+ * 
+ * POST /api/v1/chat/conversations
+ * - Создание нового чата
+ * - Body:
+ *   - type: 'private' | 'group'
+ *   - name?: string (для групповых чатов)
+ *   - participants: string[]
+ * 
+ * PUT /api/v1/chat/messages/{messageId}
+ * - Редактирование сообщения
+ * - Body:
+ *   - content: string
+ * 
+ * DELETE /api/v1/chat/messages/{messageId}
+ * - Удаление сообщения
+ * 
+ * 2. Модели данных:
+ * 
+ * interface Conversation {
+ *   id: string;
+ *   type: 'private' | 'group';
+ *   name?: string;
+ *   participants: Array<{
+ *     id: string;
+ *     name: string;
+ *     avatar?: string;
+ *     status: 'online' | 'offline' | 'away';
+ *     lastSeen?: string;
+ *   }>;
+ *   lastMessage?: Message;
+ *   unreadCount: number;
+ *   createdAt: string;
+ *   updatedAt: string;
+ * }
+ * 
+ * interface Message {
+ *   id: string;
+ *   conversationId: string;
+ *   senderId: string;
+ *   content: string;
+ *   type: 'text' | 'file' | 'image';
+ *   attachments?: Array<{
+ *     type: string;
+ *     url: string;
+ *     name: string;
+ *     size: number;
+ *   }>;
+ *   status: 'sent' | 'delivered' | 'read';
+ *   createdAt: string;
+ *   updatedAt: string;
+ *   editedAt?: string;
+ * }
+ * 
+ * 3. WebSocket события:
+ * - chat:message:new - новое сообщение
+ * - chat:message:update - обновление сообщения
+ * - chat:message:delete - удаление сообщения
+ * - chat:typing - индикатор печати
+ * - chat:status - изменение статуса пользователя
+ * - chat:read - прочтение сообщений
+ * 
+ * 4. Требования к безопасности:
+ * - Шифрование сообщений
+ * - Проверка прав доступа к чатам
+ * - Защита от спама
+ * - Фильтрация контента
+ * - Ограничение размера файлов
+ * - Rate limiting для сообщений
+ * 
+ * 5. Кэширование:
+ * - Кэширование списка чатов на 1 минуту
+ * - Кэширование сообщений на 5 минут
+ * - Кэширование информации о пользователях на 10 минут
+ * 
+ * 6. Дополнительные требования:
+ * - Поддержка форматирования текста (markdown)
+ * - Поддержка эмодзи
+ * - Поиск по сообщениям
+ * - Экспорт истории чата
+ * - Автоматическое удаление старых сообщений
+ * - Модерация контента
+ * - Push-уведомления
+ * - Поддержка офлайн-режима
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { FaSearch, FaEllipsisH, FaPaperclip, FaSmile, FaMicrophone, FaPaperPlane, FaTimes } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';

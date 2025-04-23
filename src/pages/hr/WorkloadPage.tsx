@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, ReactElement, FC } from 'react';
+import { IconType } from 'react-icons';
+import { IconBaseProps } from 'react-icons/lib';
 import { 
   FaDownload, 
   FaSearch, 
@@ -7,7 +9,10 @@ import {
   FaCalendarAlt,
   FaClock,
   FaChevronDown,
-  FaUser
+  FaUser,
+  FaEdit,
+  FaSave,
+  FaTimes
 } from 'react-icons/fa';
 import {
   BarChart,
@@ -20,179 +25,98 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  PieLabel
 } from 'recharts';
 
-interface TeacherWorkload {
-  id: string;
-  name: string;
-  position: string;
+interface WorkloadPeriod {
   standardHours: number;
   actualHours: number;
-  monthlyHours: {
-    month: number;
-    standardHours: number;
-    actualHours: number;
-  }[];
-  quarterlyHours: {
-    quarter: number;
-    standardHours: number;
-    actualHours: number;
-  }[];
-  subjects: {
-    name: string;
-    hours: number;
-    classes: string[];
-  }[];
-  additionalActivities: {
-    name: string;
-    hours: number;
-    description: string;
-  }[];
+  quarter?: number;
+  month?: number;
+}
+
+interface MonthlyWorkload {
+  month: number;
+  standardHours: number;
+  actualHours: number;
+}
+
+interface QuarterlyWorkload {
+  quarter: number;
+  standardHours: number;
+  actualHours: number;
+}
+
+interface DailyWorkload {
+  date: string;
+  hours: number;
+  type: WorkloadType;
+  comment: string;
+}
+
+interface Subject {
+  name: string;
+  hours: number;
+  classes: string[];
+}
+
+interface AdditionalActivity {
+  name: string;
+  hours: number;
+  description: string;
+}
+
+type WorkloadType = 'regular' | 'overtime' | 'sick' | 'vacation';
+
+interface CustomLabelProps {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+  index: number;
+  value: number;
+}
+
+interface IconProps extends IconBaseProps {
+  icon: IconType;
+}
+
+const Icon: FC<IconProps> = ({ icon: IconComponent, ...props }) => {
+  return <IconComponent {...props} as unknown as ReactElement />;
+};
+
+interface TeacherWorkload {
+  id: number;
+  name: string;
+  standardHours: number;
+  actualHours: number;
+  monthlyHours: MonthlyWorkload[];
+  quarterlyHours: QuarterlyWorkload[];
+  dailyHours: DailyWorkload[];
+  overtimeHours: number;
   vacationDays: number;
   sickLeaveDays: number;
+  subjects: Subject[];
+  additionalActivities: AdditionalActivity[];
 }
 
 const initialTeachers: TeacherWorkload[] = [
   {
-    id: '001',
-    name: 'Сатпаев Арман Болатович',
-    position: 'Учитель математики',
-    standardHours: 720,
-    actualHours: 680,
-    monthlyHours: [
-      { month: 9, standardHours: 80, actualHours: 75 },
-      { month: 10, standardHours: 80, actualHours: 82 },
-      { month: 11, standardHours: 80, actualHours: 78 },
-      { month: 12, standardHours: 60, actualHours: 58 },
-      { month: 1, standardHours: 80, actualHours: 76 },
-      { month: 2, standardHours: 80, actualHours: 80 },
-      { month: 3, standardHours: 80, actualHours: 82 },
-      { month: 4, standardHours: 80, actualHours: 75 },
-      { month: 5, standardHours: 100, actualHours: 95 }
-    ],
-    quarterlyHours: [
-      { quarter: 1, standardHours: 240, actualHours: 235 },
-      { quarter: 2, standardHours: 220, actualHours: 214 },
-      { quarter: 3, standardHours: 240, actualHours: 238 },
-      { quarter: 4, standardHours: 180, actualHours: 170 }
-    ],
-    subjects: [
-      {
-        name: 'Алгебра',
-        hours: 280,
-        classes: ['10A', '10Б', '11A', '11Б']
-      },
-      {
-        name: 'Геометрия',
-        hours: 240,
-        classes: ['10A', '10Б', '11A', '11Б']
-      },
-      {
-        name: 'Математический анализ',
-        hours: 120,
-        classes: ['11A', '11Б']
-      }
-    ],
-    additionalActivities: [
-      {
-        name: 'Руководство методическим объединением',
-        hours: 40,
-        description: 'Координация работы учителей математики'
-      }
-    ],
-    vacationDays: 28,
-    sickLeaveDays: 5
-  },
-  {
-    id: '002',
-    name: 'Петрова Мария Сергеевна',
-    position: 'Учитель русского языка',
-    standardHours: 680,
-    actualHours: 700,
-    monthlyHours: [
-      { month: 9, standardHours: 75, actualHours: 78 },
-      { month: 10, standardHours: 75, actualHours: 77 },
-      { month: 11, standardHours: 75, actualHours: 76 },
-      { month: 12, standardHours: 55, actualHours: 57 },
-      { month: 1, standardHours: 75, actualHours: 78 },
-      { month: 2, standardHours: 75, actualHours: 77 },
-      { month: 3, standardHours: 75, actualHours: 79 },
-      { month: 4, standardHours: 75, actualHours: 77 },
-      { month: 5, standardHours: 100, actualHours: 101 }
-    ],
-    quarterlyHours: [
-      { quarter: 1, standardHours: 225, actualHours: 231 },
-      { quarter: 2, standardHours: 205, actualHours: 212 },
-      { quarter: 3, standardHours: 225, actualHours: 234 },
-      { quarter: 4, standardHours: 175, actualHours: 178 }
-    ],
-    subjects: [
-      {
-        name: 'Русский язык',
-        hours: 360,
-        classes: ['9A', '9Б', '10A', '10Б', '11A', '11Б']
-      },
-      {
-        name: 'Литература',
-        hours: 300,
-        classes: ['9A', '9Б', '10A', '10Б', '11A']
-      }
-    ],
-    additionalActivities: [
-      {
-        name: 'Подготовка к олимпиадам',
-        hours: 40,
-        description: 'Дополнительные занятия с одаренными учениками'
-      }
-    ],
-    vacationDays: 35,
-    sickLeaveDays: 0
-  },
-  {
-    id: '003',
-    name: 'Сидоров Алексей Петрович',
-    position: 'Учитель физики',
-    standardHours: 640,
-    actualHours: 620,
-    monthlyHours: [
-      { month: 9, standardHours: 70, actualHours: 68 },
-      { month: 10, standardHours: 70, actualHours: 69 },
-      { month: 11, standardHours: 70, actualHours: 67 },
-      { month: 12, standardHours: 50, actualHours: 48 },
-      { month: 1, standardHours: 70, actualHours: 69 },
-      { month: 2, standardHours: 70, actualHours: 68 },
-      { month: 3, standardHours: 70, actualHours: 67 },
-      { month: 4, standardHours: 70, actualHours: 66 },
-      { month: 5, standardHours: 100, actualHours: 98 }
-    ],
-    quarterlyHours: [
-      { quarter: 1, standardHours: 210, actualHours: 204 },
-      { quarter: 2, standardHours: 190, actualHours: 185 },
-      { quarter: 3, standardHours: 210, actualHours: 204 },
-      { quarter: 4, standardHours: 170, actualHours: 164 }
-    ],
-    subjects: [
-      {
-        name: 'Физика',
-        hours: 480,
-        classes: ['7A', '7Б', '8A', '8Б', '9A', '9Б', '10A', '10Б', '11A', '11Б']
-      },
-      {
-        name: 'Астрономия',
-        hours: 120,
-        classes: ['10A', '10Б', '11A', '11Б']
-      }
-    ],
-    additionalActivities: [
-      {
-        name: 'Научное руководство проектами',
-        hours: 20,
-        description: 'Руководство научными проектами учеников'
-      }
-    ],
-    vacationDays: 28,
-    sickLeaveDays: 3
+    id: 1,
+    name: "Иванов Иван Иванович",
+    standardHours: 180,
+    actualHours: 165,
+    monthlyHours: [],
+    quarterlyHours: [],
+    dailyHours: [],
+    overtimeHours: 5,
+    vacationDays: 0,
+    sickLeaveDays: 0,
+    subjects: [],
+    additionalActivities: []
   }
 ];
 
@@ -205,10 +129,27 @@ const WorkloadPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [periodType, setPeriodType] = useState<'month' | 'quarter' | 'year'>('year');
   const [selectedPeriod, setSelectedPeriod] = useState<number>(new Date().getMonth() + 1);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedHours, setEditedHours] = useState<{
+    standardHours: number;
+    actualHours: number;
+    monthlyHours: { month: number; standardHours: number; actualHours: number; }[];
+    quarterlyHours: { quarter: number; standardHours: number; actualHours: number; }[];
+    dailyHours?: DailyWorkload[];
+  } | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [showDailyHours, setShowDailyHours] = useState(false);
+  const [newDailyRecord, setNewDailyRecord] = useState({
+    hours: 0,
+    type: 'regular' as const,
+    comment: ''
+  });
+  const [selectedWorkloadType, setSelectedWorkloadType] = useState<WorkloadType>('regular');
+  const [selectedTeachers, setSelectedTeachers] = useState<TeacherWorkload[]>([]);
+  const [totalHours, setTotalHours] = useState<number>(0);
 
   const filteredTeachers = teachers.filter(teacher => {
-    const matchesSearch = teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          teacher.position.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = teacher.name.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesSearch;
   });
@@ -272,23 +213,166 @@ const WorkloadPage: React.FC = () => {
 
   const handleTeacherClick = (teacher: TeacherWorkload) => {
     setSelectedTeacher(teacher);
+    setEditedHours({
+      standardHours: teacher.standardHours,
+      actualHours: teacher.actualHours,
+      monthlyHours: [...teacher.monthlyHours],
+      quarterlyHours: [...teacher.quarterlyHours],
+      dailyHours: [...teacher.dailyHours]
+    });
     setIsModalOpen(true);
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-medium text-gray-900">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value} ч.
-            </p>
-          ))}
-        </div>
-      );
+  const handleSaveChanges = () => {
+    if (!selectedTeacher || !editedHours) return;
+
+    const updatedTeachers = teachers.map(teacher => {
+      if (teacher.id === selectedTeacher.id) {
+        return {
+          ...teacher,
+          standardHours: editedHours.standardHours,
+          actualHours: editedHours.actualHours,
+          monthlyHours: editedHours.monthlyHours,
+          quarterlyHours: editedHours.quarterlyHours,
+          dailyHours: editedHours.dailyHours
+        };
+      }
+      return teacher;
+    });
+
+    setTeachers(updatedTeachers);
+    setIsEditing(false);
+  };
+
+  const handleHoursChange = (type: 'standard' | 'actual', period: 'year' | 'month' | 'quarter', index?: number, value?: number) => {
+    if (!editedHours) return;
+
+    const newEditedHours = { ...editedHours };
+
+    if (period === 'year') {
+      if (type === 'standard') {
+        newEditedHours.standardHours = value || 0;
+      } else {
+        newEditedHours.actualHours = value || 0;
+      }
+    } else if (period === 'month' && typeof index === 'number') {
+      const monthData = newEditedHours.monthlyHours[index];
+      if (monthData) {
+        if (type === 'standard') {
+          monthData.standardHours = value || 0;
+        } else {
+          monthData.actualHours = value || 0;
+        }
+      }
+    } else if (period === 'quarter' && typeof index === 'number') {
+      const quarterData = newEditedHours.quarterlyHours[index];
+      if (quarterData) {
+        if (type === 'standard') {
+          quarterData.standardHours = value || 0;
+        } else {
+          quarterData.actualHours = value || 0;
+        }
+      }
     }
-    return null;
+
+    // Пересчитываем общие часы
+    if (period !== 'year') {
+      newEditedHours.standardHours = type === 'standard' 
+        ? (period === 'month' 
+          ? newEditedHours.monthlyHours.reduce((sum, m) => sum + m.standardHours, 0)
+          : newEditedHours.quarterlyHours.reduce((sum, q) => sum + q.standardHours, 0))
+        : newEditedHours.standardHours;
+
+      newEditedHours.actualHours = type === 'actual'
+        ? (period === 'month'
+          ? newEditedHours.monthlyHours.reduce((sum, m) => sum + m.actualHours, 0)
+          : newEditedHours.quarterlyHours.reduce((sum, q) => sum + q.actualHours, 0))
+        : newEditedHours.actualHours;
+    }
+
+    setEditedHours(newEditedHours);
+  };
+
+  const handleAddDailyHours = () => {
+    if (!selectedTeacher || !editedHours) return;
+
+    const updatedHours = {
+      ...editedHours,
+      dailyHours: [
+        ...editedHours.dailyHours || [],
+        {
+          date: selectedDate,
+          hours: newDailyRecord.hours,
+          type: newDailyRecord.type,
+          comment: newDailyRecord.comment || undefined
+        }
+      ]
+    };
+
+    // Пересчитываем фактические часы
+    const monthIndex = new Date(selectedDate).getMonth();
+    const monthData = updatedHours.monthlyHours[monthIndex];
+    if (monthData) {
+      monthData.actualHours += newDailyRecord.hours;
+    }
+
+    setEditedHours(updatedHours);
+    setNewDailyRecord({ hours: 0, type: 'regular', comment: '' });
+  };
+
+  type Period = MonthlyWorkload | QuarterlyWorkload;
+
+  const handlePeriodSelect = (period: Period): void => {
+    if ('month' in period) {
+      setSelectedPeriod(period.month);
+      setPeriodType('month');
+    } else if ('quarter' in period) {
+      setSelectedPeriod(period.quarter);
+      setPeriodType('quarter');
+    }
+  };
+
+  const calculateTotalHours = (workload: MonthlyWorkload | QuarterlyWorkload): number => {
+    return workload.standardHours + workload.actualHours;
+  };
+
+  const calculateStandardHours = (workload: TeacherWorkload): number => {
+    return workload.standardHours || 0;
+  };
+
+  const handleWorkloadTypeChange = (type: WorkloadType) => {
+    setSelectedWorkloadType(type);
+  };
+
+  const handleTeacherSelect = (teachers: TeacherWorkload[]) => {
+    const validTeachers = teachers.map(teacher => ({
+      ...teacher,
+      dailyHours: teacher.dailyHours || []
+    }));
+    setSelectedTeachers(validTeachers);
+    const total = validTeachers.reduce((sum, teacher) => sum + (teacher.standardHours || 0), 0);
+    setTotalHours(total);
+  };
+
+  const renderCustomizedLabel: React.FC<CustomLabelProps> = (props) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, value, index } = props;
+    const RADIAN = Math.PI / 180;
+    const radius = 25 + innerRadius + (outerRadius - innerRadius);
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#374151"
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline="central"
+        className="text-sm"
+      >
+        {`${subjectWorkload[index].name} (${value} ч.)`}
+      </text>
+    );
   };
 
   return (
@@ -312,7 +396,7 @@ const WorkloadPage: React.FC = () => {
               <option value="quarter">По четвертям</option>
               <option value="month">По месяцам</option>
             </select>
-            <FaCalendarAlt className="absolute ml-2 text-gray-400 pointer-events-none" />
+            <Icon icon={FaCalendarAlt} className="absolute ml-2 text-gray-400 pointer-events-none" />
             
             {periodType !== 'year' && (
               <>
@@ -332,18 +416,18 @@ const WorkloadPage: React.FC = () => {
                     ))
                   )}
                 </select>
-                <FaChevronDown className="absolute right-3 text-gray-400 pointer-events-none" style={{ marginLeft: periodType === 'month' ? '180px' : '140px' }} />
+                <Icon icon={FaChevronDown} className="absolute right-3 text-gray-400 pointer-events-none" style={{ marginLeft: periodType === 'month' ? '180px' : '140px' }} />
               </>
             )}
           </div>
         </div>
         <div className="flex gap-2">
           <button className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center">
-            <FaDownload className="mr-2" />
+            <Icon icon={FaDownload} className="mr-2" />
             Загрузить шаблон
           </button>
           <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md flex items-center">
-            <FaFileExport className="mr-2" />
+            <Icon icon={FaFileExport} className="mr-2" />
             Экспорт
           </button>
         </div>
@@ -413,33 +497,7 @@ const WorkloadPage: React.FC = () => {
                   fill="#8884d8"
                   paddingAngle={5}
                   dataKey="hours"
-                  label={({
-                    cx,
-                    cy,
-                    midAngle,
-                    innerRadius,
-                    outerRadius,
-                    value,
-                    index
-                  }) => {
-                    const RADIAN = Math.PI / 180;
-                    const radius = 25 + innerRadius + (outerRadius - innerRadius);
-                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-                    return (
-                      <text
-                        x={x}
-                        y={y}
-                        fill="#374151"
-                        textAnchor={x > cx ? 'start' : 'end'}
-                        dominantBaseline="central"
-                        className="text-sm"
-                      >
-                        {subjectWorkload[index].name} ({value} ч.)
-                      </text>
-                    );
-                  }}
+                  label={renderCustomizedLabel}
                 >
                   {subjectWorkload.map((entry, index) => (
                     <Cell 
@@ -483,7 +541,7 @@ const WorkloadPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <FaSearch className="absolute left-3 top-3 text-gray-400" />
+            <Icon icon={FaSearch} className="absolute left-3 top-3 text-gray-400" />
           </div>
         </div>
       </div>
@@ -517,7 +575,6 @@ const WorkloadPage: React.FC = () => {
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{teacher.name}</div>
-                    <div className="text-sm text-gray-500">{teacher.position}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {periodData.standardHours} ч.
@@ -553,113 +610,201 @@ const WorkloadPage: React.FC = () => {
       </div>
 
       {/* Модальное окно с подробностями о нагрузке преподавателя */}
-      {isModalOpen && selectedTeacher && (
+      {isModalOpen && selectedTeacher && editedHours && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">{selectedTeacher.name}</h2>
-                  <p className="text-gray-600">{selectedTeacher.position}</p>
                 </div>
-                <button 
-                  className="text-gray-500 hover:text-gray-700"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  ✕
-                </button>
+                <div className="flex items-center gap-2">
+                  {!isEditing ? (
+                    <button 
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center gap-2"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      <Icon icon={FaEdit} />
+                      Редактировать нагрузку
+                    </button>
+                  ) : (
+                    <>
+                      <button 
+                        className="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center gap-2"
+                        onClick={() => {
+                          setIsEditing(false);
+                          setEditedHours({
+                            standardHours: selectedTeacher.standardHours,
+                            actualHours: selectedTeacher.actualHours,
+                            monthlyHours: [...selectedTeacher.monthlyHours],
+                            quarterlyHours: [...selectedTeacher.quarterlyHours],
+                            dailyHours: [...selectedTeacher.dailyHours]
+                          });
+                        }}
+                      >
+                        <Icon icon={FaTimes} />
+                        Отменить
+                      </button>
+                      <button 
+                        className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center gap-2"
+                        onClick={handleSaveChanges}
+                      >
+                        <Icon icon={FaSave} />
+                        Сохранить
+                      </button>
+                    </>
+                  )}
+                  <button 
+                    className="text-gray-500 hover:text-gray-700 ml-2"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setIsEditing(false);
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <div className="text-sm text-blue-700">Нормативная нагрузка</div>
-                  <div className="text-2xl font-bold">
-                    {getPeriodData(selectedTeacher).standardHours} ч.
-                    <div className="text-sm font-normal text-blue-600">
-                      {periodType === 'month' ? getMonthName(selectedPeriod) :
-                       periodType === 'quarter' ? getQuarterName(selectedPeriod) :
-                       'За год'}
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      className="w-full mt-1 px-3 py-2 border rounded-md"
+                      value={editedHours.standardHours}
+                      onChange={(e) => handleHoursChange('standard', 'year', undefined, Number(e.target.value))}
+                    />
+                  ) : (
+                    <div className="text-2xl font-bold">
+                      {editedHours.standardHours} ч.
                     </div>
+                  )}
+                  <div className="text-sm font-normal text-blue-600">
+                    {periodType === 'month' ? getMonthName(selectedPeriod) :
+                     periodType === 'quarter' ? getQuarterName(selectedPeriod) :
+                     'За год'}
                   </div>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg">
                   <div className="text-sm text-green-700">Фактическая нагрузка</div>
-                  <div className="text-2xl font-bold">
-                    {getPeriodData(selectedTeacher).actualHours} ч.
-                    <div className="text-sm font-normal text-green-600">
-                      {periodType === 'month' ? getMonthName(selectedPeriod) :
-                       periodType === 'quarter' ? getQuarterName(selectedPeriod) :
-                       'За год'}
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      className="w-full mt-1 px-3 py-2 border rounded-md"
+                      value={editedHours.actualHours}
+                      onChange={(e) => handleHoursChange('actual', 'year', undefined, Number(e.target.value))}
+                    />
+                  ) : (
+                    <div className="text-2xl font-bold">
+                      {editedHours.actualHours} ч.
                     </div>
+                  )}
+                  <div className="text-sm font-normal text-green-600">
+                    {periodType === 'month' ? getMonthName(selectedPeriod) :
+                     periodType === 'quarter' ? getQuarterName(selectedPeriod) :
+                     'За год'}
                   </div>
                 </div>
                 <div className={`p-4 rounded-lg ${
-                  getPeriodData(selectedTeacher).actualHours > getPeriodData(selectedTeacher).standardHours ? 'bg-red-50 text-red-700' : 
-                  getPeriodData(selectedTeacher).actualHours < getPeriodData(selectedTeacher).standardHours ? 'bg-yellow-50 text-yellow-700' : 
+                  editedHours.actualHours > editedHours.standardHours ? 'bg-red-50 text-red-700' : 
+                  editedHours.actualHours < editedHours.standardHours ? 'bg-yellow-50 text-yellow-700' : 
                   'bg-green-50 text-green-700'
                 }`}>
                   <div className="text-sm">Отклонение</div>
                   <div className="text-2xl font-bold">
-                    {getPeriodData(selectedTeacher).actualHours - getPeriodData(selectedTeacher).standardHours} ч.
+                    {editedHours.actualHours - editedHours.standardHours} ч.
                   </div>
                 </div>
               </div>
 
-              {/* График нагрузки по периодам */}
+              {/* График нагрузки по периодам с возможностью редактирования */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3 border-b pb-2">Динамика нагрузки</h3>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={
-                        periodType === 'month' 
-                          ? selectedTeacher.monthlyHours
-                          : selectedTeacher.quarterlyHours
-                      }
-                      margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis 
-                        dataKey={periodType === 'month' ? 'month' : 'quarter'}
-                        tickFormatter={
+                {isEditing ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead>
+                        <tr>
+                          <th className="px-4 py-2">Период</th>
+                          <th className="px-4 py-2">Норма часов</th>
+                          <th className="px-4 py-2">Фактические часы</th>
+                          <th className="px-4 py-2">Отклонение</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(periodType === 'month' ? editedHours.monthlyHours : editedHours.quarterlyHours).map((period, index) => (
+                          <tr key={index}>
+                            <td className="px-4 py-2">
+                              {periodType === 'month' ? getMonthName(period.month) : `${period.quarter} четверть`}
+                            </td>
+                            <td className="px-4 py-2">
+                              <input
+                                type="number"
+                                className="w-24 px-2 py-1 border rounded"
+                                value={period.standardHours}
+                                onChange={(e) => handleHoursChange('standard', periodType, index, Number(e.target.value))}
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <input
+                                type="number"
+                                className="w-24 px-2 py-1 border rounded"
+                                value={period.actualHours}
+                                onChange={(e) => handleHoursChange('actual', periodType, index, Number(e.target.value))}
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <span className={
+                                period.actualHours > period.standardHours ? 'text-red-600' :
+                                period.actualHours < period.standardHours ? 'text-yellow-600' :
+                                'text-green-600'
+                              }>
+                                {period.actualHours - period.standardHours}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="h-[300px]">
+                    {/* Существующий график */}
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={
                           periodType === 'month' 
-                            ? (value) => getMonthName(value).substring(0, 3)
-                            : (value) => `${value} чет.`
+                            ? editedHours.monthlyHours
+                            : editedHours.quarterlyHours
                         }
-                      />
-                      <YAxis 
-                        label={{ 
-                          value: 'Часы',
-                          angle: -90,
-                          position: 'insideLeft',
-                          style: { fill: '#6B7280' }
-                        }}
-                      />
-                      <Tooltip 
-                        content={({ active, payload, label }) => {
-                          if (active && payload && payload.length) {
-                            return (
-                              <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-                                <p className="font-medium text-gray-900">
-                                  {periodType === 'month' ? getMonthName(label) : `${label} четверть`}
-                                </p>
-                                {payload.map((entry: any) => (
-                                  <p key={entry.name} className="text-sm" style={{ color: entry.color }}>
-                                    {entry.name === 'standardHours' ? 'Норма: ' : 'Факт: '}
-                                    {entry.value} ч.
-                                  </p>
-                                ))}
-                              </div>
-                            );
+                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis 
+                          dataKey={periodType === 'month' ? 'month' : 'quarter'}
+                          tickFormatter={
+                            periodType === 'month' 
+                              ? (value) => getMonthName(value).substring(0, 3)
+                              : (value) => `${value} чет.`
                           }
-                          return null;
-                        }}
-                      />
-                      <Bar dataKey="standardHours" name="Норма часов" fill="#8884d8" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="actualHours" name="Фактические часы" fill="#82ca9d" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                        />
+                        <YAxis 
+                          label={{ 
+                            value: 'Часы',
+                            angle: -90,
+                            position: 'insideLeft',
+                            style: { fill: '#6B7280' }
+                          }}
+                        />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Bar dataKey="standardHours" name="Норма часов" fill="#8884d8" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="actualHours" name="Фактические часы" fill="#82ca9d" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
               </div>
 
               <div className="mb-6">
@@ -728,7 +873,7 @@ const WorkloadPage: React.FC = () => {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <FaCalendarAlt className="text-blue-500 mr-2" />
+                      <Icon icon={FaCalendarAlt} className="text-blue-500 mr-2" />
                       <span className="text-sm text-gray-700">Отпуск</span>
                     </div>
                     <span className="font-semibold">{selectedTeacher.vacationDays} дней</span>
@@ -737,11 +882,158 @@ const WorkloadPage: React.FC = () => {
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <FaClock className="text-yellow-500 mr-2" />
+                      <Icon icon={FaClock} className="text-yellow-500 mr-2" />
                       <span className="text-sm text-gray-700">Больничный</span>
                     </div>
                     <span className="font-semibold">{selectedTeacher.sickLeaveDays} дней</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Добавляем секцию ежедневного учета после графика */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold border-b pb-2">Ежедневный учет часов</h3>
+                  <button
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center gap-2"
+                    onClick={() => setShowDailyHours(true)}
+                  >
+                    + Добавить часы
+                  </button>
+                </div>
+
+                {/* Модальное окно добавления часов */}
+                {showDailyHours && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                      <h4 className="text-lg font-semibold mb-4">Добавить рабочие часы</h4>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Дата
+                          </label>
+                          <input
+                            type="date"
+                            className="w-full px-3 py-2 border rounded-md"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Количество часов
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="24"
+                            className="w-full px-3 py-2 border rounded-md"
+                            value={newDailyRecord.hours}
+                            onChange={(e) => setNewDailyRecord({
+                              ...newDailyRecord,
+                              hours: Number(e.target.value)
+                            })}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Тип
+                          </label>
+                          <select
+                            className="w-full px-3 py-2 border rounded-md"
+                            value={newDailyRecord.type}
+                            onChange={(e) => setNewDailyRecord({
+                              ...newDailyRecord,
+                              type: e.target.value as 'regular' | 'overtime' | 'sick' | 'vacation'
+                            })}
+                          >
+                            <option value="regular">Обычные часы</option>
+                            <option value="overtime">Сверхурочные</option>
+                            <option value="sick">Больничный</option>
+                            <option value="vacation">Отпуск</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Комментарий
+                          </label>
+                          <textarea
+                            className="w-full px-3 py-2 border rounded-md"
+                            rows={3}
+                            value={newDailyRecord.comment}
+                            onChange={(e) => setNewDailyRecord({
+                              ...newDailyRecord,
+                              comment: e.target.value
+                            })}
+                            placeholder="Необязательный комментарий..."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-2 mt-6">
+                        <button
+                          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
+                          onClick={() => setShowDailyHours(false)}
+                        >
+                          Отмена
+                        </button>
+                        <button
+                          className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                          onClick={() => {
+                            handleAddDailyHours();
+                            setShowDailyHours(false);
+                          }}
+                        >
+                          Добавить
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Таблица учета часов */}
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Дата</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Часы</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Тип</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Комментарий</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {editedHours?.dailyHours?.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((record, index) => (
+                        <tr key={index}>
+                          <td className="px-4 py-2 whitespace-nowrap">
+                            {new Date(record.date).toLocaleDateString('ru-RU')}
+                          </td>
+                          <td className="px-4 py-2 whitespace-nowrap">
+                            {record.hours}
+                          </td>
+                          <td className="px-4 py-2 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                              ${record.type === 'regular' ? 'bg-green-100 text-green-800' :
+                                record.type === 'overtime' ? 'bg-blue-100 text-blue-800' :
+                                record.type === 'sick' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'}`}>
+                              {record.type === 'regular' ? 'Обычные' :
+                               record.type === 'overtime' ? 'Сверхурочные' :
+                               record.type === 'sick' ? 'Больничный' :
+                               'Отпуск'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2">
+                            {record.comment || '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 

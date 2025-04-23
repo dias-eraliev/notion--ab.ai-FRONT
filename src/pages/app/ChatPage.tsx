@@ -1,4 +1,68 @@
+/**
+ * @page ChatPage
+ * @description Страница чата для общения между пользователями
+ * @author [Ваше имя]
+ * @last_updated 2024-03-23
+ * 
+ * @features
+ * 1. Список чатов с поиском
+ * 2. Обмен текстовыми сообщениями
+ * 3. Поддержка вложений (изображения, файлы)
+ * 4. Статусы сообщений (отправлено, доставлено, прочитано)
+ * 5. Индикация онлайн статуса
+ * 6. Индикация набора текста
+ * 7. Голосовые сообщения
+ * 
+ * @components
+ * - ChatList: Список чатов с поиском
+ * - ChatWindow: Окно чата с сообщениями
+ * - MessageInput: Панель ввода сообщений
+ * 
+ * @data_models
+ * 
+ * interface Message {
+ *   id: string;
+ *   sender: string;
+ *   text: string;
+ *   timestamp: Date;
+ *   status: 'sent' | 'delivered' | 'read';
+ *   attachments?: {
+ *     type: 'image' | 'file';
+ *     url: string;
+ *     name: string;
+ *   }[];
+ * }
+ * 
+ * interface Chat {
+ *   id: string;
+ *   name: string;
+ *   avatar: string;
+ *   lastMessage: string;
+ *   time: string;
+ *   unread: number;
+ *   isOnline: boolean;
+ *   typing?: boolean;
+ * }
+ * 
+ * @websocket_events
+ * - message:new - новое сообщение
+ * - message:status - обновление статуса
+ * - chat:typing - индикация набора
+ * - user:online - изменение статуса онлайн
+ * 
+ * @security
+ * - Аутентификация пользователей
+ * - Шифрование сообщений
+ * - Проверка прав доступа к чатам
+ * 
+ * @performance
+ * - Пагинация истории сообщений
+ * - Ленивая загрузка изображений
+ * - Оптимизация ре-рендеринга
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
+import type { IconType } from 'react-icons';
 import { 
   FaSearch, 
   FaEllipsisV, 
@@ -15,6 +79,16 @@ import {
   FaCheckDouble,
   FaCircle
 } from 'react-icons/fa';
+
+// Компонент-обертка для иконок
+const IconWrapper = ({ icon: Icon, className = '' }: { icon: IconType; className?: string }) => {
+  const IconComponent = Icon as React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  return (
+    <span className={className}>
+      <IconComponent />
+    </span>
+  );
+};
 
 interface Message {
   id: string;
@@ -136,11 +210,11 @@ const ChatPage: React.FC = () => {
   const getStatusIcon = (status: Message['status']) => {
     switch (status) {
       case 'sent':
-        return <FaCheck className="text-gray-400" />;
+        return <IconWrapper icon={FaCheck} className="text-gray-400" />;
       case 'delivered':
-        return <FaCheckDouble className="text-gray-400" />;
+        return <IconWrapper icon={FaCheckDouble} className="text-gray-400" />;
       case 'read':
-        return <FaCheckDouble className="text-blue-500" />;
+        return <IconWrapper icon={FaCheckDouble} className="text-blue-500" />;
       default:
         return null;
     }
@@ -160,7 +234,7 @@ const ChatPage: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
             />
-            <FaSearch className="absolute left-3 top-3 text-gray-400" />
+            <IconWrapper icon={FaSearch} className="absolute left-3 top-3 text-gray-400" />
           </div>
         </div>
 
@@ -229,13 +303,13 @@ const ChatPage: React.FC = () => {
               </div>
               <div className="flex items-center space-x-4">
                 <button className="text-gray-600 hover:text-gray-800">
-                  <FaPhone className="w-5 h-5" />
+                  <IconWrapper icon={FaPhone} className="w-5 h-5" />
                 </button>
                 <button className="text-gray-600 hover:text-gray-800">
-                  <FaVideo className="w-5 h-5" />
+                  <IconWrapper icon={FaVideo} className="w-5 h-5" />
                 </button>
                 <button className="text-gray-600 hover:text-gray-800">
-                  <FaEllipsisV className="w-5 h-5" />
+                  <IconWrapper icon={FaEllipsisV} className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -303,10 +377,10 @@ const ChatPage: React.FC = () => {
                 className="text-gray-500 hover:text-gray-600"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               >
-                <FaSmile className="w-6 h-6" />
+                <IconWrapper icon={FaSmile} className="w-6 h-6" />
               </button>
               <button className="text-gray-500 hover:text-gray-600">
-                <FaPaperclip className="w-6 h-6" />
+                <IconWrapper icon={FaPaperclip} className="w-6 h-6" />
               </button>
               <div className="flex-1">
                 <textarea
@@ -323,7 +397,7 @@ const ChatPage: React.FC = () => {
                   onClick={handleSendMessage}
                   className="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600"
                 >
-                  <FaPaperPlane className="w-5 h-5" />
+                  <IconWrapper icon={FaPaperPlane} className="w-5 h-5" />
                 </button>
               ) : (
                 <button
@@ -332,7 +406,7 @@ const ChatPage: React.FC = () => {
                     isRecording ? 'bg-red-500' : 'text-gray-500'
                   } p-2 rounded-full hover:bg-gray-100`}
                 >
-                  <FaMicrophone className="w-5 h-5" />
+                  <IconWrapper icon={FaMicrophone} className="w-5 h-5" />
                 </button>
               )}
             </div>

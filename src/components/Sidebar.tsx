@@ -44,7 +44,7 @@ const sidebarLinks = {
   main: [
     {
       to: '/',
-      icon: <FaHome />,
+      icon: <FaHome size={16} />,
       label: 'Главная',
       type: 'SidebarLink'
     }
@@ -52,75 +52,63 @@ const sidebarLinks = {
   app: [
     {
       to: '/app/chat',
-      icon: <FaComments />,
+      icon: <FaComments size={16} />,
       label: 'Чат',
       type: 'SidebarLink'
     },
     {
       to: '/app/ai-chat',
-      icon: <FaRobot />,
+      icon: <FaRobot size={16} />,
       label: 'AI чат',
       type: 'SidebarLink'
     },
     {
       to: '/app/calendar',
-      icon: <FaCalendar />,
+      icon: <FaCalendar size={16} />,
       label: 'Календарь',
       type: 'SidebarLink'
     },
     {
-      to: '/app/email',
-      icon: <FaEnvelope />,
-      label: 'Эл. почта',
-      type: 'SidebarLink'
-    },
-    {
       to: '/app/tasks',
-      icon: <FaListUl />,
+      icon: <FaListUl size={16} />,
       label: 'Список дел',
       type: 'SidebarLink'
     },
     {
-      to: '/app/files',
-      icon: <FaFolder />,
-      label: 'Файловый менеджер',
-      type: 'SidebarLink'
-    },
-    {
       to: "/app/neuro-abai",
-      icon: <FaBrain />,
-      label: 'UIB College Ai',
+      icon: <FaBrain size={16} />,
+      label: 'FIZMAT.AI',
       type: 'SidebarLink'
     }
   ],
   study: [
     {
       to: '/academic/academic-journal',
-      icon: <FaBook className="w-4 h-4 mr-3" />,
+      icon: <FaBook size={16} className="w-4 h-4 mr-3" />,
       label: 'Учебный журнал',
       type: 'Link'
     },
     {
       to: '/academic/schedule',
-      icon: <FaCalendarAlt className="w-4 h-4 mr-3" />,
+      icon: <FaCalendarAlt size={16} className="w-4 h-4 mr-3" />,
       label: 'Расписание',
       type: 'Link'
     },
     {
       to: '/academic/homework',
-      icon: <FaBookOpen className="w-4 h-4 mr-3" />,
+      icon: <FaBookOpen size={16} className="w-4 h-4 mr-3" />,
       label: 'Домашние задания',
       type: 'Link'
     },
     {
       to: '/academic/classrooms',
-      icon: <FaBuilding className="w-4 h-4 mr-3" />,
+      icon: <FaBuilding size={16} className="w-4 h-4 mr-3" />,
       label: 'Аудитории и секции',
       type: 'Link'
     },
     {
       to: '/study-plans',
-      icon: <FaBook className="w-4 h-4 mr-3" />,
+      icon: <FaBook size={16} className="w-4 h-4 mr-3" />,
       label: 'Учебные планы',
       type: 'Link'
     }
@@ -128,51 +116,45 @@ const sidebarLinks = {
   students: [
     {
       to: '/students',
-      icon: <FaUserGraduate className="w-4 h-4 mr-3" />,
+      icon: <FaUserGraduate size={16} className="w-4 h-4 mr-3" />,
       label: 'Списки учащихся',
       type: 'Link'
     },
     {
       to: '/performance',
-      icon: <FaChartLine className="w-4 h-4 mr-3" />,
+      icon: <FaChartLine size={16} className="w-4 h-4 mr-3" />,
       label: 'Успеваемость',
-      type: 'Link'
-    },
-    {
-      to: '/students/emotional-analysis',
-      icon: <FaSmile className="w-4 h-4 mr-3" />,
-      label: 'Эмоциональный анализ',
       type: 'Link'
     }
   ],
   hr: [
     {
       to: '/hr/employees',
-      icon: <FaUserTie className="w-4 h-4 mr-3" />,
+      icon: <FaUserTie size={16} className="w-4 h-4 mr-3" />,
       label: 'Сотрудники и преподаватели',
       type: 'Link'
     },
     {
       to: '/hr/workload',
-      icon: <FaClipboardList className="w-4 h-4 mr-3" />,
+      icon: <FaClipboardList size={16} className="w-4 h-4 mr-3" />,
       label: 'Нагрузки и расписание ставок',
       type: 'Link',
     },
     {
       to: '/hr/kpi',
-      icon: <FaChartLine className="w-4 h-4 mr-3" />,
+      icon: <FaChartLine size={16} className="w-4 h-4 mr-3" />,
       label: 'KPI и эффективность',
       type: 'Link',
     },
     {
       to: '/hr/vacation',
-      icon: <FaUmbrellaBeach className="w-4 h-4 mr-3" />,
+      icon: <FaUmbrellaBeach size={16} className="w-4 h-4 mr-3" />,
       label: 'Отпуска и замены',
       type: 'Link',
     },
     {
       to: '/hr/fake-positions',
-      icon: <FaUserSecret className="w-4 h-4 mr-3" />,
+      icon: <FaUserSecret size={16} className="w-4 h-4 mr-3" />,
       label: 'Контроль фиктивных ставок (AI)',
       type: 'Link',
     }
@@ -180,25 +162,31 @@ const sidebarLinks = {
   finance: [
     {
       to: '/finance/payments',
-      icon: <FaMoneyBillWave />,
+      icon: <FaMoneyBillWave size={16} />,
       label: 'Оплаты и задолженности',
       type: 'SidebarLink'
     },
     {
       to: '/finance/reports',
-      icon: <FaFileAlt />,
+      icon: <FaFileAlt size={16} />,
       label: 'Финансовые отчеты',
       type: 'SidebarLink'
     },
     {
       to: '/finance/budget',
-      icon: <FaChartBar />,
+      icon: <FaChartBar size={16} />,
       label: 'Бюджет и прогноз',
       type: 'SidebarLink'
     },
     {
+      to: '/finance/acl',
+      icon: <FaChartLine size={16} />,
+      label: 'Анализ лояльности',
+      type: 'SidebarLink'
+    },
+    {
       to: '/finance/payroll',
-      icon: <FaUserTie />,
+      icon: <FaUserTie size={16} />,
       label: 'Управление зарплатой',
       type: 'SidebarLink'
     }
@@ -206,51 +194,45 @@ const sidebarLinks = {
   erp: [
     {
       to: '/app/erp/inventory',
-      icon: <FaBarcode />,
+      icon: <FaBarcode size={16} />,
       label: 'Digital инвентаризация',
       type: 'SidebarLink'
     },
     {
       to: '/app/erp/supply',
-      icon: <FaShoppingCart />,
+      icon: <FaShoppingCart size={16} />,
       label: 'Запросы на снабжение',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/app/erp/security',
-      icon: <FaShieldAlt />,
-      label: 'Безопасность',
       type: 'SidebarLink'
     }
   ],
   settings: [
     {
       to: '/settings/users',
-      icon: <FaUsers />,
+      icon: <FaUsers size={16} />,
       label: 'Пользователи',
       type: 'SidebarLink'
     },
     {
       to: '/settings/permissions',
-      icon: <FaLock />,
+      icon: <FaLock size={16} />,
       label: 'Права доступа',
       type: 'SidebarLink'
     },
     {
       to: '/settings/integrations',
-      icon: <FaPlug />,
+      icon: <FaPlug size={16} />,
       label: 'Интеграции',
       type: 'SidebarLink'
     },
     {
       to: '/settings/branding',
-      icon: <FaPalette />,
+      icon: <FaPalette size={16} />,
       label: 'Брендинг',
       type: 'SidebarLink'
     },
     {
       to: '/settings/system',
-      icon: <FaCogs />,
+      icon: <FaCogs size={16} />,
       label: 'Система',
       type: 'SidebarLink'
     }
@@ -282,7 +264,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-4">
         <div className="flex items-center mb-8">
           <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold bg-gradient-to-r from-[#1C7E66] to-white bg-clip-text text-transparent">UIB College Ai</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-[#1e40af] to-white bg-clip-text text-transparent">FIZMAT.AI</span>
           </Link>
         </div>
 
