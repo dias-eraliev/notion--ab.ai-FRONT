@@ -415,13 +415,41 @@ const StudyPlanDetailPage: React.FC = () => {
                     hasVideo: !!(videoFile || videoLink),
                     hasPresentation: !!presentationFile,
                     hasTest: testQuestions.length > 0,
+                  });
+                  
+                  const lessonData = {
+                    ...newLesson,
+                    hasVideo: !!(videoFile || videoLink),
+                    hasPresentation: !!presentationFile,
+                    hasTest: testQuestions.length > 0,
                     videoFile,
                     videoLink,
                     presentationFile,
                     testQuestions,
-                  });
-                  handleCreateLesson();
-                  setVideoFile(null); setVideoLink(''); setPresentationFile(null); setTestQuestions([]);
+                  };
+                  
+                  setStudyPlan(prev => ({
+                    ...prev,
+                    lessons: [
+                      ...prev.lessons,
+                      {
+                        id: (prev.lessons.length + 1).toString(),
+                        title: lessonData.title,
+                        description: lessonData.description,
+                        scheduledDate: lessonData.scheduledDate,
+                        hasVideo: lessonData.hasVideo,
+                        hasPresentation: lessonData.hasPresentation,
+                        hasTest: lessonData.hasTest,
+                      },
+                    ],
+                  }));
+                  
+                  setIsModalOpen(false);
+                  setNewLesson({ title: '', description: '', scheduledDate: '', hasVideo: false, hasPresentation: false, hasTest: false });
+                  setVideoFile(null); 
+                  setVideoLink(''); 
+                  setPresentationFile(null); 
+                  setTestQuestions([]);
                 }}
                 disabled={!newLesson.title.trim()}
               >
@@ -498,7 +526,7 @@ const StudyPlanDetailPage: React.FC = () => {
                       <div key={idx} className="mb-2 p-2 border rounded">
                         <div className="font-medium">{q.question}</div>
                         <ul className="ml-4 list-disc">
-                          {q.options.map((opt, i) => (
+                          {q.options.map((opt: string, i: number) => (
                             <li key={i} className={`${q.correct === i ? 'text-blue-600 font-semibold' : 'text-gray-500'}`}>{opt}</li>
                           ))}
                         </ul>
