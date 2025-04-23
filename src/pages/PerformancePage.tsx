@@ -256,11 +256,11 @@ const PerformancePage: React.FC = () => {
           <h3 className="text-sm text-gray-600 mb-4">Общие показатели</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="80%">
+              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={filteredData.performanceMetrics}>
                 <PolarGrid />
                 <PolarAngleAxis dataKey="subject" />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar name="Показатели" dataKey="value" data={filteredData.performanceMetrics} fill="#2E69FF" fillOpacity={0.6} />
+                <Radar name="Показатели" dataKey="value" fill="#2E69FF" fillOpacity={0.6} />
               </RadarChart>
             </ResponsiveContainer>
           </div>

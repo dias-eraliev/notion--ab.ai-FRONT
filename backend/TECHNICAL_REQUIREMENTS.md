@@ -5913,3 +5913,1818 @@ async addTest(
 5. Интерактивный предпросмотр загружаемых материалов
 6. Система комментариев для обсуждения учебного плана
 7. Интеграция с AI-ассистентом для помощи в составлении планов уроков
+
+### 6.12 Модуль управления студентами (StudentsPage)
+
+#### 6.12.1 Общее описание
+Модуль управления студентами предоставляет интерфейс для просмотра, поиска и управления профилями студентов образовательного учреждения. Позволяет администраторам и преподавателям быстро находить студентов, просматривать их личную информацию, контактные данные родителей, а также данные об успеваемости, посещаемости и финансовых обязательствах. Обеспечивает централизованный доступ к полной информации о каждом студенте с различной степенью детализации в зависимости от роли пользователя.
+
+#### 6.12.2 Основные возможности
+1. Просмотр списка всех студентов образовательного учреждения
+2. Фильтрация студентов по группам/классам
+3. Поиск студентов по имени и другим параметрам
+4. Просмотр детальной информации о студенте
+5. Доступ к контактной информации студента и его родителей
+6. Быстрый просмотр ключевых показателей успеваемости
+7. Отслеживание статуса оплаты обучения
+8. Мониторинг эмоционального состояния и психологического комфорта студентов
+
+#### 6.12.3 Доступ по ролям
+
+| Роль          | Права доступа                                                                |
+|---------------|------------------------------------------------------------------------------|
+| ADMIN         | Полный доступ ко всей информации о студентах, включая финансовые данные      |
+| TEACHER       | Доступ к информации студентов своих групп, без доступа к финансовым данным   |
+| STUDENT       | Доступ только к собственному профилю с ограниченным набором данных           |
+| PARENT        | Доступ к профилям своих детей и контактам учителей                           |
+
+#### 6.12.4 Модели данных
+
+##### 6.12.4.1 Student (Студент)
+```typescript
+@Entity()
+export class Student {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column({ nullable: true })
+  middleName: string;
+
+  @Column({ nullable: true })
+  photoUrl: string;
+
+  @Column({ type: 'date' })
+  birthDate: Date;
+
+  @Column()
+  gender: 'male' | 'female';
+
+  @ManyToOne(() => Group)
+  group: Group;
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  email: string;
+
+  @OneToMany(() => Parent, parent => parent.student)
+  parents: Parent[];
+
+  @Column({ nullable: true })
+  address: string;
+
+  @Column({ type: 'date', nullable: true })
+  enrollmentDate: Date;
+
+  @Column({
+    type: 'enum',
+    enum: StudentStatus,
+    default: StudentStatus.ACTIVE
+  })
+  status: StudentStatus;
+
+  @Column({ nullable: true })
+  personalId: string; // Номер удостоверения личности или свидетельства о рождении
+
+  @OneToMany(() => StudentPerformance, performance => performance.student)
+  performances: StudentPerformance[];
+
+  @OneToMany(() => Attendance, attendance => attendance.student)
+  attendances: Attendance[];
+
+  @OneToMany(() => Payment, payment => payment.student)
+  payments: Payment[];
+
+  @OneToMany(() => EmotionalState, state => state.student)
+  emotionalStates: EmotionalState[];
+
+  @Column({ type: 'jsonb', nullable: true })
+  additionalInfo: Record<string, any>;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @ManyToOne(() => User)
+  createdBy: User;
+
+  @ManyToOne(() => User, { nullable: true })
+  updatedBy: User;
+}
+
+export enum StudentStatus {
+  ACTIVE = 'active',
+  TRANSFERRED = 'transferred',
+  GRADUATED = 'graduated',
+  EXPELLED = 'expelled',
+  ACADEMIC_LEAVE = 'academic_leave',
+  PENDING = 'pending'
+}
+```
+
+##### 6.12.4.2 Parent (Родитель)
+```typescript
+@Entity()
+export class Parent {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column({ nullable: true })
+  middleName: string;
+
+  @Column()
+  relationship: 'mother' | 'father' | 'guardian' | 'other';
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  email: string;
+
+  @Column({ nullable: true })
+  address: string;
+
+  @Column({ nullable: true })
+  workPlace: string;
+
+  @Column({ nullable: true })
+  position: string;
+
+  @ManyToOne(() => Student, student => student.parents)
+  student: Student;
+
+  @Column({ nullable: true })
+  additionalPhone: string;
+
+  @Column({
+    type: 'enum',
+    enum: ParentStatus,
+    default: ParentStatus.ACTIVE
+  })
+  status: ParentStatus;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+export enum ParentStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive'
+}
+```
+
+##### 6.12.4.3 StudentPerformance (Успеваемость студента)
+```typescript
+@Entity()
+export class StudentPerformance {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Student, student => student.performances)
+  student: Student;
+
+  @ManyToOne(() => Subject)
+  subject: Subject;
+
+  @Column({ type: 'float' })
+  averageGrade: number;
+
+  @Column()
+  period: 'quarter_1' | 'quarter_2' | 'quarter_3' | 'quarter_4' | 'semester_1' | 'semester_2' | 'year';
+
+  @Column()
+  academicYear: string; // Например: "2023-2024"
+
+  @Column({ nullable: true })
+  comments: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+```
+
+##### 6.12.4.4 Attendance (Посещаемость)
+```typescript
+@Entity()
+export class Attendance {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Student, student => student.attendances)
+  student: Student;
+
+  @Column({ type: 'date' })
+  date: Date;
+
+  @Column({
+    type: 'enum',
+    enum: AttendanceStatus,
+    default: AttendanceStatus.PRESENT
+  })
+  status: AttendanceStatus;
+
+  @Column({ nullable: true })
+  reason: string;
+
+  @Column({ nullable: true })
+  comment: string;
+
+  @ManyToOne(() => Lesson, { nullable: true })
+  lesson: Lesson;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ManyToOne(() => User)
+  markedBy: User;
+}
+
+export enum AttendanceStatus {
+  PRESENT = 'present',
+  ABSENT = 'absent',
+  LATE = 'late',
+  EXCUSED = 'excused'
+}
+```
+
+##### 6.12.4.5 Payment (Платеж)
+```typescript
+@Entity()
+export class Payment {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Student, student => student.payments)
+  student: Student;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  amount: number;
+
+  @Column()
+  currency: string;
+
+  @Column({ type: 'date' })
+  dueDate: Date;
+
+  @Column({ type: 'date', nullable: true })
+  paidDate: Date;
+
+  @Column({
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING
+  })
+  status: PaymentStatus;
+
+  @Column()
+  period: string;
+
+  @Column({ nullable: true })
+  comment: string;
+
+  @Column({ nullable: true })
+  receiptNumber: string;
+
+  @Column({ nullable: true })
+  paymentMethod: PaymentMethod;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ManyToOne(() => User, { nullable: true })
+  processedBy: User;
+}
+
+export enum PaymentStatus {
+  PENDING = 'pending',
+  PAID = 'paid',
+  OVERDUE = 'overdue',
+  PARTIALLY_PAID = 'partially_paid',
+  CANCELLED = 'cancelled',
+  REFUNDED = 'refunded'
+}
+
+export enum PaymentMethod {
+  CASH = 'cash',
+  BANK_TRANSFER = 'bank_transfer',
+  CARD = 'card',
+  ONLINE = 'online',
+  OTHER = 'other'
+}
+```
+
+##### 6.12.4.6 EmotionalState (Эмоциональное состояние)
+```typescript
+@Entity()
+export class EmotionalState {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Student, student => student.emotionalStates)
+  student: Student;
+
+  @Column({ type: 'date' })
+  date: Date;
+
+  @Column({
+    type: 'enum',
+    enum: EmotionalStateType
+  })
+  state: EmotionalStateType;
+
+  @Column({ nullable: true })
+  comment: string;
+
+  @ManyToOne(() => User)
+  observedBy: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
+
+export enum EmotionalStateType {
+  EXCELLENT = 'excellent',
+  GOOD = 'good',
+  NEUTRAL = 'neutral',
+  ANXIOUS = 'anxious',
+  UPSET = 'upset',
+  DEPRESSED = 'depressed',
+  ANGRY = 'angry',
+  OTHER = 'other'
+}
+```
+
+#### 6.12.5 API Endpoints
+
+##### 6.12.5.1 Управление студентами
+```typescript
+@Controller('api/v1/students')
+@UseGuards(JwtAuthGuard)
+export class StudentsController {
+  @Get()
+  @Roles('ADMIN', 'TEACHER')
+  getStudents(
+    @Query() query: StudentQueryDto,
+    @Req() req
+  ): Promise<{ items: StudentDto[]; meta: PaginationMeta }> {}
+
+  @Post()
+  @Roles('ADMIN')
+  createStudent(
+    @Body() createStudentDto: CreateStudentDto,
+    @Req() req
+  ): Promise<StudentDto> {}
+
+  @Get(':id')
+  @Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+  getStudent(
+    @Param('id') id: string,
+    @Req() req
+  ): Promise<StudentDto> {}
+
+  @Put(':id')
+  @Roles('ADMIN')
+  updateStudent(
+    @Param('id') id: string,
+    @Body() updateStudentDto: UpdateStudentDto,
+    @Req() req
+  ): Promise<StudentDto> {}
+
+  @Patch(':id/status')
+  @Roles('ADMIN')
+  updateStatus(
+    @Param('id') id: string,
+    @Body() statusDto: UpdateStudentStatusDto,
+    @Req() req
+  ): Promise<StudentDto> {}
+
+  @Delete(':id')
+  @Roles('ADMIN')
+  deleteStudent(
+    @Param('id') id: string,
+    @Req() req
+  ): Promise<void> {}
+
+  @Post('import')
+  @Roles('ADMIN')
+  @UseInterceptors(FileInterceptor('file'))
+  importStudents(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() importDto: ImportStudentsDto,
+    @Req() req
+  ): Promise<{ imported: number; errors: any[] }> {}
+
+  @Get('export')
+  @Roles('ADMIN')
+  exportStudents(
+    @Query() query: ExportStudentsDto,
+    @Req() req,
+    @Res() res
+  ): Promise<void> {}
+
+  @Get(':id/performance')
+  @Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+  getStudentPerformance(
+    @Param('id') id: string,
+    @Query() query: PerformanceQueryDto,
+    @Req() req
+  ): Promise<StudentPerformanceDto[]> {}
+
+  @Get(':id/attendance')
+  @Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+  getStudentAttendance(
+    @Param('id') id: string,
+    @Query() query: AttendanceQueryDto,
+    @Req() req
+  ): Promise<AttendanceDto[]> {}
+
+  @Get(':id/emotional-state')
+  @Roles('ADMIN', 'TEACHER', 'PARENT')
+  getStudentEmotionalState(
+    @Param('id') id: string,
+    @Query() query: EmotionalStateQueryDto,
+    @Req() req
+  ): Promise<EmotionalStateDto[]> {}
+
+  @Post(':id/emotional-state')
+  @Roles('ADMIN', 'TEACHER')
+  addEmotionalState(
+    @Param('id') id: string,
+    @Body() emotionalStateDto: CreateEmotionalStateDto,
+    @Req() req
+  ): Promise<EmotionalStateDto> {}
+}
+```
+
+##### 6.12.5.2 Управление родителями
+```typescript
+@Controller('api/v1/students/:studentId/parents')
+@UseGuards(JwtAuthGuard)
+export class ParentsController {
+  @Get()
+  @Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+  getParents(
+    @Param('studentId') studentId: string,
+    @Req() req
+  ): Promise<ParentDto[]> {}
+
+  @Post()
+  @Roles('ADMIN')
+  addParent(
+    @Param('studentId') studentId: string,
+    @Body() createParentDto: CreateParentDto,
+    @Req() req
+  ): Promise<ParentDto> {}
+
+  @Get(':parentId')
+  @Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+  getParent(
+    @Param('studentId') studentId: string,
+    @Param('parentId') parentId: string,
+    @Req() req
+  ): Promise<ParentDto> {}
+
+  @Put(':parentId')
+  @Roles('ADMIN')
+  updateParent(
+    @Param('studentId') studentId: string,
+    @Param('parentId') parentId: string,
+    @Body() updateParentDto: UpdateParentDto,
+    @Req() req
+  ): Promise<ParentDto> {}
+
+  @Delete(':parentId')
+  @Roles('ADMIN')
+  deleteParent(
+    @Param('studentId') studentId: string,
+    @Param('parentId') parentId: string,
+    @Req() req
+  ): Promise<void> {}
+}
+```
+
+##### 6.12.5.3 Управление платежами студентов
+```typescript
+@Controller('api/v1/students/:studentId/payments')
+@UseGuards(JwtAuthGuard)
+export class StudentPaymentsController {
+  @Get()
+  @Roles('ADMIN', 'PARENT')
+  getPayments(
+    @Param('studentId') studentId: string,
+    @Query() query: PaymentQueryDto,
+    @Req() req
+  ): Promise<PaymentDto[]> {}
+
+  @Post()
+  @Roles('ADMIN')
+  addPayment(
+    @Param('studentId') studentId: string,
+    @Body() createPaymentDto: CreatePaymentDto,
+    @Req() req
+  ): Promise<PaymentDto> {}
+
+  @Get(':paymentId')
+  @Roles('ADMIN', 'PARENT')
+  getPayment(
+    @Param('studentId') studentId: string,
+    @Param('paymentId') paymentId: string,
+    @Req() req
+  ): Promise<PaymentDto> {}
+
+  @Patch(':paymentId/status')
+  @Roles('ADMIN')
+  updatePaymentStatus(
+    @Param('studentId') studentId: string,
+    @Param('paymentId') paymentId: string,
+    @Body() statusDto: UpdatePaymentStatusDto,
+    @Req() req
+  ): Promise<PaymentDto> {}
+
+  @Get(':paymentId/receipt')
+  @Roles('ADMIN', 'PARENT')
+  getReceipt(
+    @Param('studentId') studentId: string,
+    @Param('paymentId') paymentId: string,
+    @Req() req,
+    @Res() res
+  ): Promise<void> {}
+}
+```
+
+#### 6.12.6 Бизнес-логика
+
+##### 6.12.6.1 Управление данными студентов
+1. Регистрация новых студентов с проверкой уникальности личных данных
+2. Распределение студентов по группам/классам с учетом возраста и уровня подготовки
+3. Обновление статуса студентов (активный, переведен, выпущен, отчислен)
+4. Отслеживание перемещений студентов между группами
+5. Ведение полной истории обучения студента в образовательном учреждении
+6. Управление документами студента (личные документы, медицинские справки)
+7. Синхронизация данных с государственными информационными системами
+
+##### 6.12.6.2 Анализ успеваемости и посещаемости
+1. Расчет средних показателей успеваемости по различным периодам
+2. Отслеживание динамики успеваемости студента
+3. Анализ посещаемости и выявление паттернов отсутствия
+4. Формирование отчетов об успеваемости и посещаемости
+5. Уведомление родителей и администрации о проблемах с успеваемостью и посещаемостью
+6. Сравнительный анализ успеваемости студента относительно группы/класса
+
+##### 6.12.6.3 Управление финансовыми вопросами
+1. Расчет и начисление платы за обучение
+2. Отслеживание статуса платежей и задолженностей
+3. Формирование квитанций и счетов на оплату
+4. Учет различных типов платежей и методов оплаты
+5. Автоматическое напоминание о предстоящих и просроченных платежах
+6. Формирование финансовых отчетов по оплате обучения
+
+##### 6.12.6.4 Мониторинг эмоционального состояния
+1. Регулярная фиксация эмоционального состояния студентов
+2. Выявление изменений в эмоциональном состоянии
+3. Анализ факторов, влияющих на эмоциональное состояние
+4. Уведомление психолога и родителей о негативной динамике
+5. Формирование рекомендаций по улучшению психологического комфорта
+6. Интеграция с системой психологической поддержки
+
+#### 6.12.7 Интеграции
+1. Интеграция с системой электронного журнала для получения данных об успеваемости
+2. Связь с системой контроля посещаемости
+3. Интеграция с финансовым модулем для управления платежами
+4. Связь с модулем расписания для отслеживания пропусков занятий
+5. Интеграция с системой уведомлений для информирования родителей
+6. Связь с системой психологической поддержки для мониторинга эмоционального состояния
+
+#### 6.12.8 Требования к производительности
+1. Быстрая загрузка списка студентов с пагинацией и фильтрацией
+2. Эффективное отображение детальной информации о студенте
+3. Оптимизированная работа с большими объемами данных (история успеваемости, посещаемости)
+4. Кэширование часто запрашиваемых данных о студентах
+5. Асинхронная обработка тяжелых операций (импорт/экспорт, формирование отчетов)
+
+#### 6.12.9 Требования к безопасности
+1. Строгое разграничение доступа к личным данным студентов
+2. Шифрование чувствительной информации
+3. Аудит всех операций с данными студентов
+4. Соблюдение законодательства о защите персональных данных
+5. Механизмы предотвращения несанкционированного доступа к финансовой информации
+6. Регулярное резервное копирование данных студентов
+
+#### 6.12.10 Дополнительные функции
+1. Массовое редактирование данных группы студентов
+2. Система оповещения родителей о важных событиях
+3. Формирование персонализированных отчетов для родителей
+4. Отслеживание прогресса студента по индивидуальным образовательным траекториям
+5. Интеграция с системой выявления талантов и способностей
+6. Экспорт данных в различные форматы для внешних систем
+
+### 6.13 Модуль детальной информации о студенте (StudentDetailPage)
+
+#### 6.13.1 Общее описание
+Модуль детальной информации о студенте предоставляет комплексный интерфейс для просмотра всей информации о конкретном студенте. Выступает как единый центр доступа к персональным данным, академической успеваемости, посещаемости, финансовой информации, психоэмоциональному состоянию, расписанию занятий, результатам экзаменов и внеучебной деятельности. Обеспечивает всесторонний анализ успехов и прогресса студента с помощью интерактивных графиков и визуализаций данных, а также возможность экспорта информации в различные форматы.
+
+#### 6.13.2 Основные возможности
+1. Просмотр полной персональной информации о студенте
+2. Мониторинг психоэмоционального состояния с отслеживанием тенденций
+3. Доступ к контактной информации студента и его родителей
+4. Анализ динамики успеваемости по предметам с визуализацией
+5. Отслеживание посещаемости с детализацией по причинам отсутствия
+6. Управление персональным планом развития студента
+7. Мониторинг и управление финансовыми операциями
+8. Доступ к индивидуальному расписанию занятий
+9. Анализ результатов экзаменов с детализацией по темам
+10. Отслеживание внеучебной деятельности и достижений
+11. Экспорт отчетов в PDF и другие форматы
+12. Прямая коммуникация с родителями и куратором студента
+
+#### 6.13.3 Доступ по ролям
+
+| Роль          | Права доступа                                                                |
+|---------------|------------------------------------------------------------------------------|
+| ADMIN         | Полный доступ ко всей информации с возможностью редактирования               |
+| TEACHER       | Доступ к академической информации и психоэмоциональному состоянию            |
+| STUDENT       | Ограниченный доступ к собственным данным без финансовой информации           |
+| PARENT        | Доступ к данным своего ребенка, включая финансовую информацию                |
+
+#### 6.13.4 API Endpoints
+
+##### 6.13.4.1 Получение общей информации о студенте
+```typescript
+@Get('/api/v1/students/:id')
+@Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+async getStudentDetails(
+  @Param('id') id: string,
+  @Req() req
+): Promise<{
+  id: string;
+  fullName: string;
+  class: string;
+  birthDate: string;
+  phone: string;
+  email: string;
+  address: string;
+  parentName: string;
+  parentPhone: string;
+  photo: string;
+  enrollmentDate: string;
+  nationality: string;
+  iin: string;
+  bloodGroup: string;
+  medicalInfo: string;
+  previousSchool: string;
+  achievements: string[];
+  documents: {
+    type: string;
+    date: string;
+    link: string;
+  }[];
+  academicRecords: {
+    subject: string;
+    grade: number;
+    semester: number;
+    year: string;
+  }[];
+}> {}
+```
+
+##### 6.13.4.2 Получение информации о психоэмоциональном состоянии
+```typescript
+@Get('/api/v1/students/:id/emotional-state')
+@Roles('ADMIN', 'TEACHER', 'PARENT')
+async getEmotionalState(
+  @Param('id') id: string,
+  @Query() query: { period?: string },
+  @Req() req
+): Promise<{
+  category: string;
+  score: number;
+  description: string;
+  trend: 'up' | 'down' | 'stable';
+  lastUpdate: string;
+}[]> {}
+```
+
+##### 6.13.4.3 Получение информации о контактах
+```typescript
+@Get('/api/v1/students/:id/contacts')
+@Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+async getContacts(
+  @Param('id') id: string,
+  @Req() req
+): Promise<{
+  relation: string;
+  name: string;
+  phone: string;
+  email: string;
+  occupation: string;
+  workPlace: string;
+  address: string;
+  id: string;
+}[]> {}
+```
+
+##### 6.13.4.4 Получение информации об успеваемости
+```typescript
+@Get('/api/v1/students/:id/performance')
+@Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+async getPerformance(
+  @Param('id') id: string,
+  @Query() query: { period?: string, subject?: string },
+  @Req() req
+): Promise<{
+  subject: string;
+  currentGrade: number;
+  previousGrade: number;
+  averageGrade: number;
+  trend: 'up' | 'down' | 'stable';
+  teacherName: string;
+  lastUpdate: string;
+  assignments: {
+    type: string;
+    grade: number;
+    date: string;
+    topic: string;
+  }[];
+}[]> {}
+```
+
+##### 6.13.4.5 Получение информации о посещаемости
+```typescript
+@Get('/api/v1/students/:id/attendance')
+@Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+async getAttendance(
+  @Param('id') id: string,
+  @Query() query: { period?: string, type?: string },
+  @Req() req
+): Promise<{
+  date: string;
+  type: 'presence' | 'absence' | 'late' | 'medical' | 'excused';
+  subject?: string;
+  time?: string;
+  reason?: string;
+  status?: string;
+  approvedBy?: string;
+  duration?: string;
+  comment?: string;
+}[]> {}
+```
+
+##### 6.13.4.6 Получение статистики посещаемости
+```typescript
+@Get('/api/v1/students/:id/attendance/stats')
+@Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+async getAttendanceStats(
+  @Param('id') id: string,
+  @Query() query: { period?: string },
+  @Req() req
+): Promise<{
+  total: {
+    present: number;
+    absent: number;
+    late: number;
+    medical: number;
+  };
+  byMonth: {
+    month: string;
+    присутствие: number;
+    отсутствие: number;
+    опоздания: number;
+  }[];
+  bySubject: {
+    subject: string;
+    present: number;
+    absent: number;
+    late: number;
+    medical: number;
+  }[];
+  byClass: {
+    class: string;
+    present: number;
+    absent: number;
+    late: number;
+    medical: number;
+  }[];
+}> {}
+```
+
+##### 6.13.4.7 Получение информации о персональном плане развития
+```typescript
+@Get('/api/v1/students/:id/development-plan')
+@Roles('ADMIN', 'TEACHER', 'PARENT')
+async getDevelopmentPlan(
+  @Param('id') id: string,
+  @Req() req
+): Promise<{
+  id: string;
+  studentId: string;
+  subject: string;          
+  grade: number;
+  teacherName: string;
+  lastUpdate: string;
+  assignments: {
+    type: string;
+    grade: number;
+    date: string;
+    topic: string;
+  }[];
+}> {}
+```
+
+##### 6.13.4.8 Получение информации о финансовых операциях
+```typescript   
+@Get('/api/v1/students/:id/financial-operations')
+@Roles('ADMIN', 'TEACHER', 'PARENT')
+async getFinancialOperations(
+  @Param('id') id: string,
+  @Req() req
+): Promise<{             
+  id: string;
+  studentId: string;
+  amount: number;
+  type: string;
+  date: string;
+  status: string;
+  description: string;
+  category: string;
+  paymentMethod: string;
+  receipt: string;
+  receiptUrl: string;
+  receiptDate: string;
+  receiptAmount: number;    
+}[]> {}
+```
+
+##### 6.13.4.9 Получение информации о расписании занятий
+```typescript   
+@Get('/api/v1/students/:id/schedule')
+@Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+async getSchedule(
+  @Param('id') id: string,
+  @Req() req
+): Promise<{                    
+  id: string;
+  studentId: string;
+  subject: string;
+  date: string;
+  time: string;
+  location: string;
+  teacher: string;                    
+}[]> {}
+```
+
+##### 6.13.4.10 Получение информации о результатах экзаменов
+```typescript
+@Get('/api/v1/students/:id/exams')
+@Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+async getExams(
+  @Param('id') id: string,
+  @Req() req
+): Promise<{    
+  id: string;
+  studentId: string;                
+  subject: string;
+  date: string;
+  time: string;
+  location: string;
+  teacher: string;
+}[]> {}
+```
+
+##### 6.13.4.11 Получение информации о внеучебной деятельности
+```typescript       
+@Get('/api/v1/students/:id/extra-activities')
+@Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+async getExtraActivities(
+  @Param('id') id: string,
+  @Req() req
+): Promise<{                        
+  id: string;
+  studentId: string;
+  activity: string;
+  date: string;
+  time: string;
+  location: string;
+  teacher: string;
+}[]> {}
+```
+// ... existing code ...
+
+### 6.14 Модуль анализа успеваемости (PerformancePage)
+
+#### 6.14.1 Общее описание
+Модуль анализа успеваемости предоставляет комплексные инструменты для мониторинга и анализа академических показателей учащихся как индивидуально, так и по учебным группам. Система обеспечивает сбор, анализ и визуализацию данных об успеваемости, посещаемости, выполнении заданий и других ключевых показателях образовательного процесса. Модуль предоставляет интерактивные графики, диаграммы и таблицы для наглядного отображения динамики учебных результатов, что позволяет администраторам и преподавателям своевременно выявлять проблемные области и принимать обоснованные педагогические решения.
+
+#### 6.14.2 Основные возможности
+1. Аналитические дашборды с ключевыми показателями успеваемости
+2. Фильтрация и группировка данных по учебным группам
+3. Отслеживание динамики успеваемости по периодам обучения
+4. Распределение оценок по предметам и группам
+5. Анализ успеваемости по отдельным предметам
+6. Мониторинг общих показателей (оценки, посещаемость, активность, выполнение заданий)
+7. Выявление студентов с низкой успеваемостью и высоким прогрессом
+8. Интерактивные графики и визуализации данных
+9. Выгрузка аналитических отчетов в различных форматах
+
+#### 6.14.3 Доступ по ролям
+
+1. **ADMIN** (Администратор):
+   - Полный доступ ко всем функциям модуля
+   - Настройка параметров аналитических отчетов
+   - Просмотр данных по всем группам и студентам
+   - Экспорт любых аналитических данных
+   - Настройка критериев для выявления проблемных зон
+
+2. **TEACHER** (Преподаватель):
+   - Доступ к аналитике по своим предметам и группам
+   - Просмотр индивидуальной успеваемости студентов в своих группах
+   - Отслеживание динамики успеваемости по преподаваемым предметам
+   - Формирование отчетов по своим группам
+
+3. **STUDENT** (Ученик):
+   - Доступ только к собственным показателям успеваемости
+   - Отслеживание личного прогресса по предметам
+   - Просмотр среднего балла и его динамики
+   - Сравнение личных результатов со средними по группе (без доступа к данным других студентов)
+
+4. **PARENT** (Родитель):
+   - Доступ к показателям успеваемости своих детей
+   - Отслеживание динамики успеваемости ребенка
+   - Просмотр сравнения результатов ребенка со средними показателями группы
+
+#### 6.14.4 Модели данных
+
+1. **PerformanceMetrics** - основные метрики успеваемости
+```typescript
+@Entity('performance_metrics')
+export class PerformanceMetrics {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Student)
+  student: Student;
+
+  @ManyToOne(() => Class)
+  class: Class;
+
+  @ManyToOne(() => Subject)
+  subject: Subject;
+
+  @Column({ type: 'float', nullable: true })
+  averageGrade: number;
+
+  @Column({ type: 'float', nullable: true })
+  attendance: number;
+
+  @Column({ type: 'float', nullable: true })
+  assignmentsCompletion: number;
+
+  @Column({ type: 'float', nullable: true })
+  participation: number;
+
+  @Column({ type: 'float', nullable: true })
+  testsResults: number;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  lastUpdated: Date;
+
+  @Column({ type: 'timestamp' })
+  periodStart: Date;
+
+  @Column({ type: 'timestamp' })
+  periodEnd: Date;
+}
+```
+
+2. **PerformanceTrend** - тренды успеваемости
+```typescript
+@Entity('performance_trends')
+export class PerformanceTrend {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Student, { nullable: true })
+  student: Student;
+
+  @ManyToOne(() => Class, { nullable: true })
+  class: Class;
+
+  @ManyToOne(() => Subject, { nullable: true })
+  subject: Subject;
+
+  @Column({ type: 'timestamp' })
+  period: Date;
+
+  @Column({ type: 'float' })
+  value: number;
+
+  @Column({ type: 'float', nullable: true })
+  change: number;
+
+  @Column({ type: 'enum', enum: ['grade', 'attendance', 'assignments', 'participation', 'tests'] })
+  metricType: string;
+}
+```
+
+3. **GradeDistribution** - распределение оценок
+```typescript
+@Entity('grade_distributions')
+export class GradeDistribution {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Class)
+  class: Class;
+
+  @ManyToOne(() => Subject, { nullable: true })
+  subject: Subject;
+
+  @Column({ type: 'timestamp' })
+  period: Date;
+
+  @Column({ type: 'integer' })
+  grade5Count: number;
+
+  @Column({ type: 'integer' })
+  grade4Count: number;
+
+  @Column({ type: 'integer' })
+  grade3Count: number;
+
+  @Column({ type: 'integer' })
+  grade2Count: number;
+
+  @Column({ type: 'integer' })
+  totalStudents: number;
+}
+```
+
+4. **StudentPerformanceAlert** - уведомления об успеваемости
+```typescript
+@Entity('student_performance_alerts')
+export class StudentPerformanceAlert {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Student)
+  student: Student;
+
+  @ManyToOne(() => Subject, { nullable: true })
+  subject: Subject;
+
+  @Column({ type: 'enum', enum: ['low_performance', 'high_progress', 'attendance_issue', 'missing_assignments'] })
+  alertType: string;
+
+  @Column({ type: 'float', nullable: true })
+  currentValue: number;
+
+  @Column({ type: 'float', nullable: true })
+  changeTrend: number;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ type: 'boolean', default: false })
+  isResolved: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resolvedAt: Date;
+}
+```
+
+#### 6.14.5 API Endpoints
+
+1. **Получение общих метрик успеваемости**
+```typescript
+@Controller('api/v1/performance')
+export class PerformanceController {
+  @Get('metrics')
+  @Roles('ADMIN', 'TEACHER')
+  async getPerformanceMetrics(
+    @Query('classId') classId?: string,
+    @Query('subjectId') subjectId?: string,
+    @Query('period') period?: string
+  ): Promise<PerformanceMetricsDto> {
+    // Возвращает агрегированные метрики успеваемости по указанному классу 
+    // и/или предмету за указанный период
+  }
+
+  @Get('metrics/student/:studentId')
+  @Roles('ADMIN', 'TEACHER', 'STUDENT', 'PARENT')
+  async getStudentPerformanceMetrics(
+    @Param('studentId') studentId: string,
+    @Query('subjectId') subjectId?: string,
+    @Query('period') period?: string
+  ): Promise<StudentPerformanceMetricsDto> {
+    // Возвращает метрики успеваемости для конкретного студента
+  }
+
+  @Get('trends')
+  @Roles('ADMIN', 'TEACHER')
+  async getPerformanceTrends(
+    @Query('classId') classId?: string,
+    @Query('subjectId') subjectId?: string,
+    @Query('metricType') metricType?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string
+  ): Promise<PerformanceTrendDto[]> {
+    // Возвращает тренды успеваемости за указанный период
+  }
+
+  @Get('distribution')
+  @Roles('ADMIN', 'TEACHER')
+  async getGradeDistribution(
+    @Query('classId') classId?: string,
+    @Query('subjectId') subjectId?: string,
+    @Query('period') period?: string
+  ): Promise<GradeDistributionDto> {
+    // Возвращает распределение оценок для анализа
+  }
+
+  @Get('alerts')
+  @Roles('ADMIN', 'TEACHER')
+  async getPerformanceAlerts(
+    @Query('classId') classId?: string,
+    @Query('alertType') alertType?: string
+  ): Promise<StudentPerformanceAlertDto[]> {
+    // Возвращает уведомления о проблемах с успеваемостью студентов
+  }
+
+  @Get('students/low-performing')
+  @Roles('ADMIN', 'TEACHER')
+  async getLowPerformingStudents(
+    @Query('classId') classId?: string,
+    @Query('limit') limit = 10
+  ): Promise<LowPerformingStudentDto[]> {
+    // Возвращает список студентов с низкой успеваемостью
+  }
+
+  @Get('students/high-progress')
+  @Roles('ADMIN', 'TEACHER')
+  async getHighProgressStudents(
+    @Query('classId') classId?: string,
+    @Query('limit') limit = 10
+  ): Promise<HighProgressStudentDto[]> {
+    // Возвращает список студентов с высоким прогрессом
+  }
+
+  @Get('subjects/ranking')
+  @Roles('ADMIN', 'TEACHER')
+  async getSubjectsRanking(
+    @Query('classId') classId?: string
+  ): Promise<SubjectRankingDto[]> {
+    // Возвращает рейтинг предметов по успеваемости
+  }
+
+  @Get('export')
+  @Roles('ADMIN', 'TEACHER')
+  async exportPerformanceReport(
+    @Query('classId') classId?: string,
+    @Query('period') period?: string,
+    @Query('format') format = 'pdf'
+  ): Promise<any> {
+    // Экспортирует отчет об успеваемости в выбранном формате
+  }
+}
+```
+
+#### 6.14.6 Бизнес-логика
+
+1. **Сбор и агрегация данных об успеваемости**:
+   - Сбор данных из различных модулей (электронный журнал, домашние задания, тесты)
+   - Расчет средних и интегральных показателей по группам и предметам
+   - Нормализация данных для корректного сравнения между группами и периодами
+
+2. **Анализ трендов и распределений**:
+   - Отслеживание динамики успеваемости во времени
+   - Выявление статистических аномалий и выбросов
+   - Расчет корреляций между различными метриками успеваемости
+
+3. **Выявление проблемных областей**:
+   - Автоматическое определение студентов с критически низкой успеваемостью
+   - Идентификация предметов с наибольшими проблемами по группам
+   - Анализ причин снижения успеваемости на основе комплексных метрик
+
+4. **Формирование рекомендаций**:
+   - Генерация персонализированных рекомендаций для улучшения результатов
+   - Предложения по корректировке учебных планов на основе аналитики
+   - Автоматическое создание индивидуальных траекторий для отстающих студентов
+
+5. **Прогнозирование успеваемости**:
+   - Построение предиктивных моделей для прогнозирования будущих результатов
+   - Раннее выявление рисков академической неуспеваемости
+   - Моделирование влияния различных факторов на успеваемость
+
+#### 6.14.7 Интеграции
+
+1. Интеграция с модулем электронного журнала для получения данных об оценках
+2. Взаимодействие с модулем домашних заданий для анализа выполнения заданий
+3. Интеграция с системой тестирования для учета результатов контрольных работ
+4. Взаимодействие с модулем студентов для получения персональных данных
+5. Интеграция с системой уведомлений для отправки оповещений о проблемах с успеваемостью
+6. Взаимодействие с модулем отчетов для формирования комплексных аналитических отчетов
+
+#### 6.14.8 Требования к производительности
+
+1. Быстрая загрузка интерактивных дашбордов (не более 2 секунд)
+2. Оперативный расчет комплексных показателей для больших наборов данных
+3. Эффективная фильтрация и группировка данных без задержек
+4. Оптимизированное хранение исторических данных для быстрого доступа
+5. Асинхронная генерация крупных аналитических отчетов
+6. Кэширование часто запрашиваемых метрик и распределений
+7. Эффективное обновление визуализаций в реальном времени
+
+#### 6.14.9 Требования к безопасности
+
+1. Строгое разграничение доступа к аналитическим данным согласно ролям
+2. Запрет на доступ студентов к данным других студентов
+3. Анонимизация данных при формировании общих отчетов
+4. Протоколирование всех запросов к аналитическим данным
+5. Защита от неавторизованного экспорта персональных данных
+6. Соблюдение требований законодательства о защите персональных данных
+7. Шифрование чувствительной информации при передаче и хранении
+
+#### 6.14.10 Дополнительные функции
+
+1. Прогностические модели для раннего выявления проблем с успеваемостью
+2. Система рекомендаций для повышения эффективности учебного процесса
+3. Персонализированные дашборды для различных категорий пользователей
+4. API для доступа к аналитическим данным из внешних систем
+5. Настраиваемые пороговые значения для мониторинга показателей
+6. Сравнительный анализ между группами, курсами и учебными годами
+7. Визуализация причинно-следственных связей в академических показателях# # #   6 . 1 5   >4C;L  C?@02;5=8O  ?5@A>=0;><  ( E m p l o y e e s P a g e )  
+  
+ # # # #   6 . 1 5 . 1   1I55  >?8A0=85 
+ >4C;L  C?@02;5=8O  ?5@A>=0;><  ?@54>AB02;O5B  DC=:F8>=0;L=>ABL  4;O  CG5B0,   04<8=8AB@8@>20=8O  8  <>=8B>@8=30  :04@>2>3>  A>AB020  >1@07>20B5;L=>3>  CG@5645=8O.   !8AB5<0  ?>72>;O5B  C?@02;OBL  8=D>@<0F859  >  A>B@C4=8:0E,   >BA;56820BL  8E  AB0BCAK,   :20;8D8:0F8N,   ?@5?>40205<K5  ?@54<5BK,   0  B0:65  E@0=8BL  4>:C<5=BK  8  4>AB865=8O.   >4C;L  >15A?5G8205B  @0745;5=85  A>B@C4=8:>2  =0  HB0B=KE  8  A>2<5AB8B5;59  A  2>7<>6=>ABLN  87<5=5=8O  B8?0  70=OB>AB8.  
+  
+ # # # #   6 . 1 5 . 2   A=>2=K5  2>7<>6=>AB8 
+ 1 .   #?@02;5=85  40==K<8  A>B@C4=8:>2  ( ?@5?>4020B5;59  8  04<8=8AB@0B82=>3>  ?5@A>=0;0)  
+ 2 .    0745;5=85  =0  HB0B=KE  A>B@C4=8:>2  8  A>2<5AB8B5;59 
+ 3 .   BA;56820=85  AB0BCA>2  A>B@C4=8:>2  ( 0:B825=,   2  >B?CA:5,   =0  1>;L=8G=><,   2  :><0=48@>2:5)  
+ 4 .   #G5B  :20;8D8:0F8>==KE  :0B53>@89  8  AB060  @01>BK 
+ 5 .   %@0=5=85  ?5@A>=0;L=KE  40==KE  8  :>=B0:B=>9  8=D>@<0F88 
+ 6 .   #?@02;5=85  ?@5?>40205<K<8  48AF8?;8=0<8 
+ 7 .   #G5B  >1@07>20=8O,   A?5F80;870F88  8  ?@>D5AA8>=0;L=KE  4>AB865=89 
+ 8 .   %@0=5=85  8  >BA;56820=85  4>:C<5=B>2  A>B@C4=8:>2 
+ 9 .   7<5=5=85  B8?0  70=OB>AB8  8  C?@02;5=85  4>;6=>ABO<8 
+ 1 0 .   -:A?>@B  40==KE  >  A>B@C4=8:0E  2  @07;8G=KE  D>@<0B0E 
+  
+ # # # #   6 . 1 5 . 3   >ABC?  ?>  @>;O< 
+  
+ 1 .   * * A D M I N * *   ( 4<8=8AB@0B>@) :  
+       -   >;=K9  4>ABC?  :>  2A5<  DC=:F8O<  <>4C;O 
+       -   >102;5=85,   @540:B8@>20=85  8  C40;5=85  A>B@C4=8:>2 
+       -   7<5=5=85  B8?0  70=OB>AB8  8  AB0BCA>2 
+       -   #?@02;5=85  4>:C<5=B0<8  8  ;8G=K<8  45;0<8 
+       -   -:A?>@B  ?>;=>9  8=D>@<0F88  >  A>B@C4=8:0E 
+  
+ 2 .   * * H R _ M A N A G E R * *   ( H R - <5=5465@) :  
+       -   @>A<>B@  40==KE  2A5E  A>B@C4=8:>2 
+       -   3@0=8G5==>5  @540:B8@>20=85  8=D>@<0F88 
+       -   BA;56820=85  AB0BCA>2  8  HB0B=>3>  @0A?8A0=8O 
+       -   -:A?>@B  >BG5B>2  ?>  :04@>2><C  A>AB02C 
+  
+ 3 .   * * D I R E C T O R * *   ( 8@5:B>@) :  
+       -   @>A<>B@  40==KE  2A5E  A>B@C4=8:>2 
+       -   #B25@645=85  :04@>2KE  87<5=5=89 
+       -   >ABC?  :  0=0;8B8:5  :04@>2>3>  A>AB020 
+  
+ 4 .   * * T E A C H E R * *   ( @5?>4020B5;L) :  
+       -   @>A<>B@  B>;L:>  A2>53>  ?@>D8;O 
+       -   @>A<>B@  >3@0=8G5==>9  8=D>@<0F88  >  :>;;530E 
+       -   1=>2;5=85  A2>8E  ?@>D5AA8>=0;L=KE  4>AB865=89  8  4>:C<5=B>2 
+  
+ # # # #   6 . 1 5 . 4   >45;8  40==KE 
+  
+ 1 .   * * E m p l o y e e * *   -   A>B@C4=8: 
+ ` ` ` t y p e s c r i p t  
+ @ E n t i t y ( ' e m p l o y e e s ' )  
+ e x p o r t   c l a s s   E m p l o y e e   {  
+     @ P r i m a r y G e n e r a t e d C o l u m n ( ' u u i d ' )  
+     i d :   s t r i n g ;  
+  
+     @ C o l u m n ( )  
+     n a m e :   s t r i n g ;  
+  
+     @ C o l u m n ( {   u n i q u e :   t r u e   } )  
+     i i n :   s t r i n g ;  
+  
+     @ C o l u m n ( {   u n i q u e :   t r u e   } )  
+     e m a i l :   s t r i n g ;  
+  
+     @ C o l u m n ( )  
+     p o s i t i o n :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     c a t e g o r y :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     s u b j e c t :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     e x p e r i e n c e :   s t r i n g ;  
+  
+     @ C o l u m n ( {  
+         t y p e :   ' e n u m ' ,  
+         e n u m :   E m p l o y e e S t a t u s ,  
+         d e f a u l t :   E m p l o y e e S t a t u s . A C T I V E  
+     } )  
+     s t a t u s :   E m p l o y e e S t a t u s ;  
+  
+     @ C o l u m n ( {  
+         t y p e :   ' e n u m ' ,  
+         e n u m :   E m p l o y m e n t T y p e ,  
+         d e f a u l t :   E m p l o y m e n t T y p e . F U L L T I M E  
+     } )  
+     e m p l o y m e n t T y p e :   E m p l o y m e n t T y p e ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     p h o n e :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     e d u c a t i o n :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     s p e c i a l i z a t i o n :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     a d d r e s s :   s t r i n g ;  
+  
+     @ C o l u m n ( {   t y p e :   ' d a t e ' ,   n u l l a b l e :   t r u e   } )  
+     h i r e D a t e :   D a t e ;  
+  
+     @ C o l u m n ( {   t y p e :   ' j s o n b ' ,   n u l l a b l e :   t r u e   } )  
+     s u b j e c t s :   {  
+         g e n e r a l :   s t r i n g [ ] ;  
+         s p e c i a l :   s t r i n g [ ] ;  
+     } ;  
+  
+     @ C o l u m n ( ' t e x t ' ,   {   a r r a y :   t r u e ,   n u l l a b l e :   t r u e   } )  
+     a c h i e v e m e n t s :   s t r i n g [ ] ;  
+  
+     @ O n e T o M a n y ( ( )   = >   E m p l o y e e D o c u m e n t ,   d o c u m e n t   = >   d o c u m e n t . e m p l o y e e )  
+     d o c u m e n t s :   E m p l o y e e D o c u m e n t [ ] ;  
+  
+     @ C r e a t e D a t e C o l u m n ( )  
+     c r e a t e d A t :   D a t e ;  
+  
+     @ U p d a t e D a t e C o l u m n ( )  
+     u p d a t e d A t :   D a t e ;  
+  
+     @ C o l u m n ( {   t y p e :   ' d a t e ' ,   n u l l a b l e :   t r u e   } )  
+     b i r t h D a t e :   D a t e ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     p h o t o U r l :   s t r i n g ;  
+  
+     @ M a n y T o O n e ( ( )   = >   D e p a r t m e n t )  
+     d e p a r t m e n t :   D e p a r t m e n t ;  
+  
+     @ C o l u m n ( {   t y p e :   ' d e c i m a l ' ,   p r e c i s i o n :   1 0 ,   s c a l e :   2 ,   n u l l a b l e :   t r u e   } )  
+     s a l a r y :   n u m b e r ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     c o n t r a c t N u m b e r :   s t r i n g ;  
+ }  
+  
+ e x p o r t   e n u m   E m p l o y e e S t a t u s   {  
+     A C T I V E   =   ' a c t i v e ' ,  
+     V A C A T I O N   =   ' v a c a t i o n ' ,  
+     S I C K   =   ' s i c k ' ,  
+     B U S I N E S S _ T R I P   =   ' b u s i n e s s _ t r i p ' ,  
+     S U S P E N D E D   =   ' s u s p e n d e d ' ,  
+     T E R M I N A T E D   =   ' t e r m i n a t e d '  
+ }  
+  
+ e x p o r t   e n u m   E m p l o y m e n t T y p e   {  
+     F U L L T I M E   =   ' f u l l t i m e ' ,  
+     P A R T T I M E   =   ' p a r t t i m e '  
+ }  
+ ` ` `  
+  
+ 2 .   * * E m p l o y e e D o c u m e n t * *   -   4>:C<5=BK  A>B@C4=8:0 
+ ` ` ` t y p e s c r i p t  
+ @ E n t i t y ( ' e m p l o y e e _ d o c u m e n t s ' )  
+ e x p o r t   c l a s s   E m p l o y e e D o c u m e n t   {  
+     @ P r i m a r y G e n e r a t e d C o l u m n ( ' u u i d ' )  
+     i d :   s t r i n g ;  
+  
+     @ M a n y T o O n e ( ( )   = >   E m p l o y e e ,   e m p l o y e e   = >   e m p l o y e e . d o c u m e n t s )  
+     e m p l o y e e :   E m p l o y e e ;  
+  
+     @ C o l u m n ( )  
+     t y p e :   s t r i n g ;  
+  
+     @ C o l u m n ( )  
+     n u m b e r :   s t r i n g ;  
+  
+     @ C o l u m n ( {   t y p e :   ' d a t e '   } )  
+     d a t e :   D a t e ;  
+  
+     @ C o l u m n ( )  
+     n a m e :   s t r i n g ;  
+  
+     @ C o l u m n ( {  
+         t y p e :   ' e n u m ' ,  
+         e n u m :   D o c u m e n t S t a t u s ,  
+         d e f a u l t :   D o c u m e n t S t a t u s . A C T I V E  
+     } )  
+     s t a t u s :   D o c u m e n t S t a t u s ;  
+  
+     @ C o l u m n ( )  
+     f i l e U r l :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     f i l e S i z e :   n u m b e r ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     m i m e T y p e :   s t r i n g ;  
+  
+     @ C r e a t e D a t e C o l u m n ( )  
+     c r e a t e d A t :   D a t e ;  
+  
+     @ U p d a t e D a t e C o l u m n ( )  
+     u p d a t e d A t :   D a t e ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     e x p i r y D a t e :   D a t e ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     i s s u e d B y :   s t r i n g ;  
+ }  
+  
+ e x p o r t   e n u m   D o c u m e n t S t a t u s   {  
+     A C T I V E   =   ' a c t i v e ' ,  
+     E X P I R E D   =   ' e x p i r e d ' ,  
+     R E V O K E D   =   ' r e v o k e d '  
+ }  
+ ` ` `  
+  
+ 3 .   * * D e p a r t m e n t * *   -   >B45; 
+ ` ` ` t y p e s c r i p t  
+ @ E n t i t y ( ' d e p a r t m e n t s ' )  
+ e x p o r t   c l a s s   D e p a r t m e n t   {  
+     @ P r i m a r y G e n e r a t e d C o l u m n ( ' u u i d ' )  
+     i d :   s t r i n g ;  
+  
+     @ C o l u m n ( )  
+     n a m e :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     d e s c r i p t i o n :   s t r i n g ;  
+  
+     @ M a n y T o O n e ( ( )   = >   E m p l o y e e ,   {   n u l l a b l e :   t r u e   } )  
+     h e a d :   E m p l o y e e ;  
+  
+     @ O n e T o M a n y ( ( )   = >   E m p l o y e e ,   e m p l o y e e   = >   e m p l o y e e . d e p a r t m e n t )  
+     e m p l o y e e s :   E m p l o y e e [ ] ;  
+  
+     @ C o l u m n ( {   d e f a u l t :   t r u e   } )  
+     i s A c t i v e :   b o o l e a n ;  
+  
+     @ C r e a t e D a t e C o l u m n ( )  
+     c r e a t e d A t :   D a t e ;  
+  
+     @ U p d a t e D a t e C o l u m n ( )  
+     u p d a t e d A t :   D a t e ;  
+ }  
+ ` ` `  
+  
+ 4 .   * * E m p l o y e e S t a t u s H i s t o r y * *   -   8AB>@8O  87<5=5=8O  AB0BCA0 
+ ` ` ` t y p e s c r i p t  
+ @ E n t i t y ( ' e m p l o y e e _ s t a t u s _ h i s t o r y ' )  
+ e x p o r t   c l a s s   E m p l o y e e S t a t u s H i s t o r y   {  
+     @ P r i m a r y G e n e r a t e d C o l u m n ( ' u u i d ' )  
+     i d :   s t r i n g ;  
+  
+     @ M a n y T o O n e ( ( )   = >   E m p l o y e e )  
+     e m p l o y e e :   E m p l o y e e ;  
+  
+     @ C o l u m n ( {  
+         t y p e :   ' e n u m ' ,  
+         e n u m :   E m p l o y e e S t a t u s  
+     } )  
+     s t a t u s :   E m p l o y e e S t a t u s ;  
+  
+     @ C o l u m n ( {   t y p e :   ' d a t e '   } )  
+     s t a r t D a t e :   D a t e ;  
+  
+     @ C o l u m n ( {   t y p e :   ' d a t e ' ,   n u l l a b l e :   t r u e   } )  
+     e n d D a t e :   D a t e ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     r e a s o n :   s t r i n g ;  
+  
+     @ C o l u m n ( {   n u l l a b l e :   t r u e   } )  
+     d o c u m e n t N u m b e r :   s t r i n g ;  
+  
+     @ M a n y T o O n e ( ( )   = >   U s e r )  
+     c r e a t e d B y :   U s e r ;  
+  
+     @ C r e a t e D a t e C o l u m n ( )  
+     c r e a t e d A t :   D a t e ;  
+ }  
+ ` ` `  
+  
+ # # # #   6 . 1 5 . 5   A P I   E n d p o i n t s  
+  
+ 1 .   * * #?@02;5=85  A>B@C4=8:0<8* *  
+ ` ` ` t y p e s c r i p t  
+ @ C o n t r o l l e r ( ' a p i / v 1 / e m p l o y e e s ' )  
+ @ U s e G u a r d s ( J w t A u t h G u a r d )  
+ e x p o r t   c l a s s   E m p l o y e e s C o n t r o l l e r   {  
+     @ G e t ( )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   g e t E m p l o y e e s (  
+         @ Q u e r y ( )   q u e r y :   E m p l o y e e Q u e r y D t o  
+     ) :   P r o m i s e < {   i t e m s :   E m p l o y e e D t o [ ] ;   m e t a :   P a g i n a t i o n M e t a   } >   {  
+         / /   >72@0I05B  A?8A>:  A>B@C4=8:>2  A  ?038=0F859  8  D8;LB@0F859 
+         / /   ?>  AB0BCAC,   B8?C  70=OB>AB8,   ?@54<5BC  8  4@.  
+     }  
+  
+     @ P o s t ( )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' )  
+     a s y n c   c r e a t e E m p l o y e e (  
+         @ B o d y ( )   c r e a t e E m p l o y e e D t o :   C r e a t e E m p l o y e e D t o  
+     ) :   P r o m i s e < E m p l o y e e D t o >   {  
+         / /   !>7405B  =>2>3>  A>B@C4=8:0 
+     }  
+  
+     @ G e t ( ' : i d ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' ,   ' T E A C H E R ' )  
+     a s y n c   g e t E m p l o y e e (  
+         @ P a r a m ( ' i d ' )   i d :   s t r i n g ,  
+         @ R e q ( )   r e q  
+     ) :   P r o m i s e < E m p l o y e e D t o >   {  
+         / /   >72@0I05B  40==K5  :>=:@5B=>3>  A>B@C4=8:0 
+         / /   ;O  CG8B5;59  4>ABC?  >3@0=8G5=  A>1AB25==K<  ?@>D8;5< 
+         / /   8;8  107>2>9  8=D>@<0F859  >  :>;;530E 
+     }  
+  
+     @ P u t ( ' : i d ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' )  
+     a s y n c   u p d a t e E m p l o y e e (  
+         @ P a r a m ( ' i d ' )   i d :   s t r i n g ,  
+         @ B o d y ( )   u p d a t e E m p l o y e e D t o :   U p d a t e E m p l o y e e D t o  
+     ) :   P r o m i s e < E m p l o y e e D t o >   {  
+         / /   1=>2;O5B  40==K5  A>B@C4=8:0 
+     }  
+  
+     @ D e l e t e ( ' : i d ' )  
+     @ R o l e s ( ' A D M I N ' )  
+     a s y n c   d e l e t e E m p l o y e e (  
+         @ P a r a m ( ' i d ' )   i d :   s t r i n g  
+     ) :   P r o m i s e < v o i d >   {  
+         / /   #40;O5B  A>B@C4=8:0 
+     }  
+  
+     @ P a t c h ( ' : i d / s t a t u s ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' )  
+     a s y n c   u p d a t e S t a t u s (  
+         @ P a r a m ( ' i d ' )   i d :   s t r i n g ,  
+         @ B o d y ( )   s t a t u s D t o :   U p d a t e S t a t u s D t o  
+     ) :   P r o m i s e < E m p l o y e e D t o >   {  
+         / /   1=>2;O5B  AB0BCA  A>B@C4=8:0 
+     }  
+  
+     @ P a t c h ( ' : i d / e m p l o y m e n t - t y p e ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' )  
+     a s y n c   u p d a t e E m p l o y m e n t T y p e (  
+         @ P a r a m ( ' i d ' )   i d :   s t r i n g ,  
+         @ B o d y ( )   t y p e D t o :   U p d a t e E m p l o y m e n t T y p e D t o  
+     ) :   P r o m i s e < E m p l o y e e D t o >   {  
+         / /   7<5=O5B  B8?  70=OB>AB8  ( HB0B=K9/ A>2<5AB8B5;L)  
+     }  
+  
+     @ G e t ( ' f u l l t i m e ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   g e t F u l l t i m e E m p l o y e e s (  
+         @ Q u e r y ( )   q u e r y :   E m p l o y e e Q u e r y D t o  
+     ) :   P r o m i s e < {   i t e m s :   E m p l o y e e D t o [ ] ;   m e t a :   P a g i n a t i o n M e t a   } >   {  
+         / /   >72@0I05B  A?8A>:  HB0B=KE  A>B@C4=8:>2 
+     }  
+  
+     @ G e t ( ' p a r t t i m e ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   g e t P a r t t i m e E m p l o y e e s (  
+         @ Q u e r y ( )   q u e r y :   E m p l o y e e Q u e r y D t o  
+     ) :   P r o m i s e < {   i t e m s :   E m p l o y e e D t o [ ] ;   m e t a :   P a g i n a t i o n M e t a   } >   {  
+         / /   >72@0I05B  A?8A>:  A>B@C4=8:>2- A>2<5AB8B5;59 
+     }  
+  
+     @ G e t ( ' e x p o r t ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   e x p o r t E m p l o y e e s (  
+         @ Q u e r y ( )   q u e r y :   E x p o r t E m p l o y e e s D t o ,  
+         @ R e s ( )   r e s  
+     ) :   P r o m i s e < v o i d >   {  
+         / /   -:A?>@B  40==KE  A>B@C4=8:>2  2  2K1@0==><  D>@<0B5 
+     }  
+ }  
+ ` ` `  
+  
+ 2 .   * * #?@02;5=85  4>:C<5=B0<8  A>B@C4=8:>2* *  
+ ` ` ` t y p e s c r i p t  
+ @ C o n t r o l l e r ( ' a p i / v 1 / e m p l o y e e s / : e m p l o y e e I d / d o c u m e n t s ' )  
+ @ U s e G u a r d s ( J w t A u t h G u a r d )  
+ e x p o r t   c l a s s   E m p l o y e e D o c u m e n t s C o n t r o l l e r   {  
+     @ G e t ( )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' ,   ' T E A C H E R ' )  
+     a s y n c   g e t D o c u m e n t s (  
+         @ P a r a m ( ' e m p l o y e e I d ' )   e m p l o y e e I d :   s t r i n g ,  
+         @ R e q ( )   r e q  
+     ) :   P r o m i s e < {   i t e m s :   E m p l o y e e D o c u m e n t D t o [ ] ;   m e t a :   P a g i n a t i o n M e t a   } >   {  
+         / /   >72@0I05B  A?8A>:  4>:C<5=B>2  A>B@C4=8:0 
+     }  
+  
+     @ P o s t ( )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' )  
+     @ U s e I n t e r c e p t o r s ( F i l e I n t e r c e p t o r ( ' f i l e ' ) )  
+     a s y n c   a d d D o c u m e n t (  
+         @ P a r a m ( ' e m p l o y e e I d ' )   e m p l o y e e I d :   s t r i n g ,  
+         @ B o d y ( )   d o c u m e n t D t o :   C r e a t e D o c u m e n t D t o ,  
+         @ U p l o a d e d F i l e ( )   f i l e :   E x p r e s s . M u l t e r . F i l e  
+     ) :   P r o m i s e < E m p l o y e e D o c u m e n t D t o >   {  
+         / /   >102;O5B  =>2K9  4>:C<5=B  A>B@C4=8:C 
+     }  
+  
+     @ G e t ( ' : d o c u m e n t I d ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' ,   ' T E A C H E R ' )  
+     a s y n c   g e t D o c u m e n t (  
+         @ P a r a m ( ' e m p l o y e e I d ' )   e m p l o y e e I d :   s t r i n g ,  
+         @ P a r a m ( ' d o c u m e n t I d ' )   d o c u m e n t I d :   s t r i n g ,  
+         @ R e q ( )   r e q  
+     ) :   P r o m i s e < E m p l o y e e D o c u m e n t D t o >   {  
+         / /   >72@0I05B  8=D>@<0F8N  >  :>=:@5B=><  4>:C<5=B5 
+     }  
+  
+     @ D e l e t e ( ' : d o c u m e n t I d ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' )  
+     a s y n c   d e l e t e D o c u m e n t (  
+         @ P a r a m ( ' e m p l o y e e I d ' )   e m p l o y e e I d :   s t r i n g ,  
+         @ P a r a m ( ' d o c u m e n t I d ' )   d o c u m e n t I d :   s t r i n g  
+     ) :   P r o m i s e < v o i d >   {  
+         / /   #40;O5B  4>:C<5=B 
+     }  
+  
+     @ G e t ( ' : d o c u m e n t I d / d o w n l o a d ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' ,   ' T E A C H E R ' )  
+     a s y n c   d o w n l o a d D o c u m e n t (  
+         @ P a r a m ( ' e m p l o y e e I d ' )   e m p l o y e e I d :   s t r i n g ,  
+         @ P a r a m ( ' d o c u m e n t I d ' )   d o c u m e n t I d :   s t r i n g ,  
+         @ R e q ( )   r e q ,  
+         @ R e s ( )   r e s  
+     ) :   P r o m i s e < v o i d >   {  
+         / /   !:0G820=85  4>:C<5=B0 
+     }  
+  
+     @ P a t c h ( ' : d o c u m e n t I d / s t a t u s ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' )  
+     a s y n c   u p d a t e D o c u m e n t S t a t u s (  
+         @ P a r a m ( ' e m p l o y e e I d ' )   e m p l o y e e I d :   s t r i n g ,  
+         @ P a r a m ( ' d o c u m e n t I d ' )   d o c u m e n t I d :   s t r i n g ,  
+         @ B o d y ( )   s t a t u s D t o :   U p d a t e D o c u m e n t S t a t u s D t o  
+     ) :   P r o m i s e < E m p l o y e e D o c u m e n t D t o >   {  
+         / /   1=>2;O5B  AB0BCA  4>:C<5=B0 
+     }  
+ }  
+ ` ` `  
+  
+ 3 .   * * !B0B8AB8:0  8  0=0;8B8:0  ?5@A>=0;0* *  
+ ` ` ` t y p e s c r i p t  
+ @ C o n t r o l l e r ( ' a p i / v 1 / e m p l o y e e s / s t a t i s t i c s ' )  
+ @ U s e G u a r d s ( J w t A u t h G u a r d )  
+ e x p o r t   c l a s s   E m p l o y e e S t a t i s t i c s C o n t r o l l e r   {  
+     @ G e t ( ' o v e r v i e w ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   g e t O v e r v i e w ( ) :   P r o m i s e < E m p l o y e e S t a t s D t o >   {  
+         / /   1I0O  AB0B8AB8:0  ?>  A>B@C4=8:0< 
+     }  
+  
+     @ G e t ( ' b y - s t a t u s ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   g e t S t a t s B y S t a t u s ( ) :   P r o m i s e < S t a t u s S t a t s D t o [ ] >   {  
+         / /   !B0B8AB8:0  ?>  AB0BCA0<  A>B@C4=8:>2 
+     }  
+  
+     @ G e t ( ' b y - s u b j e c t ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   g e t S t a t s B y S u b j e c t ( ) :   P r o m i s e < S u b j e c t S t a t s D t o [ ] >   {  
+         / /    0A?@545;5=85  ?@5?>4020B5;59  ?>  ?@54<5B0< 
+     }  
+  
+     @ G e t ( ' b y - c a t e g o r y ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   g e t S t a t s B y C a t e g o r y ( ) :   P r o m i s e < C a t e g o r y S t a t s D t o [ ] >   {  
+         / /    0A?@545;5=85  ?>  :20;8D8:0F8>==K<  :0B53>@8O< 
+     }  
+  
+     @ G e t ( ' b y - d e p a r t m e n t ' )  
+     @ R o l e s ( ' A D M I N ' ,   ' H R _ M A N A G E R ' ,   ' D I R E C T O R ' )  
+     a s y n c   g e t S t a t s B y D e p a r t m e n t ( ) :   P r o m i s e < D e p a r t m e n t S t a t s D t o [ ] >   {  
+         / /    0A?@545;5=85  ?>  >B45;0< 
+     }  
+ }  
+ ` ` `  
+  
+ # # # #   6 . 1 5 . 6   87=5A- ;>38:0 
+  
+ 1 .   * * #?@02;5=85  AB0BCA0<8  A>B@C4=8:>2* *  
+       -   BA;56820=85  0:B82=KE  A>B@C4=8:>2,   =0E>4OI8EAO  2  >B?CA:5,   =0  1>;L=8G=><  8;8  2  :><0=48@>2:5 
+       -   545=85  8AB>@88  87<5=5=8O  AB0BCA>2  A  C:070=85<  ?@8G8=  8  4>:C<5=B>2- >A=>20=89 
+       -   2B><0B8G5A:>5  >1=>2;5=85  AB0BCA>2  ?@8  8AB5G5=88  A@>:0  >B?CA:0  8;8  1>;L=8G=>3> 
+       -   #G5B  4>ABC?=>AB8  ?@5?>4020B5;O  4;O  A>AB02;5=8O  @0A?8A0=8O  =0  >A=>25  53>  AB0BCA0 
+  
+ 2 .   * * #?@02;5=85  B8?0<8  70=OB>AB8* *  
+       -    0745;5=85  A>B@C4=8:>2  =0  HB0B=KE  8  A>2<5AB8B5;59  A  A>>B25BAB2CNI8<8  ?@020<8  8  >1O70==>ABO<8 
+       -   @>F54C@0  ?5@52>40  87  >4=>3>  B8?0  70=OB>AB8  2  4@C3>9  A  A>E@0=5=85<  8AB>@88  87<5=5=89 
+       -   #G5B  >A>15==>AB59  >D>@<;5=8O  8  =0G8A;5=8O  70@01>B=>9  ?;0BK  2  7028A8<>AB8  >B  B8?0  70=OB>AB8 
+       -   =B53@0F8O  A  D8=0=A>2K<  <>4C;5<  4;O  :>@@5:B=>3>  @0AG5B0  70@01>B=>9  ?;0BK 
+  
+ 3 .   * * #?@02;5=85  4>:C<5=B0<8* *  
+       -   %@0=5=85  8  >@30=870F8O  4>:C<5=B>2  A>B@C4=8:>2  ( 48?;><K,   A5@B8D8:0BK,   ?@8:07K)  
+       -   BA;56820=85  AB0BCA0  4>:C<5=B>2  ( 459AB2CNI89,   ?@>A@>G5==K9)  
+       -   !8AB5<0  =0?><8=0=89  >  =5>1E>48<>AB8  >1=>2;5=8O  4>:C<5=B>2  A  8AB5:0NI8<  A@>:><  459AB28O 
+       -   $>@<8@>20=85  ;8G=>3>  45;0  A>B@C4=8:0  =0  >A=>25  E@0=OI8EAO  4>:C<5=B>2 
+  
+ 4 .   * * #?@02;5=85  :20;8D8:0F859  8  ?@>D5AA8>=0;L=K<  @0728B85<* *  
+       -   #G5B  >1@07>20=8O,   :20;8D8:0F8>==KE  :0B53>@89  8  >?KB0  @01>BK 
+       -   BA;56820=85  ?@>D5AA8>=0;L=KE  4>AB865=89  8  ?@>E>645=8O  :C@A>2  ?>2KH5=8O  :20;8D8:0F88 
+       -   ;0=8@>20=85  0BB5AB0F89  8  ?>2KH5=8O  :20;8D8:0F88 
+       -   =0;87  A>>B25BAB28O  ?@5?>4020B5;59  B@51>20=8O<  >1@07>20B5;L=KE  AB0=40@B>2 
+  
+ 5 .   * * =0;87  :04@>2>3>  A>AB020* *  
+       -   $>@<8@>20=85  >BG5B>2  >  B5:CI5<  A>AB>O=88  :04@>2>3>  >15A?5G5=8O 
+       -   KO2;5=85  =54>AB0B:0  ?@5?>4020B5;59  ?>  >?@545;5==K<  ?@54<5B0<  8;8  A?5F80;870F8O< 
+       -   =0;87  =03@C7:8  =0  ?5@A>=0;  8  @0A?@545;5=8O  ?>  >B45;0<  8  ?@54<5B0< 
+       -   @>3=>78@>20=85  ?>B@51=>AB8  2  ?5@A>=0;5  =0  >A=>25  CG51=KE  ?;0=>2 
+  
+ # # # #   6 . 1 5 . 7   =B53@0F88 
+  
+ 1 .   =B53@0F8O  A  <>4C;5<  @0A?8A0=8O  4;O  CG5B0  4>ABC?=>AB8  ?@5?>4020B5;59 
+ 2 .   =B53@0F8O  A  D8=0=A>2K<  <>4C;5<  4;O  @0AG5B0  70@01>B=>9  ?;0BK 
+ 3 .   708<>459AB285  A  <>4C;5<  M;5:B@>==>3>  4>:C<5=B>>1>@>B0 
+ 4 .   =B53@0F8O  A  A8AB5<>9  C254><;5=89  4;O  >?>25I5=89  >  AB0BCA0E  8  4>:C<5=B0E 
+ 5 .   !2O7L  A  <>4C;5<  =03@C7:8  4;O  ?;0=8@>20=8O  @01>BK  ?@5?>4020B5;59 
+ 6 .   =B53@0F8O  A  A8AB5<>9  02B>@870F88  8  @>;52>3>  4>ABC?0 
+  
+ # # # #   6 . 1 5 . 8   "@51>20=8O  :  ?@>872>48B5;L=>AB8 
+  
+ 1 .   KAB@0O  703@C7:0  A?8A:0  A>B@C4=8:>2  A  ?@8<5=5=85<  D8;LB@>2  8  ?038=0F88 
+ 2 .   -DD5:B82=K9  ?>8A:  ?>  1075  A>B@C4=8:>2  ?>  @07;8G=K<  ?0@0<5B@0< 
+ 3 .   ?B8<878@>20==0O  @01>B0  A  4>:C<5=B0<8  1>;LH>3>  @07<5@0 
+ 4 .   A8=E@>==0O  >1@01>B:0  >?5@0F89  <0AA>2>3>  8<?>@B0/ M:A?>@B0  40==KE 
+ 5 .   MH8@>20=85  G0AB>  70?@0H8205<KE  40==KE  4;O  C;CGH5=8O  >B:;8:0  A8AB5<K 
+ 6 .   ?B8<870F8O  70?@>A>2  :  1075  40==KE  ?@8  @01>B5  A  8AB>@8G5A:8<8  40==K<8 
+  
+ # # # #   6 . 1 5 . 9   "@51>20=8O  :  157>?0A=>AB8 
+  
+ 1 .   !B@>3>5  @073@0=8G5=85  4>ABC?0  :  ?5@A>=0;L=K<  40==K<  A>B@C4=8:>2 
+ 2 .   (8D@>20=85  GC2AB28B5;L=>9  8=D>@<0F88  ?@8  E@0=5=88  8  ?5@540G5 
+ 3 .   545=85  6C@=0;0  4>ABC?0  :  ?5@A>=0;L=K<  40==K< 
+ 4 .   !>1;N45=85  B@51>20=89  70:>=>40B5;LAB20  >  ?5@A>=0;L=KE  40==KE 
+ 5 .   0I8B0  :>=D845=F80;L=>9  8=D>@<0F88  >  70@01>B=>9  ?;0B5  8  CA;>28OE  B@C40 
+ 6 .   !8AB5<0  @575@2=>3>  :>?8@>20=8O  40==KE  A>B@C4=8:>2 
+  
+ # # # #   6 . 1 5 . 1 0   >?>;=8B5;L=K5  DC=:F88 
+  
+ 1 .   0AA>2K9  8<?>@B  40==KE  >  A>B@C4=8:0E  87  E x c e l ,   C S V  
+ 2 .   2B><0B8G5A:>5  D>@<8@>20=85  HB0B=>3>  @0A?8A0=8O 
+ 3 .   !8AB5<0  H01;>=>2  4;O  1KAB@>3>  A>740=8O  B8?>2KE  4>:C<5=B>2 
+ 4 .   5=5@0F8O  A?@02>:  8  >BG5B>2  4;O  3>AC40@AB25==KE  >@30=>2 
+ 5 .   2B><0B8G5A:>5  >?>25I5=85  >  =5>1E>48<>AB8  ?@>4;5=8O  4>:C<5=B>2 
+ 6 .   =B53@0F8O  A>  AB>@>==8<8  H R - A8AB5<0<8 
+ 7 .   $C=:F8O  @0A?>7=020=8O  8  872;5G5=8O  40==KE  87  703@C605<KE  4>:C<5=B>2 
+ 
