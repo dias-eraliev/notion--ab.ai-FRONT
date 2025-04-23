@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { SWRConfig } from 'swr';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import AcademicJournalPage from './pages/AcademicJournalPage';
@@ -15,11 +16,8 @@ import StudentDetailPage from './pages/StudentDetailPage';
 import ChatPage from './pages/app/ChatPage';
 import AIChatPage from './pages/app/AIChatPage';
 import CalendarPage from './pages/app/CalendarPage';
-import EmailPage from './pages/app/EmailPage';
 import TodoPage from './pages/app/TodoPage';
 import NeuroAbaiPage from './pages/app/NeuroAbaiPage';
-import FilesPage from './pages/app/FilesPage';
-import SettingsPage from './pages/app/SettingsPage';
 import ProfilePage from './pages/app/ProfilePage';
 import PerformancePage from './pages/PerformancePage';
 import EmotionalAnalysisPage from './pages/EmotionalAnalysisPage';
@@ -35,9 +33,8 @@ import PayrollPage from './pages/finance/PayrollPage';
 import SalariesPage from './pages/finance/SalariesPage';
 import AntiFraudPage from './pages/finance/AntiFraudPage';
 import Login from './pages/Login';
-import { AuthProvider, ProtectedRoute } from './providers/AuthProvider';
+import { AuthProvider, ProtectedRoute, useAuth } from './providers/AuthProvider';
 import TestRealtimeApi from './pages/TestRealtimeApi';
-import FileManagerPage from './pages/app/FileManagerPage';
 import InventoryPage from './pages/erp/InventoryPage';
 import SupplyPage from './pages/erp/SupplyPage';
 import SecurityPage from './pages/erp/SecurityPage';
@@ -50,77 +47,116 @@ import HomeworkPage from './pages/HomeworkPage';
 
 const App: React.FC = () => {
   return (
-
     <LanguageProvider>
       <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+        </Routes>
         <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<DashboardLayout />}>
-              <Route index element={<Dashboard />} />
-
-              {/* Academic routes */}
-              <Route path="academic/academic-journal" element={<AcademicJournalPage />} />
-              <Route path="academic/schedule" element={<SchedulePage />} />
-              <Route path="academic/classrooms" element={<ClassroomsPage />} />
-              <Route path="academic/requests" element={<BookingRequestsPage />} />
-              <Route path="academic/requests/new" element={<BookingRequestsPage />} />
-              <Route path="academic/study-plans" element={<StudyPlansPage />} />
-              <Route path="academic/study-plans/:id" element={<StudyPlanDetailPage />} />
-              <Route path="academic/study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
-              <Route path="academic/homework" element={<HomeworkPage />} />
-
-              {/* Students routes */}
-              <Route path="students" element={<StudentsPage />} />
-              <Route path="students/:id" element={<StudentDetailPage />} />
-              <Route path="students/emotional-analysis" element={<EmotionalAnalysisPage />} />
-              <Route path="performance" element={<PerformancePage />} />
-
-              {/* Applications routes */}
-              <Route path="app/chat" element={<ChatPage />} />
-              <Route path="app/ai-chat" element={<AIChatPage />} />
-              <Route path="app/calendar" element={<CalendarPage />} />
-              <Route path="app/email" element={<EmailPage />} />
-              <Route path="app/tasks" element={<TodoPage />} />
-              <Route path="app/files" element={<FileManagerPage />} />
-              <Route path="app/profile" element={<ProfilePage />} />
-              <Route path="app/erp/inventory" element={<InventoryPage />} />
-              <Route path="app/erp/supply" element={<SupplyPage />} />
-              <Route path="app/erp/security" element={<SecurityPage />} />
-              <Route path="app/neuro-abai" element={<NeuroAbaiPage />} />
-              {/* HR routes */}
-              <Route path="hr/employees" element={<EmployeesPage />} />
-              <Route path="hr/workload" element={<WorkloadPage />} />
-              <Route path="hr/kpi" element={<KpiPage />} />
-              <Route path="hr/vacation" element={<VacationPage />} />
-              <Route path="hr/fake-positions" element={<FakePositionsPage />} />
-
-              {/* Finance routes */}
-              <Route path="finance/payments" element={<PaymentsPage />} />
-              <Route path="finance/reports" element={<ReportsPage />} />
-              <Route path="finance/budget" element={<BudgetPage />} />
-              <Route path="finance/payroll" element={<PayrollPage />} />
-              <Route path="finance/salaries" element={<SalariesPage />} />
-              <Route path="finance/antifraud" element={<AntiFraudPage />} />
-
-              {/* Settings routes */}
-              <Route path="settings/users" element={<UsersPage />} />
-              <Route path="settings/permissions" element={<PermissionsPage />} />
-              <Route path="settings/integrations" element={<IntegrationsPage />} />
-              <Route path="settings/branding" element={<BrandingPage />} />
-              <Route path="settings/system" element={<SystemPage />} />
-
-              {/* Study Plans routes */}
-              <Route path="study-plans" element={<StudyPlansPage />} />
-              <Route path="study-plans/:id" element={<StudyPlanDetailPage />} />
-              <Route path="study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
-
-              <Route path='/test/realtime-api' element={<TestRealtimeApi />} />
-            </Route>
-          </Routes>
+          <SWRConfigWithAuth />
         </AuthProvider>
       </Router>
     </LanguageProvider>
+  );
+};
+
+// Separate component to access AuthContext
+const SWRConfigWithAuth: React.FC = () => {
+  const { token } = useAuth();
+  
+  // Custom fetcher that adds the authentication token to requests
+  const fetcher = async (url: string) => {
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      const error = new Error('An error occurred while fetching the data.');
+      // Attach extra info to the error object
+      (error as any).info = await response.json();
+      (error as any).status = response.status;
+      throw error;
+    }
+    
+    return response.json();
+  };
+
+  return (
+    <SWRConfig value={{
+      fetcher,
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      refreshInterval: 0, // No auto refresh
+      shouldRetryOnError: true,
+      dedupingInterval: 2000,
+      errorRetryInterval: 5000,
+      errorRetryCount: 3
+    }}>
+      <Routes>
+        <Route path="/" element={<DashboardLayout />}>
+          <Route index element={<Dashboard />} />
+
+          {/* Academic routes */}
+          <Route path="academic/academic-journal" element={<AcademicJournalPage />} />
+          <Route path="academic/schedule" element={<SchedulePage />} />
+          <Route path="academic/classrooms" element={<ClassroomsPage />} />
+          <Route path="academic/requests" element={<BookingRequestsPage />} />
+          <Route path="academic/requests/new" element={<BookingRequestsPage />} />
+          <Route path="academic/study-plans" element={<StudyPlansPage />} />
+          <Route path="academic/study-plans/:id" element={<StudyPlanDetailPage />} />
+          <Route path="academic/study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
+          <Route path="academic/homework" element={<HomeworkPage />} />
+
+          {/* Students routes */}
+          <Route path="students" element={<StudentsPage />} />
+          <Route path="students/:id" element={<StudentDetailPage />} />
+          <Route path="students/emotional-analysis" element={<EmotionalAnalysisPage />} />
+          <Route path="performance" element={<PerformancePage />} />
+
+          {/* Applications routes */}
+          <Route path="app/chat" element={<ChatPage />} />
+          <Route path="app/ai-chat" element={<AIChatPage />} />
+          <Route path="app/calendar" element={<CalendarPage />} />
+          <Route path="app/tasks" element={<TodoPage />} />
+          <Route path="app/profile" element={<ProfilePage />} />
+          <Route path="app/erp/inventory" element={<InventoryPage />} />
+          <Route path="app/erp/supply" element={<SupplyPage />} />
+          <Route path="app/erp/security" element={<SecurityPage />} />
+          <Route path="app/neuro-abai" element={<NeuroAbaiPage />} />
+          {/* HR routes */}
+          <Route path="hr/employees" element={<EmployeesPage />} />
+          <Route path="hr/workload" element={<WorkloadPage />} />
+          <Route path="hr/kpi" element={<KpiPage />} />
+          <Route path="hr/vacation" element={<VacationPage />} />
+          <Route path="hr/fake-positions" element={<FakePositionsPage />} />
+
+          {/* Finance routes */}
+          <Route path="finance/payments" element={<PaymentsPage />} />
+          <Route path="finance/reports" element={<ReportsPage />} />
+          <Route path="finance/budget" element={<BudgetPage />} />
+          <Route path="finance/payroll" element={<PayrollPage />} />
+          <Route path="finance/salaries" element={<SalariesPage />} />
+          <Route path="finance/antifraud" element={<AntiFraudPage />} />
+
+          {/* Settings routes */}
+          <Route path="settings/users" element={<UsersPage />} />
+          <Route path="settings/permissions" element={<PermissionsPage />} />
+          <Route path="settings/integrations" element={<IntegrationsPage />} />
+          <Route path="settings/branding" element={<BrandingPage />} />
+          <Route path="settings/system" element={<SystemPage />} />
+
+          {/* Study Plans routes */}
+          <Route path="study-plans" element={<StudyPlansPage />} />
+          <Route path="study-plans/:id" element={<StudyPlanDetailPage />} />
+          <Route path="study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
+
+          <Route path='/test/realtime-api' element={<TestRealtimeApi />} />
+        </Route>
+      </Routes>
+    </SWRConfig>
   );
 };
 

@@ -6,7 +6,7 @@ import WeekGrid from '../components/WeekGrid';
 import ClassroomModal from '../components/ClassroomModal';
 import * as XLSX from 'xlsx';
 import { useSearchParams } from 'react-router-dom';
-import { useAuthContext, UserRole } from '../providers/AuthProvider';
+import { useAuth } from '../providers/AuthProvider';
 
 // Типы данных
 interface Schedule {
@@ -545,7 +545,7 @@ const SchedulePage: React.FC = () => {
   const [selectedCell, setSelectedCell] = useState<{ day: Schedule['day']; startTime: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedClassroom, setSelectedClassroom] = useState<null>(null);
-  const { role } = useAuthContext();
+  const { payload: { role } } = useAuth();
 
   useEffect(() => {
     if (roomFilter) {
@@ -565,17 +565,17 @@ const SchedulePage: React.FC = () => {
         // Студент видит только расписание своей группы (допустим, он в МК24-1М)
         filtered = filtered.filter(item => item.classId === 'МК24-1М');
         break;
-      
+
       case 'parent':
         // Родитель видит расписание группы своего ребенка (допустим, МК24-2М)
         filtered = filtered.filter(item => item.classId === 'МК24-2М');
         break;
-      
+
       case 'teacher':
         // Учитель видит только свои занятия
         filtered = filtered.filter(item => item.teacherId === 'ivanova'); // Предполагаем, что текущий учитель - Иванова
         break;
-      
+
       case 'admin':
         // Администратор видит все расписание
         break;
@@ -588,7 +588,7 @@ const SchedulePage: React.FC = () => {
       const matchesSubject = !filters.subject || item.subject === filters.subject;
       const matchesTeacher = !filters.teacherId || item.teacherId === filters.teacherId;
       const matchesRoom = !filters.roomId || item.roomId === filters.roomId;
-      
+
       return matchesDay && matchesClass && matchesSubject && matchesTeacher && matchesRoom;
     });
   };
@@ -613,7 +613,7 @@ const SchedulePage: React.FC = () => {
       subject: scheduleItem.subject!,
       teacherId: scheduleItem.teacherId!,
       teacherName: scheduleItem.teacherId === 'ivanova' ? 'Иванова Л.' :
-                  scheduleItem.teacherId === 'petrov' ? 'Петров А.' : 'Сидоров В.',
+        scheduleItem.teacherId === 'petrov' ? 'Петров А.' : 'Сидоров В.',
       roomId: scheduleItem.roomId!,
       type: scheduleItem.type as Schedule['type'],
       repeat: scheduleItem.repeat as Schedule['repeat'],
@@ -684,11 +684,11 @@ const SchedulePage: React.FC = () => {
         <div className="flex items-center space-x-4">
           <h1 className="text-3xl font-bold text-gray-900">
             {role === 'student' ? 'Моё расписание' :
-             role === 'parent' ? 'Расписание занятий' :
-             role === 'teacher' ? 'Мои занятия' :
-             'Управление расписанием'}
+              role === 'parent' ? 'Расписание занятий' :
+                role === 'teacher' ? 'Мои занятия' :
+                  'Управление расписанием'}
           </h1>
-          
+
           {/* Показываем кнопки импорта и AI только администратору */}
           {role === 'admin' && (
             <div className="flex space-x-2">
@@ -722,18 +722,16 @@ const SchedulePage: React.FC = () => {
         <div className="flex space-x-2">
           <button
             onClick={() => setViewMode('table')}
-            className={`px-4 py-2 rounded-md ${
-              viewMode === 'table' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'
-            }`}
+            className={`px-4 py-2 rounded-md ${viewMode === 'table' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'
+              }`}
           >
             <FaTable className="inline-block mr-2" />
             Таблица
           </button>
           <button
             onClick={() => setViewMode('grid')}
-            className={`px-4 py-2 rounded-md ${
-              viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'
-            }`}
+            className={`px-4 py-2 rounded-md ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'
+              }`}
           >
             <FaCalendar className="inline-block mr-2" />
             Сетка
@@ -866,9 +864,9 @@ const SchedulePage: React.FC = () => {
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {item.day === 'monday' ? 'Понедельник' :
-                     item.day === 'tuesday' ? 'Вторник' :
-                     item.day === 'wednesday' ? 'Среда' :
-                     item.day === 'thursday' ? 'Четверг' : 'Пятница'}
+                      item.day === 'tuesday' ? 'Вторник' :
+                        item.day === 'wednesday' ? 'Среда' :
+                          item.day === 'thursday' ? 'Четверг' : 'Пятница'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {item.startTime} - {item.endTime}
@@ -892,20 +890,19 @@ const SchedulePage: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {item.type === 'lesson' ? 'Урок' :
-                     item.type === 'consultation' ? 'Консультация' : 'Доп. занятие'}
+                      item.type === 'consultation' ? 'Консультация' : 'Доп. занятие'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {item.repeat === 'weekly' ? 'Еженедельно' :
-                     item.repeat === 'biweekly' ? 'Раз в 2 недели' : 'Единожды'}
+                      item.repeat === 'biweekly' ? 'Раз в 2 недели' : 'Единожды'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      item.status === 'upcoming' ? 'bg-green-100 text-green-800' :
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.status === 'upcoming' ? 'bg-green-100 text-green-800' :
                       item.status === 'completed' ? 'bg-gray-100 text-gray-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
+                        'bg-red-100 text-red-800'
+                      }`}>
                       {item.status === 'upcoming' ? 'Предстоит' :
-                       item.status === 'completed' ? 'Завершено' : 'Отменено'}
+                        item.status === 'completed' ? 'Завершено' : 'Отменено'}
                     </span>
                   </td>
                 </tr>

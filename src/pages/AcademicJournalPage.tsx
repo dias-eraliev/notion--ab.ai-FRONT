@@ -5,7 +5,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import DateRangePicker from '../components/DateRangePicker';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { useAuthContext, UserRole } from '../providers/AuthProvider';
+import { useAuth } from '../providers/AuthProvider';
 
 // Обновляем интерфейс для поддержки двух оценок
 interface GradeItem {
@@ -339,7 +339,7 @@ const AcademicJournalPage: React.FC = () => {
     date: string;
   } | null>(null);
   const [selectedGrade, setSelectedGrade] = useState<GradeInfo | null>(null);
-  const { role } = useAuthContext();
+  const { payload: { role } } = useAuth();
 
   // Даты для колонок (в реальном приложении это должно быть динамическим)
   const dates = ['27.02', '28.02', '01.03', '02.03', '05.03', '06.03'];
@@ -562,7 +562,8 @@ const AcademicJournalPage: React.FC = () => {
     const now = new Date().toLocaleString();
     let newGrades = {
       classwork: classworkGrade ? { ...classworkGrade, createdAt: now } : undefined,
-      homework: homeworkGrade ? { ...homeworkGrade, createdAt: now } : undefined
+      homework: homeworkGrade ? { ...homeworkGrade, createdAt: now } : undefined,
+      average: 0
     };
 
     // Расчет среднего арифметического

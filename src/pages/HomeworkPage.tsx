@@ -17,7 +17,7 @@ import {
   FaUsers,
   FaStar
 } from 'react-icons/fa';
-import { useAuthContext, UserRole } from '../providers/AuthProvider';
+import { useAuth } from '../providers/AuthProvider';
 
 interface Homework {
   id: string;
@@ -356,7 +356,7 @@ const HomeworkDetailsModal: React.FC<{
   homework: Homework;
   onSubmit?: (files: File[], comment: string) => void;
 }> = ({ isOpen, onClose, homework, onSubmit }) => {
-  const { role } = useAuthContext();
+  const { payload: { role } } = useAuth();
   const [comment, setComment] = useState('');
   const [files, setFiles] = useState<File[]>([]);
 
@@ -594,7 +594,7 @@ const HomeworkDetailsModal: React.FC<{
 };
 
 const HomeworkPage: React.FC = () => {
-  const { role } = useAuthContext();
+  const { payload: { role } } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
   const [filters, setFilters] = useState({

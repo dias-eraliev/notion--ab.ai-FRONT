@@ -69,21 +69,9 @@ const sidebarLinks = {
       type: 'SidebarLink'
     },
     {
-      to: '/app/email',
-      icon: <FaEnvelope />,
-      label: 'Эл. почта',
-      type: 'SidebarLink'
-    },
-    {
       to: '/app/tasks',
       icon: <FaListUl />,
       label: 'Список дел',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/app/files',
-      icon: <FaFolder />,
-      label: 'Файловый менеджер',
       type: 'SidebarLink'
     },
     {

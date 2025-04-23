@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FaVideo, FaFile, FaClipboardCheck, FaArrowLeft, FaSpinner } from 'react-icons/fa';
+import useSWR from 'swr';
+import { createLesson, fetcher, studyPlanKey, type Lesson, type CreateLessonDto } from '../api/studyPlans';
+import { useAuth } from '../providers/AuthProvider';
 
 interface LessonCard {
-  id: string;
+  id: string | number;
   title: string;
   description: string;
   hasVideo: boolean;
@@ -12,53 +15,18 @@ interface LessonCard {
   scheduledDate?: string;
 }
 
+interface TestQuestion {
+  question: string;
+  options: string[];
+  correct: number;
+}
+
 const StudyPlanDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
-  const [isLoading, setIsLoading] = useState(true);
+  const { token, payload } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  const [studyPlan, setStudyPlan] = useState<{
-    subject: string;
-    class: string;
-    teacher: string;
-    totalLessons: number;
-    lessons: LessonCard[];
-  }>({
-    subject: 'Алгебра',
-    class: '10A',
-    teacher: 'Иванова Л.',
-    totalLessons: 36,
-    lessons: [
-      {
-        id: '1',
-        title: 'Квадратные уравнения',
-        description: 'Основные понятия и методы решения квадратных уравнений.',
-        hasVideo: true,
-        hasPresentation: true,
-        hasTest: true,
-        scheduledDate: '2025-04-01 08:30'
-      },
-      {
-        id: '2',
-        title: 'Дискриминант',
-        description: 'Формула дискриминанта и ее применение для определения количества корней.',
-        hasVideo: true,
-        hasPresentation: true,
-        hasTest: true,
-        scheduledDate: '2025-04-03 10:25'
-      },
-      {
-        id: '3',
-        title: 'Теорема Виета',
-        description: 'Связь между корнями квадратного уравнения и его коэффициентами.',
-        hasVideo: true,
-        hasPresentation: true,
-        hasTest: true,
-        scheduledDate: '2025-04-05 12:15'
-      }
-    ]
-  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newLesson, setNewLesson] = useState({
@@ -75,55 +43,105 @@ const StudyPlanDetailPage: React.FC = () => {
   const [videoLink, setVideoLink] = useState('');
   const [presentationFile, setPresentationFile] = useState<File | null>(null);
   const [testModalOpen, setTestModalOpen] = useState(false);
-  const [testQuestions, setTestQuestions] = useState<any[]>([]);
-  const [currentQuestion, setCurrentQuestion] = useState({ question: '', options: ['', ''], correct: 0 });
+  const [testQuestions, setTestQuestions] = useState<TestQuestion[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState<TestQuestion>({ question: '', options: ['', ''], correct: 0 });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        // Имитация загрузки данных
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // В реальном приложении здесь будет API-запрос
-        // const response = await fetch(`/api/study-plans/${id}`);
-        // const data = await response.json();
-        // setStudyPlan(data);
-        
-        setError(null);
-      } catch (err) {
-        setError('Ошибка при загрузке учебного плана');
-        console.error('Error loading study plan:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fetch study plan data using SWR
+  const { data: studyPlanData, error: fetchError, isLoading, mutate } = useSWR(
+    id && token ? studyPlanKey(id) : null,
+    fetcher
+  );
 
-    if (id) {
-      loadData();
-    }
-  }, [id]);
+  // Transform API data to match our component state format
+  const studyPlan = studyPlanData ? {
+    subject: studyPlanData.subject,
+    // Extract class info - if available in description or elsewhere
+    class: studyPlanData.description?.split(',')[0] || '- -',
+    // Format teacher name
+    teacher: `${studyPlanData.teacher.name} ${studyPlanData.teacher.surname}`,
+    // Count lessons
+    totalLessons: studyPlanData.lessons.length,
+    // Transform lessons
+    lessons: studyPlanData.lessons.map((lesson: Lesson) => ({
+      id: lesson.id,
+      title: lesson.title,
+      description: lesson.description,
+      hasVideo: lesson.hasVideo,
+      hasPresentation: lesson.hasPresentation,
+      hasTest: lesson.hasTest,
+      scheduledDate: lesson.scheduledDate,
+    }))
+  } : null;
+
+  // Check if user can create lessons (only teachers and admins)
+  const canCreateLesson = payload?.role === 'TEACHER' || payload?.role === 'ADMIN';
 
   const handleBack = () => {
     const basePath = location.pathname.includes('/academic') ? '/academic/study-plans' : '/study-plans';
     navigate(basePath);
   };
 
-  const handleCreateLesson = () => {
-    if (!newLesson.title.trim()) return;
-    setStudyPlan(prev => ({
-      ...prev,
-      lessons: [
-        ...prev.lessons,
-        {
-          id: (prev.lessons.length + 1).toString(),
-          ...newLesson,
-        },
-      ],
-    }));
-    setIsModalOpen(false);
-    setNewLesson({ title: '', description: '', scheduledDate: '', hasVideo: false, hasPresentation: false, hasTest: false });
+  const handleCreateLesson = async () => {
+    if (!newLesson.title.trim() || !id) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Prepare the lesson data
+      const lessonData: CreateLessonDto = {
+        title: newLesson.title,
+        description: newLesson.description,
+        scheduledDate: newLesson.scheduledDate || undefined,
+        hasVideo: !!(videoFile || videoLink),
+        hasPresentation: !!presentationFile,
+        hasTest: testQuestions.length > 0,
+        videoFile: videoFile || undefined,
+        videoLink: videoLink || undefined,
+        presentationFile: presentationFile || undefined,
+        testQuestions: testQuestions.length > 0 ? testQuestions.map(q => ({
+          question: q.question,
+          options: q.options,
+          correct: q.correct
+        })) : undefined,
+      };
+      
+      // Create the lesson
+      await createLesson(id, lessonData);
+      
+      // Reset form state
+      setIsModalOpen(false);
+      setNewLesson({ title: '', description: '', scheduledDate: '', hasVideo: false, hasPresentation: false, hasTest: false });
+      setVideoFile(null);
+      setVideoLink('');
+      setPresentationFile(null);
+      setTestQuestions([]);
+      
+      // Revalidate data
+      mutate();
+    } catch (err) {
+      console.error('Error creating lesson:', err);
+      setError('Ошибка при создании урока');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (!token) {
+    return (
+      <div className="p-6 max-w-[1600px] mx-auto">
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
+          <p>Для просмотра учебного плана необходимо авторизоваться</p>
+          <button 
+            onClick={() => navigate('/login')}
+            className="mt-2 text-sm text-yellow-600 hover:text-yellow-500"
+          >
+            Перейти на страницу входа
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -135,14 +153,40 @@ const StudyPlanDetailPage: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (fetchError || error) {
     return (
       <div className="p-6 max-w-[1600px] mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          <p>{error}</p>
+          <p>{error || 'Ошибка при загрузке учебного плана'}</p>
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={handleBack}
+              className="text-sm text-red-600 hover:text-red-500"
+            >
+              Вернуться к списку учебных планов
+            </button>
+            {fetchError && (
+              <button
+                onClick={() => mutate()}
+                className="text-sm text-red-600 hover:text-red-500"
+              >
+                Попробовать снова
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!studyPlan) {
+    return (
+      <div className="p-6 max-w-[1600px] mx-auto">
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
+          <p>Учебный план не найден</p>
           <button
             onClick={handleBack}
-            className="mt-2 text-sm text-red-600 hover:text-red-500"
+            className="mt-2 text-sm text-yellow-600 hover:text-yellow-500"
           >
             Вернуться к списку учебных планов
           </button>
@@ -161,12 +205,14 @@ const StudyPlanDetailPage: React.FC = () => {
           <FaArrowLeft className="mr-2" />
           Назад к списку планов
         </button>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-corporate-primary text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-corporate-primary-dark transition"
-        >
-          + Создать урок
-        </button>
+        {canCreateLesson && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-corporate-primary text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-corporate-primary-dark transition"
+          >
+            + Создать урок
+          </button>
+        )}
       </div>
 
       {/* Модальное окно создания урока */}
@@ -176,7 +222,7 @@ const StudyPlanDetailPage: React.FC = () => {
             <div className="px-8 pt-8 pb-2">
               <div className="text-2xl font-extrabold mb-6 text-corporate-primary">Создать новый урок</div>
             </div>
-            <div className="flex-1 overflow-y-auto px-8 pb-2" style={{maxHeight: '70vh'}}>
+            <div className="flex-1 overflow-y-auto px-8 pb-2" style={{ maxHeight: '70vh' }}>
               <div className="space-y-5">
                 <div>
                   <label className="block text-gray-700 font-semibold mb-1">Название урока</label>
@@ -269,23 +315,17 @@ const StudyPlanDetailPage: React.FC = () => {
               </button>
               <button
                 className="px-6 py-2 rounded-lg bg-corporate-primary text-white font-semibold shadow hover:bg-corporate-primary-dark transition disabled:opacity-50"
-                onClick={() => {
-                  setNewLesson({
-                    ...newLesson,
-                    hasVideo: !!(videoFile || videoLink),
-                    hasPresentation: !!presentationFile,
-                    hasTest: testQuestions.length > 0,
-                    videoFile,
-                    videoLink,
-                    presentationFile,
-                    testQuestions,
-                  });
-                  handleCreateLesson();
-                  setVideoFile(null); setVideoLink(''); setPresentationFile(null); setTestQuestions([]);
-                }}
-                disabled={!newLesson.title.trim()}
+                onClick={handleCreateLesson}
+                disabled={!newLesson.title.trim() || isSubmitting}
               >
-                Создать
+                {isSubmitting ? (
+                  <>
+                    <FaSpinner className="inline w-4 h-4 mr-2 animate-spin" />
+                    Создание...
+                  </>
+                ) : (
+                  'Создать'
+                )}
               </button>
             </div>
             {/* Модалка создания теста */}
@@ -358,7 +398,7 @@ const StudyPlanDetailPage: React.FC = () => {
                       <div key={idx} className="mb-2 p-2 border rounded">
                         <div className="font-medium">{q.question}</div>
                         <ul className="ml-4 list-disc">
-                          {q.options.map((opt, i) => (
+                          {q.options.map((opt: string, i: number) => (
                             <li key={i} className={q.correct === i ? 'text-green-600 font-semibold' : ''}>{opt}</li>
                           ))}
                         </ul>
@@ -386,52 +426,58 @@ const StudyPlanDetailPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {studyPlan.lessons.map((lesson) => (
-          <div 
-            key={lesson.id}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => {
-              const basePath = location.pathname.includes('/academic') ? '/academic/study-plans' : '/study-plans';
-              navigate(`${basePath}/${id}/lessons/${lesson.id}`);
-            }}
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="flex items-center gap-3">
-                  <h3 className="text-xl font-semibold">{lesson.title}</h3>
-                  {lesson.scheduledDate && (
-                    <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                      {new Date(lesson.scheduledDate).toLocaleString('ru-RU', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
+        {studyPlan.lessons.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-md p-6 text-center text-gray-500">
+            Пока нет уроков. Создайте первый урок, нажав на кнопку "Создать урок".
+          </div>
+        ) : (
+          studyPlan.lessons.map((lesson: LessonCard) => (
+            <div 
+              key={lesson.id}
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => {
+                const basePath = location.pathname.includes('/academic') ? '/academic/study-plans' : '/study-plans';
+                navigate(`${basePath}/${id}/lessons/${lesson.id}`);
+              }}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xl font-semibold">{lesson.title}</h3>
+                    {lesson.scheduledDate && (
+                      <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {new Date(lesson.scheduledDate).toLocaleString('ru-RU', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-gray-600 mt-2">{lesson.description}</p>
+                </div>
+                <div className="flex space-x-4">
+                  {lesson.hasVideo && (
+                    <div className="text-blue-600">
+                      <FaVideo className="w-5 h-5" />
+                    </div>
+                  )}
+                  {lesson.hasPresentation && (
+                    <div className="text-blue-600">
+                      <FaFile className="w-5 h-5" />
+                    </div>
+                  )}
+                  {lesson.hasTest && (
+                    <div className="text-blue-600">
+                      <FaClipboardCheck className="w-5 h-5" />
                     </div>
                   )}
                 </div>
-                <p className="text-gray-600 mt-2">{lesson.description}</p>
-              </div>
-              <div className="flex space-x-4">
-                {lesson.hasVideo && (
-                  <div className="text-blue-600">
-                    <FaVideo className="w-5 h-5" />
-                  </div>
-                )}
-                {lesson.hasPresentation && (
-                  <div className="text-blue-600">
-                    <FaFile className="w-5 h-5" />
-                  </div>
-                )}
-                {lesson.hasTest && (
-                  <div className="text-blue-600">
-                    <FaClipboardCheck className="w-5 h-5" />
-                  </div>
-                )}
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

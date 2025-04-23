@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaCheck } from 'react-icons/fa';
 import AnimatedBackground from '../components/AnimatedBackground';
-
+import { useNavigate } from 'react-router-dom';
+import { authApi } from '@/api/auth';
+import { useAuth } from '@/providers/AuthProvider';
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  
+
+  const { setToken, setPayload } = useAuth();
+
   // Анимация для букв логотипа
   const letterVariants = {
     hidden: { y: -100, opacity: 0 },
@@ -39,17 +43,31 @@ const Login: React.FC = () => {
 
   const letters = "UIB College Ai".split("");
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Имитация запроса
-    setTimeout(() => {
+
+    try {
+      const response = await authApi.login({
+        username: (e.target as HTMLFormElement).username.value,
+        password: (e.target as HTMLFormElement).password.value,
+        rememberMe: (e.target as HTMLFormElement).rememberMe.checked,
+      });
+
+      setToken(response.token);
+      setPayload(response.payload);
+
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('payload', JSON.stringify(response.payload));
+
+      navigate('/');
+    } catch (error) {
+      console.error(error);
+    } finally {
       setIsLoading(false);
-      setIsSuccess(true);
-      setTimeout(() => {
-        // Здесь будет редирект на главную страницу
-      }, 1500);
-    }, 2000);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -60,7 +78,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen bg-corporate-bg flex items-center justify-center p-4 relative overflow-hidden">
       <AnimatedBackground />
-      
+
       <div className="w-full max-w-md relative z-10">
         {/* Анимированный логотип */}
         <div className="flex justify-center mb-8 space-x-1">
@@ -77,7 +95,7 @@ const Login: React.FC = () => {
             </motion.span>
           ))}
         </div>
-        
+
         <motion.div
           variants={formVariants}
           initial="hidden"
@@ -106,17 +124,6 @@ const Login: React.FC = () => {
 
           <h2 className="text-2xl font-semibold text-center mb-2 text-corporate-primary">Добро пожаловать</h2>
           <p className="text-gray-600 text-center mb-8">Войдите в свою учетную запись, чтобы продолжить</p>
-          
-          {/* Кнопка входа через Google */}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center py-2 px-4 mb-6 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary"
-          >
-            <FaGoogle className="w-5 h-5 mr-2 text-corporate-primary" />
-            Войти через Google
-          </motion.button>
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
@@ -126,7 +133,7 @@ const Login: React.FC = () => {
               <span className="px-2 bg-white/80 text-gray-500">или</span>
             </div>
           </div>
-          
+
           {/* Форма входа */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
@@ -139,9 +146,10 @@ const Login: React.FC = () => {
                 </div>
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
-                  type="email"
+                  type="text"
+                  name="username"
                   className="block w-full pl-10 pr-3 py-2 border border-corporate-primary/20 rounded-lg focus:ring-2 focus:ring-corporate-primary focus:border-corporate-primary bg-white/50 transition-all duration-200 ease-in-out hover:shadow-lg"
-                  placeholder="Введите email"
+                  placeholder="Введите имя пользователя"
                 />
               </div>
             </div>
@@ -157,6 +165,7 @@ const Login: React.FC = () => {
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
                   type={showPassword ? "text" : "password"}
+                  name="password"
                   className="block w-full pl-10 pr-10 py-2 border border-corporate-primary/20 rounded-lg focus:ring-2 focus:ring-corporate-primary focus:border-corporate-primary bg-white/50 transition-all duration-200 ease-in-out hover:shadow-lg"
                   placeholder="Введите пароль"
                 />
@@ -178,6 +187,7 @@ const Login: React.FC = () => {
               <div className="flex items-center">
                 <input
                   type="checkbox"
+                  name="rememberMe"
                   className="h-4 w-4 text-corporate-primary focus:ring-corporate-primary border-corporate-primary/20 rounded"
                 />
                 <label className="ml-2 block text-sm text-gray-700">
@@ -213,7 +223,7 @@ const Login: React.FC = () => {
             </motion.button>
           </form>
         </motion.div>
-        
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
