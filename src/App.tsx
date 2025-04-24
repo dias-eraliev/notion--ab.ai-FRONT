@@ -18,6 +18,7 @@ import AIChatPage from './pages/app/AIChatPage';
 import CalendarPage from './pages/app/CalendarPage';
 import TodoPage from './pages/app/TodoPage';
 import NeuroAbaiPage from './pages/app/NeuroAbaiPage';
+import SettingsPage from './pages/app/SettingsPage';
 import ProfilePage from './pages/app/ProfilePage';
 import PerformancePage from './pages/PerformancePage';
 import EmotionalAnalysisPage from './pages/EmotionalAnalysisPage';
@@ -116,22 +117,22 @@ const SWRConfigWithAuth: React.FC = () => {
           <Route path="students/emotional-analysis" element={<EmotionalAnalysisPage />} />
           <Route path="performance" element={<PerformancePage />} />
 
-          {/* Applications routes */}
-          <Route path="app/chat" element={<ChatPage />} />
-          <Route path="app/ai-chat" element={<AIChatPage />} />
-          <Route path="app/calendar" element={<CalendarPage />} />
-          <Route path="app/tasks" element={<TodoPage />} />
-          <Route path="app/profile" element={<ProfilePage />} />
-          <Route path="app/erp/inventory" element={<InventoryPage />} />
-          <Route path="app/erp/supply" element={<SupplyPage />} />
-          <Route path="app/erp/security" element={<SecurityPage />} />
-          <Route path="app/neuro-abai" element={<NeuroAbaiPage />} />
-          {/* HR routes */}
-          <Route path="hr/employees" element={<EmployeesPage />} />
-          <Route path="hr/workload" element={<WorkloadPage />} />
-          <Route path="hr/kpi" element={<KpiPage />} />
-          <Route path="hr/vacation" element={<VacationPage />} />
-          <Route path="hr/fake-positions" element={<FakePositionsPage />} />
+              {/* Applications routes */}
+              <Route path="app/chat" element={<ChatPage />} />
+              <Route path="app/ai-chat" element={<AIChatPage />} />
+              <Route path="app/calendar" element={<CalendarPage />} />
+              <Route path="app/tasks" element={<TodoPage />} />
+              <Route path="app/profile" element={<ProfilePage />} />
+              <Route path="app/erp/inventory" element={<InventoryPage />} />
+              <Route path="app/erp/supply" element={<SupplyPage />} />
+              <Route path="app/erp/security" element={<SecurityPage />} />
+              <Route path="app/neuro-abai" element={<NeuroAbaiPage />} />
+              {/* HR routes */}
+              <Route path="hr/employees" element={<EmployeesPage />} />
+              <Route path="hr/workload" element={<WorkloadPage />} />
+              <Route path="hr/kpi" element={<KpiPage />} />
+              <Route path="hr/vacation" element={<VacationPage />} />
+              <Route path="hr/fake-positions" element={<FakePositionsPage />} />
 
           {/* Finance routes */}
           <Route path="finance/payments" element={<PaymentsPage />} />
