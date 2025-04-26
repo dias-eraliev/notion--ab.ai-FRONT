@@ -6,3 +6,5 @@ pnpm-lock.yaml
 .DS_Store
 
 dist
+
+src/types/dto

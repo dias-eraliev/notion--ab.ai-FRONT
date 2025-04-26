@@ -1,5 +1,5 @@
 import api from ".";
-import { LoginDto } from "../types/auth.dto";
+import { LoginDto } from "../types/dto/auth.dto";
 
 export const authApi = {
     login: async (data: LoginDto) => {
