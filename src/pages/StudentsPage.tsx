@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {FaSearch, FaUserGraduate, FaPhone, FaEnvelope, FaIdCard} from 'react-icons/fa';
 import api from "@/api";
+import {Group} from "@/types/group.entity.ts";
 
 interface Student {
     id: string;
@@ -35,11 +36,11 @@ const StudentModal: React.FC<StudentModalProps> = ({student, onClose, onViewDeta
                     <div className="flex justify-between items-start">
                         <div className="flex items-center">
                             <div className="w-20 h-20 rounded-full overflow-hidden mr-4">
-                                <img src={student.image} alt={student.name + " " + student.surname} className="w-full h-full object-cover"/>
+                                <img src={student.image || "https://media.istockphoto.com/id/588348500/nl/vector/male-avatar-profile-picture-vector.jpg?s=612x612&w=0&k=20&c=5IcAtIJUOTcrRDxQd5Q6Yi8C83ptgrOgXTCP-GaDrRY="} alt={student.name} className="w-32 h-32 object-cover"/>
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-800">{student.name + " " + student.surname}</h2>
-                                <p className="text-gray-600">Группа: {student.class}</p>
+                                <h2 className="text-2xl font-bold text-gray-800">{student.name + " " + student.surname + " " + student.lastname}</h2>
+                                <p className="text-gray-600">Группа: {student.group.name}</p>
                             </div>
                         </div>
                         <button
@@ -118,15 +119,28 @@ const StudentsPage: React.FC = () => {
     const [page, setPage] = useState<number>(1); // Текущая страница
     const [totalPages, setTotalPages] = useState<number>(1); // Общее количество страниц
 
-    // Доступные классы
-    const classes = [
-        'Все группы',
-        'МК24-1М',
-        'МК24-2М',
-        'ПК24-1П',
-        'ПК24-2П',
-        'ПД24-1Д'
-    ];
+
+
+    const [groups, setGroups] = useState<Group[]>([]);
+
+    const fetchGroups = async () => {
+        try {
+            const response = await api.get('groups');
+            const result = response.data?.data ?? response.data ?? [];
+
+            console.log("Fetched groups:", result);
+
+            if (Array.isArray(result)) {
+                setGroups(result);
+            } else {
+                setGroups([]);
+            }
+        } catch (error) {
+            console.error("Error fetching groups:", error);
+            setGroups([]);
+        }
+    };
+
 
     const fetchStudents = async () => {
         try {
@@ -149,11 +163,12 @@ const StudentsPage: React.FC = () => {
     // Эффект для загрузки студентов при изменении страницы, класса или поискового запроса
     useEffect(() => {
         fetchStudents();
+        fetchGroups()
     }, [page, selectedClass, searchQuery]);
 
     // Фильтрация студентов на фронтенде
     const filteredStudents = students.filter(student => {
-        const matchesClass = !selectedClass || selectedClass === 'Все группы' || student.class === selectedClass;
+        const matchesClass = !selectedClass || selectedClass === 'Все группы' || student.group?.name === selectedClass;
         const matchesSearch = !searchQuery ||
             student.name.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesClass && matchesSearch;
@@ -193,15 +208,17 @@ const StudentsPage: React.FC = () => {
                         <select
                             value={selectedClass}
                             onChange={(e) => setSelectedClass(e.target.value)}
-                            className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="..."
                         >
                             <option value="">Все группы</option>
-                            {classes.slice(1).map(classItem => (
-                                <option key={classItem} value={classItem}>
-                                    {classItem}
+                            {Array.isArray(groups) && groups.map(group => (
+                                <option key={group.id} value={group.name}>
+                                    {group.name}
                                 </option>
                             ))}
+
                         </select>
+
                     </div>
                 </div>
 
@@ -214,14 +231,14 @@ const StudentsPage: React.FC = () => {
                         >
                             <div className="aspect-w-4 aspect-h-3">
                                 <img
-                                    src={student.image}
+                                    src={student.image || "https://media.istockphoto.com/id/588348500/nl/vector/male-avatar-profile-picture-vector.jpg?s=612x612&w=0&k=20&c=5IcAtIJUOTcrRDxQd5Q6Yi8C83ptgrOgXTCP-GaDrRY="}
                                     alt={student.name}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
                             <div className="p-4">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-1">{student.name}</h3>
-                                <p className="text-sm text-gray-600">Группа: {student.class}</p>
+                                <h3 className="text-lg font-semibold text-gray-800 mb-1">{student.name + " " + student.surname}</h3>
+                                <p className="text-sm text-gray-600">Группа: {student.group.name}</p>
                                 <div className="mt-2 flex items-center text-sm text-gray-500">
                                     <FaPhone className="w-4 h-4 mr-2"/>
                                     <span>{student.phone}</span>

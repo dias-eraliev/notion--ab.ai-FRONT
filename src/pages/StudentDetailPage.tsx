@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   FaUserGraduate,
@@ -53,10 +53,27 @@ import {
 } from 'recharts';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import api from "@/api";
 
 type JsPDFWithPlugin = jsPDF & {
   autoTable: (options: any) => void;
 };
+
+interface Student {
+  id: string;
+  name: string;
+  class: string;
+  performance: number;
+  attendance: number;
+  emotionalState: string;
+  payments: string;
+  image: string;
+  phone?: string;
+  email?: string;
+  birthDate?: string;
+  parentName?: string;
+  parentPhone?: string;
+}
 
 interface Document {
   type: string;
@@ -248,6 +265,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 const StudentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [students, setStudents] = useState<Student[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentFormData, setPaymentFormData] = useState<PaymentFormData>({
@@ -268,6 +286,31 @@ const StudentDetailPage: React.FC = () => {
     examType: 'all'
   });
   const [selectedExam, setSelectedExam] = useState<ExamResult | null>(null);
+
+  const fetchStudents = async () => {
+    try {
+      const response = await api.get('/students', {
+        // params: {
+        //     page: page,
+        //     limit: 10
+        // },
+      });
+
+
+      console.log(response.data.data.Parent)
+
+      console.log(response.data.data.Parent?.user?.username);
+      setStudents(response.data.data);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
+
+
+  // Эффект для загрузки студентов при изменении страницы, класса или поискового запроса
+  useEffect(() => {
+    fetchStudents();
+  }, []);
 
   // Добавим типы оплат
   const paymentTypes = [
@@ -318,37 +361,37 @@ const StudentDetailPage: React.FC = () => {
     { name: 'Тесты', value: 88 },
   ];
 
-  // Пример данных студента
-  const student = {
-    id,
-    fullName: 'Алихан Сатыбалды',
-    class: 'МК24-1М',
-    birthDate: '2008-05-15',
-    phone: '+7 (777) 123-45-67',
-    email: 'alikhan@example.com',
-    address: 'ул. Абая 123, кв. 45',
-    parentName: 'Сатыбалды Нурлан',
-    parentPhone: '+7 (777) 765-43-21',
-    photo: 'https://placekitten.com/200/200',
-    enrollmentDate: '2020-09-01',
-    nationality: 'Казахстан',
-    iin: '080515123456',
-    bloodGroup: 'II+',
-    medicalInfo: 'Нет противопоказаний',
-    previousSchool: 'Школа №15',
-    achievements: [
-      'Победитель олимпиады по математике 2022',
-      'Участник научной конференции 2023'
-    ],
-    documents: [
-      { type: 'Удостоверение личности', date: '2023-01-15', link: '#' },
-      { type: 'Медицинская карта', date: '2023-02-20', link: '#' }
-    ],
-    academicRecords: [
-      { subject: 'Математика', grade: 5, semester: 1, year: '2023-2024' },
-      { subject: 'Физика', grade: 4, semester: 1, year: '2023-2024' }
-    ]
-  };
+  // // Пример данных студента
+  // const student = {
+  //   id,
+  //   fullName: 'Алихан Сатыбалды',
+  //   class: 'МК24-1М',
+  //   birthDate: '2008-05-15',
+  //   phone: '+7 (777) 123-45-67',
+  //   email: 'alikhan@example.com',
+  //   address: 'ул. Абая 123, кв. 45',
+  //   parentName: 'Сатыбалды Нурлан',
+  //   parentPhone: '+7 (777) 765-43-21',
+  //   photo: 'https://placekitten.com/200/200',
+  //   enrollmentDate: '2020-09-01',
+  //   nationality: 'Казахстан',
+  //   iin: '080515123456',
+  //   bloodGroup: 'II+',
+  //   medicalInfo: 'Нет противопоказаний',
+  //   previousSchool: 'Школа №15',
+  //   achievements: [
+  //     'Победитель олимпиады по математике 2022',
+  //     'Участник научной конференции 2023'
+  //   ],
+  //   documents: [
+  //     { type: 'Удостоверение личности', date: '2023-01-15', link: '#' },
+  //     { type: 'Медицинская карта', date: '2023-02-20', link: '#' }
+  //   ],
+  //   academicRecords: [
+  //     { subject: 'Математика', grade: 5, semester: 1, year: '2023-2024' },
+  //     { subject: 'Физика', grade: 4, semester: 1, year: '2023-2024' }
+  //   ]
+  // };
 
   // Пример данных для медпункта
   const medicalRecords: MedicalRecord[] = [
@@ -422,12 +465,12 @@ const StudentDetailPage: React.FC = () => {
   const contacts = [
     {
       relation: 'Отец',
-      name: student.parentName,
-      phone: student.parentPhone,
+      // name: student.parentName,
+      // phone: student.parentPhone,
       email: 'nurlan@example.com',
       occupation: 'Инженер',
       workPlace: 'ТОО "Технопром"',
-      address: student.address,
+      // address: student.address,
       id: 'father_1'
     },
     {
@@ -437,7 +480,7 @@ const StudentDetailPage: React.FC = () => {
       email: 'aigul@example.com',
       occupation: 'Врач',
       workPlace: 'Городская поликлиника №5',
-      address: student.address,
+      // address: student.address,
       id: 'mother_1'
     },
     {
@@ -1045,8 +1088,8 @@ const StudentDetailPage: React.FC = () => {
     doc.setFontSize(16);
     doc.text('Результаты экзаменов', 14, 15);
     doc.setFontSize(12);
-    doc.text(`Студент: ${student.fullName}`, 14, 25);
-    doc.text(`Класс: ${student.class}`, 14, 32);
+    doc.text(`Студент: ${students.name}`, 14, 25);
+    // doc.text(`Класс: ${student.class}`, 14, 32);
     doc.text(`Учебный год: ${examFilter.year}`, 14, 39);
 
     // Таблица результатов
@@ -1074,7 +1117,7 @@ const StudentDetailPage: React.FC = () => {
     doc.text(`Процент успеваемости: ${filteredExamSummary.percentage.toFixed(2)}%`, 14, finalY + 14);
 
     // Сохранение файла
-    doc.save(`Результаты_экзаменов_${student.fullName}.pdf`);
+    doc.save(`Результаты_экзаменов_${students.name}.pdf`);
   };
 
   // Данные для дополнительного образования
@@ -1267,24 +1310,24 @@ const StudentDetailPage: React.FC = () => {
       <div className="bg-white rounded-xl shadow-md p-6 mb-6">
         <div className="flex items-start gap-6">
           <div className="w-24 h-24 rounded-full overflow-hidden">
-            <img
-              src={student.photo}
-              alt={student.fullName}
-              className="w-full h-full object-cover"
-            />
+            {/*<img*/}
+            {/*  src={student.photo}*/}
+            {/*  alt={student.fullName}*/}
+            {/*  className="w-full h-full object-cover"*/}
+            {/*/>*/}
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{student.fullName}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{students.name}</h1>
                 <div className="flex items-center gap-4 mt-2 text-gray-600">
                   <div className="flex items-center">
                     <FaUserGraduate className="w-4 h-4 mr-2" />
-                    <span>{student.class}</span>
+                    {/*<span>{student.class}</span>*/}
                   </div>
                   <div className="flex items-center">
                     <FaIdCard className="w-4 h-4 mr-2" />
-                    <span>{student.iin}</span>
+                    {/*<span>{student.iin}</span>*/}
                   </div>
                 </div>
               </div>
@@ -1424,10 +1467,14 @@ const StudentDetailPage: React.FC = () => {
                   </button>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600">{student.parentName}</p>
+                  <p className="text-sm text-gray-600">
+                    {students?.Parent?.user?.username ? `Parent: ${students.Parent.user.username}` : 'No parent info available'}
+                  </p>
+
+
                   <div className="flex items-center text-sm text-gray-600">
                     <FaPhone className="w-4 h-4 mr-2" />
-                    <span>{student.parentPhone}</span>
+                    {/*<span>{student.parentPhone}</span>*/}
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <FaEnvelope className="w-4 h-4 mr-2" />
