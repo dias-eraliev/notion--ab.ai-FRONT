@@ -3,13 +3,16 @@ import api from "@/api";
 export class StudentsRequests {
     async fetchStudents() {
         try {
-            const response = await api.get('/students');
+            return await api.get('/students');
+        } catch (error) {
+            console.error("Error fetching students:", error);
+        }
+    }
 
 
-            console.log(response.data.data.Parent)
-
-            console.log(response.data.data.Parent?.user?.username);
-            return response;
+    async fetchStudentsById(studentId: number) {
+        try {
+            return await api.get(`/students/${studentId}`);
         } catch (error) {
             console.error("Error fetching students:", error);
         }

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {
     FaUserGraduate,
     FaPhone,
@@ -55,7 +55,6 @@ import {IExtracurricularActivity} from "@/Interfeces/ExtracurricularActivity.int
 import {examResults, examSummary, examTypes} from '@/api/MockDataBase/examResults.db';
 import {emotionalStates} from "@/api/MockDataBase/emotionalStates.db.ts";
 import {attendanceData, performanceData, skillsData} from '@/api/MockDataBase/charts.db';
-import {gradesData} from '@/api/MockDataBase/gradesData.db';
 import {developmentPlans} from '@/api/MockDataBase/developmentPlans.db';
 import {attendanceHistory} from '@/api/MockDataBase/attendanceHistory.db';
 import {attendanceStats} from "@/api/MockDataBase/attendanceStats.db.ts";
@@ -77,7 +76,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const StudentDetailPage: React.FC = () => {
 
-    // const {id} = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [students, setStudents] = useState<IStudent>();
     const [activeTab, setActiveTab] = useState('overview');
@@ -104,10 +103,12 @@ const StudentDetailPage: React.FC = () => {
     // Эффект для загрузки студентов при изменении страницы, класса или поискового запроса
     useEffect(() => {
         const students = async () => {
-            const GetStudents = await StudentsReq.fetchStudents();
+            const GetStudents = await StudentsReq.fetchStudentsById(Number(id));
 
-            if (GetStudents?.data?.data) { // проверяем что точно есть ответ и данные
-                setStudents(GetStudents.data.data)
+            console.log(GetStudents?.data)
+
+            if (GetStudents?.data) { // проверяем что точно есть ответ и данные
+                setStudents(GetStudents.data)
             } else {
                 console.error("No students data received.");
             }
@@ -116,9 +117,11 @@ const StudentDetailPage: React.FC = () => {
         students()
 
 
-
-    //     Дальше остальные данные можно будет подгружать по аналогу
+        //     Дальше остальные данные можно будет подгружать по аналогу
     }, []);
+
+
+    // console.log(students?.lessonGrades)
 
 
     const getScoreColor = (score: number) => {
@@ -316,16 +319,16 @@ const StudentDetailPage: React.FC = () => {
             <div className="bg-white rounded-xl shadow-md p-6 mb-6">
                 <div className="flex items-start gap-6">
                     <div className="w-24 h-24 rounded-full overflow-hidden">
-                        {/*<img*/}
-                        {/*  src={student.photo}*/}
-                        {/*  alt={student.fullName}*/}
-                        {/*  className="w-full h-full object-cover"*/}
-                        {/*/>*/}
+                        <img
+                          src="https://media.istockphoto.com/id/588348500/nl/vector/male-avatar-profile-picture-vector.jpg?s=612x612&w=0&k=20&c=5IcAtIJUOTcrRDxQd5Q6Yi8C83ptgrOgXTCP-GaDrRY="
+                          alt={students?.name + " " + students?.surname + " " + students?.lastname}
+                          className="w-full h-full object-cover"
+                        />
                     </div>
                     <div className="flex-1">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">{students?.name}</h1>
+                                <h1 className="text-2xl font-bold text-gray-900">{students?.name + " " + students?.surname + " " + students?.lastname}</h1>
                                 <div className="flex items-center gap-4 mt-2 text-gray-600">
                                     <div className="flex items-center">
                                         <FaUserGraduate className="w-4 h-4 mr-2"/>
@@ -460,40 +463,41 @@ const StudentDetailPage: React.FC = () => {
                         <h2 className="text-xl font-semibold mb-6">Контакты</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Отец */}
-                            <div className="bg-gray-50 rounded-lg p-4">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center">
-                                        <FaUserGraduate className="w-5 h-5 text-gray-500"/>
-                                        <span className="ml-2 font-medium">Отец</span>
+                            {students?.Parent.relation === "FATHER" &&
+                                <div className="bg-gray-50 rounded-lg p-4">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center">
+                                            <FaUserGraduate className="w-5 h-5 text-gray-500"/>
+                                            <span className="ml-2 font-medium">Отец</span>
+                                        </div>
+                                        <button
+                                            onClick={() => handleChatWithParent(students?.Parent.relation, students?.Parent.user.username)}
+                                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                                        >
+                                            Написать
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => handleChatWithParent('father', 'Сатыбалды Нурлан')}
-                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                                    >
-                                        Написать
-                                    </button>
-                                </div>
-                                <div className="space-y-2">
-                                    <p className="text-sm text-gray-600">
-                                        {/*Доделать*/}
-                                        {students?.Parent?.user?.username ? `Parent: ${students.Parent.user.username}` : 'No parent info available'}
-                                    </p>
+                                    <div className="space-y-2">
+                                        <p className="text-sm text-gray-600">
+                                        <span key={students?.id}>
+                                                {students?.Parent.relation === "FATHER" ? students?.Parent.user.username : "Not a Fatcher" }
+                                            </span>
+                                        </p>
 
-
-                                    <div className="flex items-center text-sm text-gray-600">
-                                        <FaPhone className="w-4 h-4 mr-2"/>
-                                        {/*<span>{student.parentPhone}</span>*/}
+                                        <div className="flex items-center text-sm text-gray-600">
+                                            {/*<FaPhone className="w-4 h-4 mr-2"/>*/}
+                                            {/*<span>{students.}</span>*/}
+                                        </div>
+                                        <div className="flex items-center text-sm text-gray-600">
+                                            <FaEnvelope className="w-4 h-4 mr-2"/>
+                                            <span>nurlan@example.com</span>
+                                        </div>
+                                        <div className="flex items-center text-sm text-gray-600">
+                                            <FaBriefcase className="w-4 h-4 mr-2"/>
+                                            <span>Инженер<br/>ТОО "Технопром"</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center text-sm text-gray-600">
-                                        <FaEnvelope className="w-4 h-4 mr-2"/>
-                                        <span>nurlan@example.com</span>
-                                    </div>
-                                    <div className="flex items-center text-sm text-gray-600">
-                                        <FaBriefcase className="w-4 h-4 mr-2"/>
-                                        <span>Инженер<br/>ТОО "Технопром"</span>
-                                    </div>
-                                </div>
-                            </div>
+                                </div>}
 
                             {/* Мать */}
                             <div className="bg-gray-50 rounded-lg p-4">
@@ -604,7 +608,8 @@ const StudentDetailPage: React.FC = () => {
                             <p className="text-sm text-gray-500">Оценки и прогресс по предметам</p>
                         </div>
                         <div className="grid grid-cols-3 gap-4 p-4">
-                            {gradesData.map((subject, index) => (
+
+                            {students?.lessonGrades.map((subject, index) => (
                                 <div
                                     key={index}
                                     className="bg-white border border-gray-100 rounded-lg hover:border-blue-100 transition-all duration-200"
@@ -612,64 +617,61 @@ const StudentDetailPage: React.FC = () => {
                                     <div className="p-4">
                                         <div className="flex items-center justify-between mb-3">
                                             <div className="flex items-center gap-2">
-                                                <h3 className="text-base font-medium text-gray-900">{subject.subject}</h3>
+                                                <h3 className="text-base font-medium text-gray-900">{subject.lesson.name}</h3>
                                                 <span className={`
                           px-1.5 py-0.5 rounded text-xs font-medium
-                          ${subject.trend === 'up' ? 'bg-green-50 text-green-700' :
-                                                    subject.trend === 'down' ? 'bg-red-50 text-red-700' :
-                                                        'bg-gray-50 text-gray-700'}
-                        `}>
-                          {subject.trend === 'up' ? '↑' : subject.trend === 'down' ? '↓' : '→'}
-                                                    {subject.currentGrade}
+                        `}>132
+                          {/*{subject.trend === 'up' ? '↑' : subject.trend === 'down' ? '↓' : '→'}*/}
+                          {/*                          {subject.currentGrade}*/}
                         </span>
                                             </div>
                                         </div>
 
                                         <div className="text-sm text-gray-500 mb-3">
-                                            Преподаватель: {subject.teacherName}
+                                            Преподаватель: {students?.Syllabus.teacherId}
                                         </div>
 
                                         <div className="grid grid-cols-3 gap-2 mb-4 bg-gray-50 rounded-lg p-2">
                                             <div>
                                                 <div className="text-xs text-gray-500">Текущая</div>
                                                 <div
-                                                    className="text-lg font-medium text-gray-900">{subject.currentGrade}</div>
+                                                    className="text-lg font-medium text-gray-900">{subject.grade}</div>
                                             </div>
-                                            <div>
-                                                <div className="text-xs text-gray-500">Предыдущая</div>
-                                                <div
-                                                    className="text-lg font-medium text-gray-900">{subject.previousGrade}</div>
-                                            </div>
-                                            <div>
-                                                <div className="text-xs text-gray-500">Средняя</div>
-                                                <div
-                                                    className="text-lg font-medium text-gray-900">{subject.averageGrade}</div>
-                                            </div>
+                                            {/*<div>*/}
+                                            {/*    <div className="text-xs text-gray-500">Предыдущая</div>*/}
+                                            {/*    <div*/}
+                                            {/*        className="text-lg font-medium text-gray-900">{subject.previousGrade}</div>*/}
+                                            {/*</div>*/}
+                                            {/*<div>*/}
+                                            {/*    <div className="text-xs text-gray-500">Средняя</div>*/}
+                                            {/*    <div*/}
+                                            {/*        className="text-lg font-medium text-gray-900">{subject.averageGrade}</div>*/}
+                                            {/*</div>*/}
                                         </div>
 
                                         <div>
                                             <div className="text-xs text-gray-500 mb-2">Последние задания</div>
                                             <div className="space-y-1.5">
-                                                {subject.assignments.map((assignment, idx) => (
+                                                {/*{subject.assignments.map((assignment, idx) => (*/}
+                                                {/*))}*/}
                                                     <div
-                                                        key={idx}
+                                                        key={subject.id}
                                                         className="flex items-center justify-between py-0.5"
                                                     >
                                                         <div className="flex items-center gap-1.5">
                                                             <div className="w-1 h-1 rounded-full bg-gray-300"></div>
                                                             <span
-                                                                className="text-xs text-gray-900">{assignment.type}</span>
+                                                                className="text-xs text-gray-900">{subject.lessonId}</span>
                                                         </div>
                                                         <span className={`
                               px-1.5 py-0.5 rounded text-xs font-medium
-                              ${assignment.grade >= 4.5 ? 'bg-green-50 text-green-700' :
-                                                            assignment.grade >= 4 ? 'bg-blue-50 text-blue-700' :
+                              ${subject.grade >= 4.5 ? 'bg-green-50 text-green-700' :
+                                                            subject.grade >= 4 ? 'bg-blue-50 text-blue-700' :
                                                                 'bg-yellow-50 text-yellow-700'}
                             `}>
-                              {assignment.grade}
+                              {subject.grade}
                             </span>
                                                     </div>
-                                                ))}
                                             </div>
                                         </div>
                                     </div>
@@ -822,7 +824,7 @@ const StudentDetailPage: React.FC = () => {
                         <p className="text-sm text-gray-500 mb-6">Записи о посещаемости, медицинских визитах и
                             пропусках</p>
                         <div className="grid grid-cols-1 gap-4">
-                            {attendanceHistory.map((record, index) => (
+                            {students?.Attendance.map((record, index) => (
                                 <div
                                     key={index}
                                     className="border border-gray-200 rounded-lg hover:border-blue-200 transition-all duration-200"
@@ -830,24 +832,24 @@ const StudentDetailPage: React.FC = () => {
                                     <div className="border-b border-gray-100 p-4">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                        <span className={`
-                          px-2 py-1 rounded-md text-xs font-medium
-                          ${record.type === 'medical' ? 'bg-blue-50 text-blue-700' :
-                            record.type === 'late' ? 'bg-yellow-50 text-yellow-700' :
-                                record.type === 'excused' ? 'bg-gray-50 text-gray-700' :
-                                    record.type === 'absence' ? 'bg-red-50 text-red-700' :
-                                        'bg-green-50 text-green-700'}
-                        `}>
-                          {getAttendanceTypeText(record.type)}
-                        </span>
+                        {/*<span className={`*/}
+                        {/*  px-2 py-1 rounded-md text-xs font-medium*/}
+                        {/*  ${record === 'medical' ? 'bg-blue-50 text-blue-700' :*/}
+                        {/*    record.type === 'late' ? 'bg-yellow-50 text-yellow-700' :*/}
+                        {/*        record.type === 'excused' ? 'bg-gray-50 text-gray-700' :*/}
+                        {/*            record.type === 'absence' ? 'bg-red-50 text-red-700' :*/}
+                        {/*                'bg-green-50 text-green-700'}*/}
+                        {/*`}>*/}
+                        {/*  {getAttendanceTypeText(record.type)}*/}
+                        {/*</span>*/}
                                                 <h3 className="text-sm font-medium text-gray-900">
-                                                    {record.reason || (record.subject && `Предмет: ${record.subject}`)}
+                                                    {record.lesson.name && `Предмет: ${record.lesson.name}`}
                                                 </h3>
                                             </div>
                                             <div className="text-right">
                                                 <div className="text-sm font-medium text-gray-900">{record.date}</div>
-                                                {record.time && (
-                                                    <div className="text-xs text-gray-500">{record.time}</div>
+                                                {record.studentId && (
+                                                    <div className="text-xs text-gray-500">{record.studentId}</div>
                                                 )}
                                             </div>
                                         </div>
@@ -860,22 +862,22 @@ const StudentDetailPage: React.FC = () => {
                                                     <p className="mt-1 text-gray-900">{record.status}</p>
                                                 </div>
                                             )}
-                                            {record.approvedBy && (
+                                            {record.studentId && (
                                                 <div className="text-sm">
                                                     <span className="text-gray-500">Подтверждено</span>
-                                                    <p className="mt-1 text-gray-900">{record.approvedBy}</p>
+                                                    <p className="mt-1 text-gray-900">{record.studentId}</p>
                                                 </div>
                                             )}
-                                            {record.duration && (
+                                            {record.studentId && (
                                                 <div className="text-sm">
                                                     <span className="text-gray-500">Длительность</span>
-                                                    <p className="mt-1 text-gray-900">{record.duration}</p>
+                                                    <p className="mt-1 text-gray-900">{record.studentId}</p>
                                                 </div>
                                             )}
-                                            {record.comment && (
+                                            {record.studentId && (
                                                 <div className="text-sm col-span-2">
                                                     <span className="text-gray-500">Комментарий</span>
-                                                    <p className="mt-1 text-gray-900 italic">{record.comment}</p>
+                                                    <p className="mt-1 text-gray-900 italic">{record.studentId}</p>
                                                 </div>
                                             )}
                                         </div>
