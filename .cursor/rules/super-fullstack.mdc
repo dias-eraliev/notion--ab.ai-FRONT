@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+1. use swr for data fetching and revalidation on mutations
+2. all frontend api clients are in the folder named api. Also define dtos and response interfaces there
+3. on the frontend use authProvider for authorization
+4. use nest generator to create rest api resources
+5. use guards like AuthGuard and RoleGuard for authentication and authorization 
+6. if user request includes backend interaction read prisma schema to write correct database requests

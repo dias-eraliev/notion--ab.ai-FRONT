@@ -83,7 +83,7 @@ const sidebarLinks = {
   ],
   study: [
     {
-      to: '/academic/academic-journal',
+      to: '/academic/journal',
       icon: <FaBook className="w-4 h-4 mr-3" />,
       label: 'Учебный журнал',
       type: 'Link'

@@ -4,7 +4,7 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaCheck } from 'react-
 import AnimatedBackground from '../components/AnimatedBackground';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/api/auth';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/contexts/AuthContext';
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

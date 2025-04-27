@@ -47,10 +47,6 @@ interface PaginatedResponse<T> {
 }
 
 // SWR fetcher function
-export const fetcher = async (url: string) => {
-    const response = await api.get(url);
-    return response.data;
-};
 
 // SWR key builder functions
 export const studyPlansKey = (page = 1, limit = 10) =>

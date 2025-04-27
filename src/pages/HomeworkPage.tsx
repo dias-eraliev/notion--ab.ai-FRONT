@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FaBook, 
-  FaUpload, 
-  FaDownload, 
-  FaCheck, 
-  FaTimes, 
-  FaClock, 
+import {
+  FaBook,
+  FaUpload,
+  FaDownload,
+  FaCheck,
+  FaTimes,
+  FaClock,
   FaComment,
   FaPaperclip,
   FaPlus,
@@ -17,7 +17,7 @@ import {
   FaUsers,
   FaStar
 } from 'react-icons/fa';
-import { useAuth } from '../providers/AuthProvider';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Homework {
   id: string;
@@ -127,7 +127,7 @@ const HomeworkModal: React.FC<{
             <FaTimes />
           </button>
         </div>
-        
+
         <form onSubmit={(e) => {
           e.preventDefault();
           onSubmit(formData);
@@ -364,13 +364,13 @@ const HomeworkDetailsModal: React.FC<{
     const now = new Date();
     const due = new Date(homework.dueDate);
     const diff = due.getTime() - now.getTime();
-    
+
     if (diff < 0) return 'Срок сдачи истек';
-    
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     return `${days}д ${hours}ч ${minutes}м`;
   };
 
@@ -422,7 +422,7 @@ const HomeworkDetailsModal: React.FC<{
             <div className="text-sm text-gray-500 mb-1">Приоритет</div>
             <div className="font-medium text-purple-700">
               {homework.priority === 'high' ? 'Высокий' :
-               homework.priority === 'medium' ? 'Средний' : 'Низкий'}
+                homework.priority === 'medium' ? 'Средний' : 'Низкий'}
             </div>
             <div className="text-sm text-purple-600 mt-1">
               Примерное время: {homework.estimatedTime} мин
@@ -649,11 +649,11 @@ const HomeworkPage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
           {role === 'student' ? 'Мои задания' :
-           role === 'parent' ? 'Задания ребенка' :
-           role === 'teacher' ? 'Управление заданиями' :
-           'Все задания'}
+            role === 'parent' ? 'Задания ребенка' :
+              role === 'teacher' ? 'Управление заданиями' :
+                'Все задания'}
         </h1>
-        
+
         {(role === 'teacher' || role === 'admin') && (
           <button
             onClick={() => setIsModalOpen(true)}

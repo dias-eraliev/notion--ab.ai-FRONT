@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { FaDownload, FaSearch, FaEye, FaCheck, FaTimes, FaExclamationTriangle, FaSpinner, FaPlus } from 'react-icons/fa';
 import { useNavigate, Link } from 'react-router-dom';
 import useSWR from 'swr';
-import { fetcher, studyPlansKey, type StudyPlan as ApiStudyPlan } from '../api/studyPlans';
-import { useAuth } from '../providers/AuthProvider';
+import { studyPlansKey, type StudyPlan as ApiStudyPlan } from '../api/studyPlans';
+import { useAuth } from '../contexts/AuthContext';
+import { fetcher } from '@/api/index';
 
 interface StudyPlan {
   id: string | number;
@@ -56,24 +57,21 @@ const StudyPlansPage: React.FC = () => {
     // Format teacher name
     teacher: `${plan.teacher.name} ${plan.teacher.surname}`,
     // Calculate lessons info
-    totalLessons: plan.lessons.length,
+    totalLessons: plan._count.lessons,
     // Count lessons with all materials
-    completedLessons: plan.lessons.filter(
-      lesson => lesson.hasVideo && lesson.hasPresentation && lesson.hasTest
-    ).length,
     // Use current date as last update if not available
     lastUpdate: new Date().toISOString().split('T')[0],
     // Transform lessons
-    lessons: plan.lessons.map(lesson => ({
-      id: lesson.id,
-      topic: lesson.title,
-      hasVideo: lesson.hasVideo,
-      hasPresentation: lesson.hasPresentation,
-      hasTest: lesson.hasTest,
-      addedDate: '', // Not provided by API
-      responsible: `${plan.teacher.name} ${plan.teacher.surname}`,
-      scheduledDate: lesson.scheduledDate
-    }))
+    // lessons: plan.lessons.map(lesson => ({
+    //   id: lesson.id,
+    //   topic: lesson.title,
+    //   hasVideo: lesson.hasVideo,
+    //   hasPresentation: lesson.hasPresentation,
+    //   hasTest: lesson.hasTest,
+    //   addedDate: '', // Not provided by API
+    //   responsible: `${plan.teacher.name} ${plan.teacher.surname}`,
+    //   scheduledDate: lesson.scheduledDate
+    // }))
   })) : [];
 
   // Check if user can create study plans (only teachers and admins)
@@ -145,7 +143,7 @@ const StudyPlansPage: React.FC = () => {
         <h1 className="text-2xl font-bold">Учебные планы</h1>
         <div className="flex gap-2">
           {canCreateStudyPlan && (
-            <button 
+            <button
               onClick={() => navigate('/study-plans/create')}
               className="px-4 py-2 bg-corporate-primary text-white rounded-md hover:bg-corporate-primary-dark flex items-center"
             >
@@ -205,7 +203,7 @@ const StudyPlansPage: React.FC = () => {
       {!token ? (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
           <p>Для просмотра учебных планов необходимо авторизоваться</p>
-          <button 
+          <button
             onClick={() => navigate('/login')}
             className="mt-2 text-sm text-yellow-600 hover:text-yellow-500"
           >
@@ -232,8 +230,8 @@ const StudyPlansPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow overflow-hidden">
             {filteredPlans.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
-                {plans.length === 0 ? 
-                  'Нет доступных учебных планов' : 
+                {plans.length === 0 ?
+                  'Нет доступных учебных планов' :
                   'Нет учебных планов, соответствующих выбранным фильтрам'}
               </div>
             ) : (
@@ -252,7 +250,7 @@ const StudyPlansPage: React.FC = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredPlans.map((plan, index) => (
-                    <tr 
+                    <tr
                       key={plan.id}
                       className="hover:bg-gray-50 cursor-pointer"
                       onClick={() => setSelectedPlan(plan)}
@@ -264,7 +262,7 @@ const StudyPlansPage: React.FC = () => {
                         {plan.class}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <Link 
+                        <Link
                           to={`/study-plans/${plan.id}`}
                           className="text-blue-600 hover:text-blue-800 hover:underline"
                         >
@@ -287,7 +285,7 @@ const StudyPlansPage: React.FC = () => {
                         {plan.lastUpdate}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <button 
+                        <button
                           className="text-blue-600 hover:text-blue-800 flex items-center"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -312,17 +310,17 @@ const StudyPlansPage: React.FC = () => {
                 Показано {Math.min(pagination.limit, filteredPlans.length)} из {data.total} учебных планов
               </div>
               <div className="flex gap-2">
-                <button 
+                <button
                   className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50"
                   disabled={pagination.page === 1}
-                  onClick={() => setPagination({...pagination, page: pagination.page - 1})}
+                  onClick={() => setPagination({ ...pagination, page: pagination.page - 1 })}
                 >
                   Назад
                 </button>
-                <button 
+                <button
                   className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50"
                   disabled={pagination.page * pagination.limit >= (data.total || 0)}
-                  onClick={() => setPagination({...pagination, page: pagination.page + 1})}
+                  onClick={() => setPagination({ ...pagination, page: pagination.page + 1 })}
                 >
                   Вперед
                 </button>

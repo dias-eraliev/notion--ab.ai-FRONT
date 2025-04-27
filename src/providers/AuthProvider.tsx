@@ -1,40 +1,34 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-export const AuthContext = createContext({
-  token: "",
-  setToken: (token: string) => { },
-  payload: Object.create(null),
-  setPayload: (payload: any) => { },
-});
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import AuthContext, { useAuth } from "../contexts/AuthContext";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useState<string>("");
-  const [payload, setPayload] = useState<any>(null);
+  const [token, setToken] = useState<string>(localStorage.getItem('token') || "");
+  const [payload, setPayload] = useState<any>(localStorage.getItem('payload') || null);
+  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const payload = localStorage.getItem('payload');
+    const storedToken = localStorage.getItem('token');
+    const storedPayload = localStorage.getItem('payload');
 
-    if (!token || !payload) {
-      navigate('/login');
+    if (!storedToken || !storedPayload) {
+      if (location.pathname !== '/login') {
+        navigate('/login');
+      }
       return;
     }
 
-    setToken(token);
-    setPayload(JSON.parse(payload || '{}'));
-  }, []);
+    setToken(storedToken);
+    setPayload(JSON.parse(storedPayload || "{}"));
+  }, [location.pathname]);
 
   return <AuthContext.Provider value={{ token, setToken, payload, setPayload }}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { token } = useAuth();
-  if (!token) {
+  const { token, payload } = useAuth();
+  if (!token || !payload) {
     return <Navigate to="/login" />;
   }
   return children;
