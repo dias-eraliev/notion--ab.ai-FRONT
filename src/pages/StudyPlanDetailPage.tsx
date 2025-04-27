@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FaVideo, FaFile, FaClipboardCheck, FaArrowLeft, FaSpinner } from 'react-icons/fa';
 import useSWR from 'swr';
-import { createLesson, fetcher, studyPlanKey, type Lesson, type CreateLessonDto } from '../api/studyPlans';
-import { useAuth } from '../providers/AuthProvider';
+import { createLesson, studyPlanKey, type Lesson, type CreateLessonDto } from '../api/studyPlans';
+import { useAuth } from '../contexts/AuthContext';
+import { fetcher } from '@/api/index';
 
 interface LessonCard {
   id: string | number;
@@ -84,9 +85,9 @@ const StudyPlanDetailPage: React.FC = () => {
 
   const handleCreateLesson = async () => {
     if (!newLesson.title.trim() || !id) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Prepare the lesson data
       const lessonData: CreateLessonDto = {
@@ -105,10 +106,10 @@ const StudyPlanDetailPage: React.FC = () => {
           correct: q.correct
         })) : undefined,
       };
-      
+
       // Create the lesson
       await createLesson(id, lessonData);
-      
+
       // Reset form state
       setIsModalOpen(false);
       setNewLesson({ title: '', description: '', scheduledDate: '', hasVideo: false, hasPresentation: false, hasTest: false });
@@ -116,7 +117,7 @@ const StudyPlanDetailPage: React.FC = () => {
       setVideoLink('');
       setPresentationFile(null);
       setTestQuestions([]);
-      
+
       // Revalidate data
       mutate();
     } catch (err) {
@@ -132,7 +133,7 @@ const StudyPlanDetailPage: React.FC = () => {
       <div className="p-6 max-w-[1600px] mx-auto">
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
           <p>Для просмотра учебного плана необходимо авторизоваться</p>
-          <button 
+          <button
             onClick={() => navigate('/login')}
             className="mt-2 text-sm text-yellow-600 hover:text-yellow-500"
           >
@@ -432,7 +433,7 @@ const StudyPlanDetailPage: React.FC = () => {
           </div>
         ) : (
           studyPlan.lessons.map((lesson: LessonCard) => (
-            <div 
+            <div
               key={lesson.id}
               className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => {
