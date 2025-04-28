@@ -1,4 +1,5 @@
-import api from './index';
+import api, { fetcher } from './index';
+import useSWR from 'swr';
 
 interface StudyPlan {
     id: number;
@@ -12,9 +13,15 @@ interface StudyPlan {
     lessons: Lesson[];
 }
 
+// Simple study plan structure returned by the group endpoint
+interface GroupStudyPlan {
+    id: number;
+    name: string;
+}
+
 interface Lesson {
     id: number;
-    title: string;
+    name: string;
     description: string;
     scheduledDate?: string;
     hasVideo: boolean;
@@ -46,14 +53,90 @@ interface PaginatedResponse<T> {
     limit: number;
 }
 
-// SWR fetcher function
-
 // SWR key builder functions
 export const studyPlansKey = (page = 1, limit = 10) =>
     `/study-plans?page=${page}&limit=${limit}`;
 
+export const studyPlanByGroupKey = (groupId: number) =>
+    `/study-plans/${groupId}/group`;
+
 export const studyPlanKey = (id: string) =>
     `/study-plans/${id}`;
+
+export const studyPlanLessonsKey = (id: number) =>
+    `/study-plans/${id}/lessons`;
+
+/**
+ * SWR hook to fetch study plans based on the user's role
+ * - Students: Only plans associated with their groups
+ * - Teachers: Only plans they created or are assigned to
+ * - Admins: All plans
+ */
+export const useStudyPlans = (page = 1, limit = 10) => {
+    const { data, error, mutate } = useSWR<PaginatedResponse<StudyPlan>>(
+        studyPlansKey(page, limit),
+        fetcher
+    );
+    
+    return {
+        studyPlans: data?.data,
+        isLoading: !error && !data,
+        isError: error,
+        total: data?.total,
+        mutate
+    };
+};
+
+/**
+ * SWR hook to fetch study plans for a specific group
+ */
+export const useStudyPlansByGroup = (groupId?: number) => {
+    const { data, error, mutate } = useSWR<GroupStudyPlan[]>(
+        groupId ? studyPlanByGroupKey(groupId) : null,
+        fetcher
+    );
+    
+    return {
+        studyPlans: data,
+        isLoading: !error && !data,
+        isError: error,
+        mutate
+    };
+};
+
+/**
+ * SWR hook to fetch a specific study plan by ID
+ */
+export const useStudyPlan = (id?: number) => {
+    const { data, error, mutate } = useSWR<StudyPlan>(
+        id ? studyPlanKey(id.toString()) : null,
+        fetcher
+    );
+    
+    return {
+        studyPlan: data,
+        isLoading: !error && !data,
+        isError: error,
+        mutate
+    };
+};
+
+/**
+ * SWR hook to fetch lessons for a specific study plan
+ */
+export const useStudyPlanLessons = (id?: number) => {
+    const { data, error, mutate } = useSWR<Lesson[]>(
+        id ? studyPlanLessonsKey(id) : null,
+        fetcher
+    );
+    
+    return {
+        lessons: data,
+        isLoading: !error && !data,
+        isError: error,
+        mutate
+    };
+};
 
 /**
  * Fetches study plans based on the user's role
@@ -67,11 +150,27 @@ export const getStudyPlans = async (page = 1, limit = 10) => {
 };
 
 /**
+ * Fetches study plans for a specific group
+ */
+export const getStudyPlansByGroup = async (groupId: number) => {
+    const response = await api.get<GroupStudyPlan[]>(studyPlanByGroupKey(groupId));
+    return response.data;
+};
+
+/**
  * Fetches a specific study plan by ID
  * Access is controlled on the backend based on the user's role
  */
 export const getStudyPlanById = async (id: string) => {
     const response = await api.get<StudyPlan>(studyPlanKey(id));
+    return response.data;
+};
+
+/**
+ * Fetches lessons for a specific study plan
+ */
+export const getLessonsByStudyPlanId = async (id: number) => {
+    const response = await api.get<Lesson[]>(studyPlanLessonsKey(id));
     return response.data;
 };
 
@@ -135,4 +234,4 @@ export const createStudyPlan = async (studyPlanData: any, groupIds: number[]) =>
     return response.data;
 };
 
-export type { StudyPlan, Lesson, CreateLessonDto, PaginatedResponse }; 
+export type { StudyPlan, GroupStudyPlan, Lesson, CreateLessonDto, PaginatedResponse }; 

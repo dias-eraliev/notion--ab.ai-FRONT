@@ -3,71 +3,14 @@ import { FaCalendar, FaSpinner } from 'react-icons/fa';
 import { AnimatePresence } from 'framer-motion';
 import ScheduleModal from '../components/ScheduleModal';
 import DaySchedule from '../components/DaySchedule';
+import { useSchedules, createSchedule, updateSchedule, deleteSchedule, ScheduleDto } from '../api/schedule';
+import { useGroups, GroupDto } from '../api/groups.api';
+import { useClassrooms, ClassroomDto } from '../api/classrooms.api';
 
-// Mock data
-const mockGroups = [
-  { id: 1, name: 'Группа 1' },
-  { id: 2, name: 'Группа 2' },
-  { id: 3, name: 'Группа 3' }
-];
-
+// Mock study plans until we have an API for them
 const mockStudyPlans = [
   { id: 1, name: 'Учебный план 1' },
   { id: 2, name: 'Учебный план 2' }
-];
-
-const mockSchedules = [
-  {
-    id: 1,
-    day: 'monday',
-    startTime: '08:00',
-    endTime: '09:30',
-    subject: 'Математика',
-    teacherId: 'Петров И.И.',
-    type: 'lesson',
-    repeat: 'weekly',
-    classroomId: 101,
-    groupId: 1,
-    classroom: { id: 101, name: '101', isFree: false }
-  },
-  {
-    id: 2,
-    day: 'monday',
-    startTime: '10:00',
-    endTime: '11:30',
-    subject: 'Физика',
-    teacherId: 'Иванов А.А.',
-    type: 'lesson',
-    repeat: 'weekly',
-    classroomId: 102,
-    groupId: 1,
-    classroom: { id: 102, name: '102', isFree: false }
-  },
-  {
-    id: 3,
-    day: 'tuesday',
-    startTime: '08:00',
-    endTime: '09:30',
-    subject: 'Химия',
-    teacherId: 'Сидорова Е.В.',
-    type: 'lesson',
-    repeat: 'weekly',
-    classroomId: 201,
-    groupId: 1,
-    classroom: { id: 201, name: '201', isFree: false }
-  }
-];
-
-// Mock data for teachers and classrooms
-const mockTeachers = [
-  { id: 1, name: 'Иван', surname: 'Петров' },
-  { id: 2, name: 'Елена', surname: 'Иванова' }
-];
-
-const mockClassrooms = [
-  { id: 101, name: '101', isFree: true },
-  { id: 102, name: '102', isFree: true },
-  { id: 201, name: '201', isFree: true }
 ];
 
 const SchedulePage: React.FC = () => {
@@ -76,35 +19,76 @@ const SchedulePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentSchedule, setCurrentSchedule] = useState<any>(undefined);
+  const [currentSchedule, setCurrentSchedule] = useState<ScheduleDto | undefined>(undefined);
+
+  // Data fetching with SWR
+  const { groups, isLoading: groupsLoading, isError: groupsError } = useGroups();
+  const { data: schedules, error: schedulesError, mutate: mutateSchedules } = useSchedules(selectedGroupId);
+  const { classrooms, isLoading: classroomsLoading, isError: classroomsError } = useClassrooms();
+
+  const isLoadingData = groupsLoading || classroomsLoading || (selectedGroupId && !schedules);
+  const hasError = groupsError || classroomsError || schedulesError;
 
   const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
   // Group schedules by day
   const schedulesByDay = daysOfWeek.reduce((acc, day) => {
-    acc[day] = mockSchedules.filter(schedule => schedule.day === day);
+    acc[day] = schedules?.filter(schedule => schedule.day === day) || [];
     return acc;
-  }, {} as Record<string, typeof mockSchedules>);
+  }, {} as Record<string, ScheduleDto[]>);
 
-  // Handler functions (empty implementation)
+  // Handler functions
   const handleAddSchedule = (day: string) => {
     setSelectedDay(day);
     setCurrentSchedule(undefined);
     setIsModalOpen(true);
   };
 
-  const handleEditSchedule = (schedule: any) => {
+  const handleEditSchedule = (schedule: ScheduleDto) => {
     setCurrentSchedule(schedule);
     setIsModalOpen(true);
   };
 
-  const handleDeleteSchedule = (scheduleId: number) => {
-    console.log('Delete schedule', scheduleId);
+  const handleDeleteSchedule = async (scheduleId: number) => {
+    if (!selectedGroupId) return;
+
+    setIsLoading(true);
+    try {
+      await deleteSchedule(scheduleId, selectedGroupId);
+      await mutateSchedules();
+    } catch (error) {
+      console.error('Failed to delete schedule', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSaveSchedule = (data: any) => {
-    console.log('Save schedule', data);
-    setIsModalOpen(false);
+  const handleSaveSchedule = async (data: any) => {
+    if (!selectedGroupId) return;
+
+    setIsLoading(true);
+    try {
+      if (currentSchedule) {
+        // Update existing schedule
+        await updateSchedule(currentSchedule.id, {
+          ...data,
+          groupId: selectedGroupId
+        });
+      } else {
+        // Create new schedule
+        await createSchedule({
+          ...data,
+          groupId: selectedGroupId
+        });
+      }
+
+      await mutateSchedules();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Failed to save schedule', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -126,9 +110,10 @@ const SchedulePage: React.FC = () => {
                 value={selectedGroupId || ''}
                 onChange={(e) => setSelectedGroupId(e.target.value ? Number(e.target.value) : undefined)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                disabled={isLoadingData || !!hasError}
               >
                 <option value="">Выберите группу</option>
-                {mockGroups.map(group => (
+                {groups?.map((group: GroupDto) => (
                   <option key={group.id} value={group.id}>
                     {group.name}
                   </option>
@@ -138,7 +123,7 @@ const SchedulePage: React.FC = () => {
 
             <div className="flex-1 flex justify-end">
               <div className="flex items-center space-x-2">
-                <FaCalendar className="text-gray-400" />
+                {isLoadingData ? <FaSpinner className="animate-spin text-gray-400" /> : <FaCalendar className="text-gray-400" />}
                 <span className="text-gray-500">Расписание на неделю</span>
               </div>
             </div>
@@ -146,8 +131,24 @@ const SchedulePage: React.FC = () => {
         </div>
       </div>
 
+      {/* Error state */}
+      {hasError && (
+        <div className="bg-red-50 p-4 rounded-lg shadow mb-6">
+          <p className="text-red-600">
+            Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.
+          </p>
+        </div>
+      )}
+
       {/* Main Content */}
-      {!selectedGroupId ? (
+      {isLoadingData && !hasError ? (
+        <div className="bg-white p-8 rounded-lg shadow text-center">
+          <FaSpinner className="animate-spin text-gray-400 mx-auto mb-4 text-3xl" />
+          <p className="text-lg text-gray-600">
+            Загрузка данных...
+          </p>
+        </div>
+      ) : !selectedGroupId ? (
         <div className="bg-white p-8 rounded-lg shadow text-center">
           <p className="text-lg text-gray-600">
             Выберите группу, чтобы просмотреть расписание
@@ -177,9 +178,8 @@ const SchedulePage: React.FC = () => {
             onClose={() => setIsModalOpen(false)}
             onSave={handleSaveSchedule}
             schedule={currentSchedule}
-            classrooms={mockClassrooms}
-            teachers={mockTeachers}
-            groups={mockGroups}
+            classrooms={classrooms || []}
+            groups={groups || []}
             studyPlans={mockStudyPlans}
             selectedGroupId={selectedGroupId}
             isLoading={isLoading}

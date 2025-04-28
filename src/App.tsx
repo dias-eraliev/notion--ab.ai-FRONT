@@ -34,6 +34,7 @@ import SalariesPage from './pages/finance/SalariesPage';
 import AntiFraudPage from './pages/finance/AntiFraudPage';
 import Login from './pages/Login';
 import { AuthProvider } from './providers/AuthProvider';
+import RoleProtectedRoute from './components/RoleProtectedRoute';
 import { useAuth } from './contexts/AuthContext';
 import TestRealtimeApi from './pages/TestRealtimeApi';
 import InventoryPage from './pages/erp/InventoryPage';
@@ -61,7 +62,11 @@ const App: React.FC = () => {
               {/* Academic routes */}
               <Route path="academic/journal" element={<JournalPage />} />
               <Route path="academic/schedule" element={<SchedulePage />} />
-              <Route path="academic/classrooms" element={<ClassroomsPage />} />
+              <Route path="academic/classrooms" element={
+                <RoleProtectedRoute allowedRoles={['TEACHER', 'ADMIN']}>
+                  <ClassroomsPage />
+                </RoleProtectedRoute>
+              } />
               <Route path="academic/requests" element={<BookingRequestsPage />} />
               <Route path="academic/requests/new" element={<BookingRequestsPage />} />
               <Route path="academic/study-plans" element={<StudyPlansPage />} />
