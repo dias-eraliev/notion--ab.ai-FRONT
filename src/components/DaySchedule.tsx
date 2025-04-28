@@ -1,14 +1,12 @@
 import React from 'react';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import { ScheduleDto } from '../api/schedule.api';
-import { useAuth } from '../contexts/AuthContext';
 
 interface DayScheduleProps {
     day: string;
-    schedules: ScheduleDto[];
-    onAddClick: (day: string) => void;
-    onEditClick: (schedule: ScheduleDto) => void;
-    onDeleteClick: (scheduleId: number) => void;
+    schedules: any[];
+    onAddClick?: (day: string) => void;
+    onEditClick?: (schedule: any) => void;
+    onDeleteClick?: (scheduleId: number) => void;
 }
 
 const DaySchedule: React.FC<DayScheduleProps> = ({
@@ -18,9 +16,6 @@ const DaySchedule: React.FC<DayScheduleProps> = ({
     onEditClick,
     onDeleteClick
 }) => {
-    const { payload: { role } } = useAuth();
-    const canEdit = role === 'ADMIN' || role === 'TEACHER';
-
     // Sort schedules by start time
     const sortedSchedules = [...schedules].sort((a, b) => {
         return a.startTime.localeCompare(b.startTime);
@@ -51,7 +46,7 @@ const DaySchedule: React.FC<DayScheduleProps> = ({
         <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="flex justify-between items-center px-6 py-4 bg-blue-50">
                 <h3 className="text-lg font-medium text-blue-800">{getDayTitle(day)}</h3>
-                {canEdit && (
+                {onAddClick && (
                     <button
                         onClick={() => onAddClick(day)}
                         className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
@@ -83,27 +78,27 @@ const DaySchedule: React.FC<DayScheduleProps> = ({
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    {canEdit && (
-                                        <>
-                                            <button
-                                                onClick={() => onEditClick(schedule)}
-                                                className="p-1 text-gray-500 hover:text-blue-500"
-                                            >
-                                                <FaEdit />
-                                            </button>
-                                            <button
-                                                onClick={() => onDeleteClick(schedule.id)}
-                                                className="p-1 text-gray-500 hover:text-red-500"
-                                            >
-                                                <FaTrash />
-                                            </button>
-                                        </>
+                                    {onEditClick && (
+                                        <button
+                                            onClick={() => onEditClick(schedule)}
+                                            className="p-1 text-gray-500 hover:text-blue-500"
+                                        >
+                                            <FaEdit />
+                                        </button>
+                                    )}
+                                    {onDeleteClick && (
+                                        <button
+                                            onClick={() => onDeleteClick(schedule.id)}
+                                            className="p-1 text-gray-500 hover:text-red-500"
+                                        >
+                                            <FaTrash />
+                                        </button>
                                     )}
                                 </div>
                             </div>
                             <div className="mt-2 flex items-center justify-between text-sm">
                                 <div className="text-gray-500">
-                                    Аудитория: <span className="font-medium">{schedule.classroomId}</span>
+                                    Аудитория: <span className="font-medium">{schedule.classroom?.name || schedule.classroomId}</span>
                                 </div>
                                 <div className="text-gray-500">
                                     Преподаватель: <span className="font-medium">{schedule.teacherId}</span>
