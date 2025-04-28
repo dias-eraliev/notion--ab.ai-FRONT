@@ -851,7 +851,7 @@ const HomeworkDetailsModal: React.FC<{
             {/* Tab implementation */}
             {(() => {
               const [activeTab, setActiveTab] = useState('lecture');
-              
+
               // Count available tabs
               const hasMaterial = {
                 lecture: !!homework.material.lecture,
@@ -859,7 +859,7 @@ const HomeworkDetailsModal: React.FC<{
                 presentation: !!homework.material.presentationUrl,
                 quiz: !!(homework.material.Quiz && homework.material.Quiz.questions && homework.material.Quiz.questions.length > 0)
               };
-              
+
               // If no tabs are available, show the no materials message
               if (!Object.values(hasMaterial).some(Boolean)) {
                 return (
@@ -868,7 +868,7 @@ const HomeworkDetailsModal: React.FC<{
                   </div>
                 );
               }
-              
+
               // Set the first available tab as active
               useEffect(() => {
                 for (const [key, value] of Object.entries(hasMaterial)) {
@@ -878,7 +878,7 @@ const HomeworkDetailsModal: React.FC<{
                   }
                 }
               }, []);
-              
+
               return (
                 <div className="bg-gray-50 rounded-lg overflow-hidden">
                   {/* Tab navigation */}
@@ -908,7 +908,7 @@ const HomeworkDetailsModal: React.FC<{
                       Тест
                     </button>
                   </div>
-                  
+
                   {/* Tab content */}
                   <div className="p-4">
                     {/* Lecture tab */}
@@ -924,7 +924,7 @@ const HomeworkDetailsModal: React.FC<{
                         )}
                       </div>
                     )}
-                    
+
                     {/* Video tab */}
                     {activeTab === 'video' && (
                       <div>
@@ -932,9 +932,9 @@ const HomeworkDetailsModal: React.FC<{
                           <>
                             <h5 className="font-medium mb-2">Видео материал</h5>
                             <div className="aspect-w-16 aspect-h-9">
-                              <iframe 
-                                src={homework.material.videoUrl} 
-                                className="w-full h-64 rounded" 
+                              <iframe
+                                src={homework.material.videoUrl}
+                                className="w-full h-64 rounded"
                                 allowFullScreen
                                 title="Video material"
                               ></iframe>
@@ -945,16 +945,16 @@ const HomeworkDetailsModal: React.FC<{
                         )}
                       </div>
                     )}
-                    
+
                     {/* Presentation tab */}
                     {activeTab === 'presentation' && (
                       <div>
                         {homework.material.presentationUrl ? (
                           <>
                             <h5 className="font-medium mb-2">Презентация</h5>
-                            <a 
-                              href={homework.material.presentationUrl} 
-                              target="_blank" 
+                            <a
+                              href={homework.material.presentationUrl}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center text-blue-600 hover:underline"
                             >
@@ -967,7 +967,7 @@ const HomeworkDetailsModal: React.FC<{
                         )}
                       </div>
                     )}
-                    
+
                     {/* Quiz tab */}
                     {activeTab === 'quiz' && (
                       <div>
@@ -975,12 +975,12 @@ const HomeworkDetailsModal: React.FC<{
                           <>
                             <h5 className="font-medium mb-2">Тест: {homework.material.Quiz.name}</h5>
                             <p className="mb-2 text-gray-700">{homework.material.Quiz.description}</p>
-                            
+
                             <div className="space-y-4 mt-3">
                               {homework.material.Quiz.questions.map((question, idx) => (
                                 <div key={question.id} className="border border-gray-200 p-3 rounded">
                                   <p className="font-medium mb-2">{idx + 1}. {question.question}</p>
-                                  
+
                                   {question.answers && (
                                     <div className="pl-4 space-y-1">
                                       {question.answers.map((answer) => (
@@ -1168,7 +1168,7 @@ const HomeworkPage: React.FC = () => {
   });
 
   // Extract groups and syllabuses from the payload
-  const userGroups = payload?.profile?.group || payload?.profile?.groups || [];
+  const userGroups = payload?.profile?.groups || [payload?.profile?.group] || [];
   const userSyllabuses = payload?.profile?.Syllabus || [];
 
   // Set default filters when payload changes
