@@ -10,10 +10,11 @@ interface LessonCard {
   id: string | number;
   title: string;
   description: string;
-  hasVideo: boolean;
-  hasPresentation: boolean;
-  hasTest: boolean;
   scheduledDate?: string;
+  hasVideo?: boolean;
+  hasPresentation?: boolean;
+  hasTest?: boolean;
+  homework?: { id: number; name: string };
 }
 
 interface TestQuestion {
@@ -57,21 +58,18 @@ const StudyPlanDetailPage: React.FC = () => {
   // Transform API data to match our component state format
   const studyPlan = studyPlanData ? {
     subject: studyPlanData.subject,
-    // Extract class info - if available in description or elsewhere
     class: studyPlanData.description?.split(',')[0] || '- -',
-    // Format teacher name
     teacher: `${studyPlanData.teacher.name} ${studyPlanData.teacher.surname}`,
-    // Count lessons
     totalLessons: studyPlanData.lessons.length,
-    // Transform lessons
-    lessons: studyPlanData.lessons.map((lesson: Lesson) => ({
+    lessons: studyPlanData.lessons.map((lesson: any) => ({
       id: lesson.id,
-      title: lesson.title,
+      title: lesson.name,
       description: lesson.description,
-      hasVideo: lesson.hasVideo,
-      hasPresentation: lesson.hasPresentation,
-      hasTest: lesson.hasTest,
-      scheduledDate: lesson.scheduledDate,
+      scheduledDate: lesson.date,
+      hasVideo: false,
+      hasPresentation: false,
+      hasTest: !!lesson.homework,
+      homework: lesson.homework,
     }))
   } : null;
 
@@ -457,6 +455,11 @@ const StudyPlanDetailPage: React.FC = () => {
                     )}
                   </div>
                   <p className="text-gray-600 mt-2">{lesson.description}</p>
+                  {lesson.homework && (
+                    <div className="mt-2 text-green-700 text-sm">
+                      Домашнее задание: {lesson.homework.name}
+                    </div>
+                  )}
                 </div>
                 <div className="flex space-x-4">
                   {lesson.hasVideo && (
