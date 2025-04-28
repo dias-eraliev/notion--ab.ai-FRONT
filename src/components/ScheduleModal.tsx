@@ -1,22 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaTimes } from 'react-icons/fa';
-import { ClassroomDto } from '../api/classrooms.api';
-import { TeacherDto } from '../api/teachers.api';
-import { GroupDto } from '../api/groups.api';
-import { CreateScheduleDto, ScheduleDto } from '../api/schedule.api';
-import { LessonDto } from '../api/educational-plans.api';
+import { FaTimes, FaSpinner } from 'react-icons/fa';
 
 interface ScheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (scheduleItem: CreateScheduleDto) => void;
-  schedule?: ScheduleDto;
-  classrooms: ClassroomDto[];
-  teachers: TeacherDto[];
-  groups: GroupDto[];
-  lessons: LessonDto[];
-  selectedPlanId?: number;
+  onSave: (scheduleItem: any) => void;
+  schedule?: any;
+  classrooms: any[];
+  teachers: any[];
+  groups: any[];
+  studyPlans: any[];
+  selectedGroupId?: number;
   isLoading?: boolean;
 }
 
@@ -25,92 +20,37 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
   onClose,
   onSave,
   schedule,
-  classrooms,
-  teachers,
-  groups,
-  lessons,
-  selectedPlanId,
+  classrooms = [],
+  teachers = [],
+  groups = [],
+  studyPlans = [],
+  selectedGroupId,
   isLoading = false
 }) => {
-  const [formData, setFormData] = useState<Partial<CreateScheduleDto>>({
+  const [formData, setFormData] = useState({
     day: 'monday',
     startTime: '08:00',
     endTime: '08:45',
-    subject: '',
-    teacherId: '',
+    subject: 'Математика',
     type: 'lesson',
     repeat: 'weekly',
-    classroomId: 0,
-    groupId: 0,
-    lessonId: 0
+    classroomId: 101,
+    groupId: selectedGroupId || 1,
+    lessonId: 1,
+    teacherId: '1'
   });
 
-  useEffect(() => {
-    if (schedule) {
-      setFormData({
-        day: schedule.day,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-        subject: schedule.subject,
-        teacherId: schedule.teacherId,
-        type: schedule.type,
-        repeat: schedule.repeat,
-        comment: schedule.comment,
-        classroomId: schedule.classroomId,
-        groupId: schedule.groupId,
-        lessonId: schedule.lessonId || 0
-      });
-    } else if (groups && groups.length > 0) {
-      // Set default group when adding new schedule
-      setFormData(prevFormData => ({
-        ...prevFormData,
-        groupId: groups[0].id
-      }));
-    }
-
-    // Set default lesson if available
-    if (lessons && lessons.length > 0 && !schedule) {
-      setFormData(prevFormData => ({
-        ...prevFormData,
-        lessonId: lessons[0].id,
-        subject: lessons[0].name // Set the subject from the lesson
-      }));
-    }
-  }, [schedule, groups, lessons]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
-    if (name === 'lessonId' && value) {
-      const selectedLesson = lessons.find(lesson => lesson.id === Number(value));
-      if (selectedLesson) {
-        setFormData({
-          ...formData,
-          lessonId: Number(value),
-          subject: selectedLesson.name // Auto-update subject when lesson changes
-        });
-      }
-    } else {
-      setFormData({
-        ...formData,
-        [name]: name === 'classroomId' || name === 'groupId' || name === 'lessonId' ? Number(value) : value
-      });
-    }
+    setFormData({
+      ...formData,
+      [name]: value
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Ensure all required fields have proper values before saving
-    const dataToSave = {
-      ...formData,
-      groupId: formData.groupId || (groups && groups.length > 0 ? groups[0].id : 0),
-      classroomId: Number(formData.classroomId) || 0,
-      lessonId: Number(formData.lessonId) || 0
-    } as CreateScheduleDto;
-
-    onSave(dataToSave);
-    onClose();
+    onSave(formData);
   };
 
   if (!isOpen) return null;
@@ -160,13 +100,13 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
               </label>
               <select
                 name="groupId"
-                value={formData.groupId || ''}
+                value={formData.groupId}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
               >
                 <option value="">Выберите группу</option>
-                {groups?.map(group => (
+                {groups.map(group => (
                   <option key={group.id} value={group.id}>
                     {group.name}
                   </option>
@@ -206,65 +146,63 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Занятие (из учебного плана)
+              Предмет
             </label>
-            <select
-              name="lessonId"
-              value={formData.lessonId || ''}
+            <input
+              type="text"
+              name="subject"
+              value={formData.subject}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
-            >
-              <option value="">Выберите занятие</option>
-              {lessons?.map(lesson => (
-                <option key={lesson.id} value={lesson.id}>
-                  {lesson.name}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Преподаватель
-              </label>
-              <select
-                name="teacherId"
-                value={formData.teacherId || ''}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              >
-                <option value="">Выберите преподавателя</option>
-                {teachers?.map(teacher => (
-                  <option key={teacher.id} value={teacher.id}>
-                    {teacher.surname} {teacher.name}
-                  </option>
-                ))}
-              </select>
-            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Аудитория
               </label>
               <select
                 name="classroomId"
-                value={formData.classroomId || ''}
+                value={formData.classroomId}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
               >
                 <option value="">Выберите аудиторию</option>
-                {classrooms?.map(classroom => (
-                  <option
-                    key={classroom.id}
-                    value={classroom.id}
-                    disabled={!classroom.isFree && formData.classroomId !== classroom.id}
-                  >
-                    {classroom.name} {!classroom.isFree && formData.classroomId !== classroom.id ? '(занято)' : ''}
-                  </option>
-                ))}
+                {classrooms.length > 0 ? (
+                  classrooms.map(classroom => (
+                    <option key={classroom.id} value={classroom.id}>
+                      {classroom.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="101">101</option>
+                )}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Преподаватель
+              </label>
+              <select
+                name="teacherId"
+                value={formData.teacherId}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              >
+                <option value="">Выберите преподавателя</option>
+                {teachers.length > 0 ? (
+                  teachers.map(teacher => (
+                    <option key={teacher.id} value={teacher.id}>
+                      {teacher.surname} {teacher.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="1">Иванов И.И.</option>
+                )}
               </select>
             </div>
           </div>
@@ -279,6 +217,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
                 value={formData.type}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
               >
                 <option value="lesson">Урок</option>
                 <option value="consultation">Консультация</option>
@@ -294,10 +233,11 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
                 value={formData.repeat}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
               >
                 <option value="weekly">Еженедельно</option>
-                <option value="biweekly">Раз в 2 недели</option>
-                <option value="once">Единожды</option>
+                <option value="biweekly">Раз в две недели</option>
+                <option value="once">Однократно</option>
               </select>
             </div>
           </div>
@@ -308,28 +248,29 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
             </label>
             <textarea
               name="comment"
-              value={formData.comment || ''}
-              onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
               rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              onChange={handleChange}
               placeholder="Дополнительная информация о занятии"
             />
           </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className="flex justify-end space-x-2 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              disabled={isLoading}
             >
               Отмена
             </button>
             <button
               type="submit"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
               disabled={isLoading}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-blue-300"
             >
-              {isLoading ? 'Сохранение...' : 'Сохранить'}
+              {isLoading && <FaSpinner className="animate-spin mr-2" />}
+              Сохранить
             </button>
           </div>
         </form>

@@ -25,14 +25,10 @@ export interface LessonDto {
 
 // Pagination interface
 export interface PaginatedDto<T> {
-    items: T[];
-    meta: {
-        totalItems: number;
-        itemCount: number;
-        itemsPerPage: number;
-        totalPages: number;
-        currentPage: number;
-    };
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
 }
 
 // Get all study plans with pagination
@@ -43,8 +39,12 @@ export const useStudyPlans = (page = 1, limit = 10) => {
     );
 
     return {
-        studyPlans: data?.items || [],
-        pagination: data?.meta,
+        studyPlans: data?.data || [],
+        pagination: {
+            total: data?.total || 0,
+            page: data?.page || 0,
+            limit: data?.limit || 0,
+        },
         isLoading: !error && !data,
         isError: error,
         mutate
@@ -54,13 +54,17 @@ export const useStudyPlans = (page = 1, limit = 10) => {
 // Get study plans by group ID
 export const useStudyPlansByGroup = (groupId?: number, page = 1, limit = 10) => {
     const { data, error, mutate } = useSWR<PaginatedDto<SyllabusDto>>(
-        groupId ? `/study-plans?page=${page}&limit=${limit}&groupId=${groupId}` : null,
+        groupId ? `/study-plans/?page=${page}&limit=${limit}` : null,
         fetcher
     );
 
     return {
-        studyPlans: data?.items || [],
-        pagination: data?.meta,
+        studyPlans: data?.data || [],
+        pagination: {
+            total: data?.total || 0,
+            page: data?.page || 0,
+            limit: data?.limit || 0,
+        },
         isLoading: !error && !data,
         isError: error,
         mutate

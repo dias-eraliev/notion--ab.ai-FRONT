@@ -15,6 +15,16 @@ export interface ScheduleDto {
   classroomId: number;
   groupId: number;
   lessonId?: number;
+  // Additional fields for more complete schedule data
+  classroom?: {
+    id: number;
+    name: string;
+    isFree: boolean;
+  };
+  group?: {
+    id: number;
+    name: string;
+  };
 }
 
 export interface CreateScheduleDto {
@@ -33,8 +43,8 @@ export interface CreateScheduleDto {
 
 export interface UpdateScheduleDto extends Partial<CreateScheduleDto> { }
 
-// Get all schedules
-export const useSchedules = () => {
+// Get all schedules (admin view)
+export const useAllSchedules = () => {
   const { data, error, mutate } = useSWR<ScheduleDto[]>('/schedule', fetcher);
 
   return {
@@ -49,6 +59,21 @@ export const useSchedules = () => {
 export const useSchedulesByGroup = (groupId?: number) => {
   const { data, error, mutate } = useSWR<ScheduleDto[]>(
     groupId ? `/schedule?groupId=${groupId}` : null,
+    fetcher
+  );
+
+  return {
+    schedules: data,
+    isLoading: !error && !data,
+    isError: error,
+    mutate
+  };
+};
+
+// Get schedules by teacher ID
+export const useSchedulesByTeacher = (teacherId?: string) => {
+  const { data, error, mutate } = useSWR<ScheduleDto[]>(
+    teacherId ? `/schedule?teacherId=${teacherId}` : null,
     fetcher
   );
 
