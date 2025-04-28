@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import useSWR, { mutate } from 'swr';
 import {
   FaBook,
   FaUpload,
@@ -15,45 +16,137 @@ import {
   FaSearch,
   FaUser,
   FaUsers,
-  FaStar
+  FaStar,
+  FaSpinner
 } from 'react-icons/fa';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, AuthPayload } from '../contexts/AuthContext';
+import { homeworkApi } from '../api';
+import { HomeworkResponse, CreateHomeworkDto } from '../api/homework.api';
+import { toast } from 'react-toastify';
 
+// Updated Homework interface to match backend data structure
 interface Homework {
-  id: string;
-  subjectId: string;
-  subject: string;
-  title: string;
-  description: string;
-  dueDate: string;
+  id: number;
+  name: string;
+  description: string | null;
+  deadline: string | null;
+  date: string | null;
+  createdAt: string;
+  updatedAt: string;
+  lessonId: number;
+  materialId: number | null;
+  // Derived fields
+  status: 'pending' | 'submitted' | 'graded' | 'overdue';
   attachments: {
     id: string;
     name: string;
     type: string;
-    size: number;
   }[];
-  status: 'pending' | 'submitted' | 'graded' | 'overdue';
+  // Lesson info
+  Lesson?: {
+    id: number;
+    name: string;
+    description: string;
+    syllabusId: number;
+    date: string;
+    Syllabus?: {
+      id: number;
+      name: string;
+      description: string;
+      teacherId: number;
+      group?: Array<{
+        id: number;
+        name: string;
+      }>;
+      teacher?: {
+        id: number;
+        name: string;
+        surname: string;
+      };
+    };
+  };
+  // Material info
+  material?: {
+    id: number;
+    name: string;
+    videoUrl: string | null;
+    lecture: string | null;
+    presentationUrl: string | null;
+    quizId: number | null;
+    Quiz?: {
+      id: number;
+      name: string;
+      description: string;
+      questions?: Array<{
+        id: number;
+        question: string;
+        answers?: Array<{
+          id: number;
+          answer: string;
+          isCorrect: boolean;
+        }>;
+      }>;
+    };
+  };
+  // Submission and feedback
   grade?: number;
   feedback?: string;
-  submissionDate?: string;
   submission?: {
     files: {
       id: string;
       name: string;
       type: string;
-      size: number;
     }[];
     comment?: string;
     submittedAt?: string;
   };
-  teacherId: string;
-  teacherName: string;
-  classId: string;
-  createdAt: string;
-  priority: 'high' | 'medium' | 'low';
-  estimatedTime: string;
-  maxScore: number;
 }
+
+// Function to convert backend data to our frontend model
+const mapHomeworkResponseToHomework = (homework: any): Homework => {
+  // Calculate status based on deadline, submissions, etc.
+  let status: Homework['status'] = 'pending';
+  const now = new Date();
+
+  if (homework.deadline) {
+    const deadline = new Date(homework.deadline);
+    if (now > deadline) {
+      status = 'overdue';
+    }
+  }
+
+  // Construct attachments array from various material types
+  const attachments: Homework['attachments'] = [];
+  if (homework.material) {
+    if (homework.material.videoUrl) {
+      attachments.push({
+        id: `video-${homework.material.id}`,
+        name: 'Video',
+        type: 'video'
+      });
+    }
+    if (homework.material.lecture) {
+      attachments.push({
+        id: `lecture-${homework.material.id}`,
+        name: homework.material.name || 'Lecture',
+        type: 'document'
+      });
+    }
+    if (homework.material.presentationUrl) {
+      attachments.push({
+        id: `presentation-${homework.material.id}`,
+        name: 'Presentation',
+        type: 'presentation'
+      });
+    }
+  }
+
+  return {
+    ...homework,
+    status,
+    attachments
+  };
+};
 
 // Компонент для отображения статуса задания
 const StatusBadge: React.FC<{ status: Homework['status'] }> = ({ status }) => {
@@ -94,20 +187,231 @@ const StatusBadge: React.FC<{ status: Homework['status'] }> = ({ status }) => {
   );
 };
 
+interface HomeworkModalData {
+  title: string;
+  description: string;
+  deadline: string;
+  date: string;
+  lessonId: string;
+  groupId: string;
+  studyPlanId: string;
+  materialType: string;
+  materialContent: string;
+  materialUrl: string;
+  hasQuiz: boolean;
+  quizTitle: string;
+  quizDescription: string;
+  questions: Array<{
+    question: string;
+    options: string[];
+    correctOption: number;
+    answers?: Array<{
+      text: string;
+      isCorrect: boolean;
+    }>;
+  }>;
+}
+
+// Fix the formatDate helper to handle null values properly
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) return 'Не указано';
+
+  try {
+    // Cast to any first to bypass TypeScript's strict type checking
+    const date = new Date(dateString as any);
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Неверный формат даты';
+  }
+};
+
+const formatDateShort = (dateString: string | null): string => {
+  if (!dateString) return 'Не указано';
+
+  try {
+    // Cast to any first to bypass TypeScript's strict type checking
+    const date = new Date(dateString as any);
+    return date.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Неверный формат даты';
+  }
+};
+
 // Модальное окно для создания/редактирования задания
 const HomeworkModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: Partial<Homework>) => void;
-  initialData?: Partial<Homework>;
+  onSubmit: (data: any) => void;
+  initialData?: Partial<HomeworkModalData>;
 }> = ({ isOpen, onClose, onSubmit, initialData }) => {
-  const [formData, setFormData] = useState<Partial<Homework>>(initialData || {
+  const { payload } = useAuth();
+
+  // Extract groups and syllabuses from the payload
+  const userGroups = payload?.profile?.group || payload?.profile?.groups || [];
+  const userSyllabuses = payload?.profile?.Syllabus || [];
+
+  // Create a state for lessons based on selected syllabus
+  const [availableLessons, setAvailableLessons] = useState<any[]>([]);
+
+  // Update the initialFormData to match the questions interface
+  const [formData, setFormData] = useState<HomeworkModalData>({
     title: '',
     description: '',
-    dueDate: '',
-    subjectId: '',
-    classId: ''
+    deadline: '',
+    date: '',
+    lessonId: '',
+    groupId: '',
+    studyPlanId: '',
+    materialType: 'text',
+    materialContent: '',
+    materialUrl: '',
+    hasQuiz: false,
+    quizTitle: '',
+    quizDescription: '',
+    questions: [{
+      question: '',
+      options: ['', '', '', ''],
+      correctOption: 0,
+      answers: [
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false }
+      ]
+    }]
   });
+
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // When syllabus changes, fetch available lessons
+  useEffect(() => {
+    if (formData.studyPlanId) {
+      // In a real implementation, you would fetch lessons for the selected studyPlan
+      // For now, we'll simulate with mock data
+      setAvailableLessons([
+        { id: 1, name: 'Урок 1: Введение' },
+        { id: 2, name: 'Урок 2: Основные концепции' },
+        { id: 3, name: 'Урок 3: Практическое применение' }
+      ]);
+    } else {
+      setAvailableLessons([]);
+    }
+  }, [formData.studyPlanId]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFiles(Array.from(e.target.files));
+    }
+  };
+
+  const handleQuestionChange = (index: number, field: string, value: any) => {
+    const newQuestions = [...formData.questions];
+    newQuestions[index] = { ...newQuestions[index], [field]: value };
+    setFormData({ ...formData, questions: newQuestions });
+  };
+
+  const handleOptionChange = (questionIndex: number, optionIndex: number, value: string) => {
+    const newQuestions = [...formData.questions];
+    const newOptions = [...newQuestions[questionIndex].options];
+    newOptions[optionIndex] = value;
+    newQuestions[questionIndex] = { ...newQuestions[questionIndex], options: newOptions };
+    setFormData({ ...formData, questions: newQuestions });
+  };
+
+  const addQuestion = () => {
+    setFormData({
+      ...formData,
+      questions: [...formData.questions, {
+        question: '', options: ['', '', '', ''], correctOption: 0, answers: [
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false }
+        ]
+      }]
+    });
+  };
+
+  const removeQuestion = (index: number) => {
+    const newQuestions = [...formData.questions];
+    newQuestions.splice(index, 1);
+    setFormData({ ...formData, questions: newQuestions });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUploading(true);
+
+    try {
+      // Upload files if any
+      let materialUrl = formData.materialUrl;
+
+      if (selectedFiles.length > 0 && formData.materialType) {
+        const file = selectedFiles[0];
+        const response = await homeworkApi.uploadFile(file);
+        materialUrl = response.data.url;
+      }
+
+      // Prepare data for submission based on backend structure
+      const homeworkData: Partial<CreateHomeworkDto> = {
+        Lesson: {
+          connect: {
+            id: parseInt(formData.lessonId)
+          }
+        },
+        name: formData.title,
+        description: formData.description,
+        deadline: formData.deadline,
+        date: formData.date
+      };
+
+      // Add material if appropriate
+      if (formData.materialType || materialUrl) {
+        homeworkData.material = {
+          create: {
+            type: formData.materialType,
+            content: formData.materialContent,
+            url: materialUrl
+          }
+        };
+
+        // Add quiz if enabled
+        if (formData.hasQuiz && homeworkData.material?.create) {
+          homeworkData.material.create.Quiz = {
+            create: {
+              title: formData.quizTitle,
+              description: formData.quizDescription,
+              questions: {
+                create: formData.questions.map(q => ({
+                  question: q.question,
+                  options: q.options,
+                  correctOption: q.correctOption
+                }))
+              }
+            }
+          };
+        }
+      }
+
+      onSubmit(homeworkData);
+    } catch (error) {
+      console.error('Error submitting homework:', error);
+      toast.error('Ошибка при создании задания');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -117,7 +421,7 @@ const HomeworkModal: React.FC<{
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[600px] max-h-[80vh] overflow-y-auto"
+        className="bg-white rounded-lg p-6 w-[700px] max-h-[80vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">
@@ -128,10 +432,7 @@ const HomeworkModal: React.FC<{
           </button>
         </div>
 
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          onSubmit(formData);
-        }}>
+        <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -159,77 +460,269 @@ const HomeworkModal: React.FC<{
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Учебный план
+              </label>
+              <select
+                value={formData.studyPlanId}
+                onChange={(e) => setFormData({ ...formData, studyPlanId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              >
+                <option value="">Выберите учебный план</option>
+                {userSyllabuses.map(syllabus => (
+                  <option key={syllabus.id} value={syllabus.id}>
+                    {syllabus.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Группа
+              </label>
+              <select
+                value={formData.groupId}
+                onChange={(e) => setFormData({ ...formData, groupId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              >
+                <option value="">Выберите группу</option>
+                {userGroups.map(group => (
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Урок
+              </label>
+              <select
+                value={formData.lessonId}
+                onChange={(e) => setFormData({ ...formData, lessonId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+                disabled={!formData.studyPlanId}
+              >
+                <option value="">Выберите урок</option>
+                {availableLessons.map(lesson => (
+                  <option key={lesson.id} value={lesson.id}>
+                    {lesson.name}
+                  </option>
+                ))}
+              </select>
+              {!formData.studyPlanId && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Сначала выберите учебный план
+                </p>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Предмет
+                  Дата создания
                 </label>
-                <select
-                  value={formData.subjectId}
-                  onChange={(e) => setFormData({ ...formData, subjectId: e.target.value })}
+                <input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
-                >
-                  <option value="">Выберите предмет</option>
-                  <option value="math">Математика</option>
-                  <option value="physics">Физика</option>
-                  <option value="chemistry">Химия</option>
-                  <option value="biology">Биология</option>
-                </select>
+                />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Класс
+                  Срок сдачи
                 </label>
-                <select
-                  value={formData.classId}
-                  onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
+                <input
+                  type="datetime-local"
+                  value={formData.deadline}
+                  onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
-                >
-                  <option value="">Выберите класс</option>
-                  <option value="10A">10A</option>
-                  <option value="10B">10B</option>
-                  <option value="11A">11A</option>
-                  <option value="11B">11B</option>
-                </select>
+                />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Срок сдачи
+                Тип материала
               </label>
-              <input
-                type="datetime-local"
-                value={formData.dueDate}
-                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+              <select
+                value={formData.materialType}
+                onChange={(e) => setFormData({ ...formData, materialType: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              />
+              >
+                <option value="">Без материала</option>
+                <option value="document">Документ</option>
+                <option value="video">Видео</option>
+                <option value="presentation">Презентация</option>
+                <option value="link">Ссылка</option>
+              </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Прикрепить файлы
-              </label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div className="space-y-1 text-center">
-                  <FaUpload className="mx-auto h-12 w-12 text-gray-400" />
-                  <div className="flex text-sm text-gray-600">
-                    <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
-                      <span>Загрузить файлы</span>
-                      <input type="file" className="sr-only" multiple />
-                    </label>
-                    <p className="pl-1">или перетащите их сюда</p>
+            {formData.materialType === 'link' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  URL материала
+                </label>
+                <input
+                  type="url"
+                  value={formData.materialUrl}
+                  onChange={(e) => setFormData({ ...formData, materialUrl: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="https://example.com/resource"
+                />
+              </div>
+            )}
+
+            {['document', 'video', 'presentation'].includes(formData.materialType) && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Загрузить файл
+                </label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                  <div className="space-y-1 text-center">
+                    <FaUpload className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="flex text-sm text-gray-600">
+                      <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                        <span>Загрузить файл</span>
+                        <input
+                          type="file"
+                          className="sr-only"
+                          onChange={handleFileChange}
+                        />
+                      </label>
+                      <p className="pl-1">или перетащите его сюда</p>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {formData.materialType === 'document' ? 'PDF, DOCX до 10MB' :
+                        formData.materialType === 'video' ? 'MP4, AVI до 100MB' :
+                          'PPT, PPTX до 20MB'}
+                    </p>
+                    {selectedFiles.length > 0 && (
+                      <div className="mt-2 text-sm text-gray-900">
+                        Выбрано: {selectedFiles[0].name} ({(selectedFiles[0].size / 1024 / 1024).toFixed(2)} MB)
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG, PDF до 10MB
-                  </p>
                 </div>
               </div>
+            )}
+
+            <div className="flex items-center space-x-2 mt-4">
+              <input
+                type="checkbox"
+                id="hasQuiz"
+                checked={formData.hasQuiz}
+                onChange={(e) => setFormData({ ...formData, hasQuiz: e.target.checked })}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="hasQuiz" className="text-sm font-medium text-gray-700">
+                Добавить тест
+              </label>
             </div>
+
+            {formData.hasQuiz && (
+              <div className="space-y-4 border-t pt-4">
+                <h4 className="font-medium text-lg">Информация о тесте</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Название теста
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.quizTitle}
+                    onChange={(e) => setFormData({ ...formData, quizTitle: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required={formData.hasQuiz}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Описание теста
+                  </label>
+                  <textarea
+                    value={formData.quizDescription}
+                    onChange={(e) => setFormData({ ...formData, quizDescription: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    rows={2}
+                  />
+                </div>
+
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">Вопросы</h5>
+                    <button
+                      type="button"
+                      onClick={addQuestion}
+                      className="px-3 py-1 bg-blue-100 text-blue-600 rounded-md text-sm hover:bg-blue-200"
+                    >
+                      Добавить вопрос
+                    </button>
+                  </div>
+
+                  {formData.questions.map((question, qIndex) => (
+                    <div key={qIndex} className="border p-4 rounded-md space-y-3">
+                      <div className="flex justify-between">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Вопрос {qIndex + 1}
+                        </label>
+                        {formData.questions.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeQuestion(qIndex)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <FaTimes />
+                          </button>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        value={question.question}
+                        onChange={(e) => handleQuestionChange(qIndex, 'question', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        placeholder="Текст вопроса"
+                        required={formData.hasQuiz}
+                      />
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Варианты ответов
+                        </label>
+                        {question.options.map((option, oIndex) => (
+                          <div key={oIndex} className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              name={`correct-${qIndex}`}
+                              checked={question.correctOption === oIndex}
+                              onChange={() => handleQuestionChange(qIndex, 'correctOption', oIndex)}
+                              className="h-4 w-4 text-blue-600"
+                            />
+                            <input
+                              type="text"
+                              value={option}
+                              onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                              placeholder={`Вариант ${oIndex + 1}`}
+                              required={formData.hasQuiz}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-6 flex justify-end space-x-2">
@@ -237,14 +730,23 @@ const HomeworkModal: React.FC<{
               type="button"
               onClick={onClose}
               className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              disabled={isUploading}
             >
               Отмена
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center space-x-1"
+              disabled={isUploading}
             >
-              Сохранить
+              {isUploading ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  <span>Загрузка...</span>
+                </>
+              ) : (
+                <span>Сохранить</span>
+              )}
             </button>
           </div>
         </form>
@@ -253,102 +755,6 @@ const HomeworkModal: React.FC<{
   );
 };
 
-// Добавим больше тестовых данных
-const mockHomeworks: Homework[] = [
-  {
-    id: '1',
-    subjectId: 'math',
-    subject: 'Математика',
-    title: 'Квадратные уравнения',
-    description: 'Решить задачи 1-5 из учебника на странице 42. Обязательно показать полное решение с формулами.',
-    dueDate: '2024-03-15T23:59:59',
-    attachments: [
-      {
-        id: '1',
-        name: 'Примеры_решения.pdf',
-        type: 'application/pdf',
-        size: 1024576
-      }
-    ],
-    status: 'pending',
-    teacherId: 'ivanova',
-    teacherName: 'Иванова Л.М.',
-    classId: '10A',
-    createdAt: '2024-03-10T10:00:00',
-    priority: 'high',
-    estimatedTime: '45',
-    maxScore: 10
-  },
-  {
-    id: '2',
-    subjectId: 'physics',
-    subject: 'Физика',
-    title: 'Законы Ньютона',
-    description: 'Подготовить презентацию по трем законам Ньютона. Включить практические примеры из жизни.',
-    dueDate: '2024-03-18T23:59:59',
-    attachments: [
-      {
-        id: '2',
-        name: 'Требования_к_презентации.docx',
-        type: 'application/docx',
-        size: 512000
-      }
-    ],
-    status: 'submitted',
-    teacherId: 'petrov',
-    teacherName: 'Петров А.С.',
-    classId: '10A',
-    createdAt: '2024-03-08T11:30:00',
-    priority: 'medium',
-    estimatedTime: '90',
-    maxScore: 15,
-    submission: {
-      files: [
-        {
-          id: 'sub1',
-          name: 'Законы_Ньютона_Презентация.pptx',
-          type: 'application/pptx',
-          size: 2048576
-        }
-      ],
-      comment: 'Презентация готова, добавил анимации для наглядности',
-      submittedAt: '2024-03-15T14:30:00'
-    }
-  },
-  {
-    id: '3',
-    subjectId: 'chemistry',
-    subject: 'Химия',
-    title: 'Периодическая система элементов',
-    description: 'Выучить первые 20 элементов таблицы Менделеева, их свойства и применение.',
-    dueDate: '2024-03-20T23:59:59',
-    attachments: [
-      {
-        id: '3',
-        name: 'Таблица_Менделеева.pdf',
-        type: 'application/pdf',
-        size: 2048576
-      },
-      {
-        id: '4',
-        name: 'Конспект_урока.pdf',
-        type: 'application/pdf',
-        size: 1048576
-      }
-    ],
-    status: 'graded',
-    grade: 5,
-    feedback: 'Отличная работа! Особенно хорошо раскрыты практические применения элементов.',
-    teacherId: 'smirnova',
-    teacherName: 'Смирнова Е.В.',
-    classId: '10A',
-    createdAt: '2024-03-05T09:15:00',
-    priority: 'medium',
-    estimatedTime: '60',
-    maxScore: 5
-  }
-];
-
 // Обновленное модальное окно для просмотра задания
 const HomeworkDetailsModal: React.FC<{
   isOpen: boolean;
@@ -356,13 +762,14 @@ const HomeworkDetailsModal: React.FC<{
   homework: Homework;
   onSubmit?: (files: File[], comment: string) => void;
 }> = ({ isOpen, onClose, homework, onSubmit }) => {
-  const { payload: { role } } = useAuth();
+  const { payload } = useAuth();
   const [comment, setComment] = useState('');
   const [files, setFiles] = useState<File[]>([]);
 
   const getTimeRemaining = () => {
     const now = new Date();
-    const due = new Date(homework.dueDate);
+    if (!homework.deadline) return 'Срок не установлен';
+    const due = new Date(homework.deadline);
     const diff = due.getTime() - now.getTime();
 
     if (diff < 0) return 'Срок сдачи истек';
@@ -386,19 +793,19 @@ const HomeworkDetailsModal: React.FC<{
       >
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">{homework.title}</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{homework.name}</h3>
             <div className="flex items-center space-x-4 text-sm text-gray-500">
               <span className="flex items-center">
                 <FaBook className="mr-1" />
-                {homework.subject}
+                {homework.Lesson?.name || 'Урок'}
               </span>
               <span className="flex items-center">
                 <FaUser className="mr-1" />
-                {homework.teacherName}
+                {homework.Lesson?.Syllabus?.teacher?.name}
               </span>
               <span className="flex items-center">
                 <FaUsers className="mr-1" />
-                Класс {homework.classId}
+                {homework.Lesson?.Syllabus?.group?.map(g => g.name).join(', ') || 'Группа'}
               </span>
             </div>
           </div>
@@ -407,34 +814,25 @@ const HomeworkDetailsModal: React.FC<{
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-blue-50 p-4 rounded-lg">
             <div className="text-sm text-gray-500 mb-1">Срок сдачи</div>
             <div className="font-medium text-blue-700">
-              {new Date(homework.dueDate).toLocaleString()}
+              {homework.deadline ? new Date(homework.deadline).toLocaleString() : 'Срок не установлен'}
             </div>
             <div className="text-sm text-blue-600 mt-1">
               Осталось: {getTimeRemaining()}
             </div>
           </div>
 
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <div className="text-sm text-gray-500 mb-1">Приоритет</div>
-            <div className="font-medium text-purple-700">
-              {homework.priority === 'high' ? 'Высокий' :
-                homework.priority === 'medium' ? 'Средний' : 'Низкий'}
-            </div>
-            <div className="text-sm text-purple-600 mt-1">
-              Примерное время: {homework.estimatedTime} мин
-            </div>
-          </div>
-
           <div className="bg-green-50 p-4 rounded-lg">
             <div className="text-sm text-gray-500 mb-1">Статус</div>
             <StatusBadge status={homework.status} />
-            <div className="text-sm text-green-600 mt-1">
-              Макс. баллов: {homework.maxScore}
-            </div>
+            {homework.grade && (
+              <div className="text-sm text-green-600 mt-1">
+                Оценка: {homework.grade}
+              </div>
+            )}
           </div>
         </div>
 
@@ -444,6 +842,176 @@ const HomeworkDetailsModal: React.FC<{
             {homework.description}
           </div>
         </div>
+
+        {/* Display material content */}
+        {homework.material && (
+          <div className="prose max-w-none mb-6">
+            <h4 className="text-lg font-medium mb-2">Материал урока</h4>
+
+            {/* Tab implementation */}
+            {(() => {
+              const [activeTab, setActiveTab] = useState('lecture');
+              
+              // Count available tabs
+              const hasMaterial = {
+                lecture: !!homework.material.lecture,
+                video: !!homework.material.videoUrl,
+                presentation: !!homework.material.presentationUrl,
+                quiz: !!(homework.material.Quiz && homework.material.Quiz.questions && homework.material.Quiz.questions.length > 0)
+              };
+              
+              // If no tabs are available, show the no materials message
+              if (!Object.values(hasMaterial).some(Boolean)) {
+                return (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-gray-600 italic">Нет дополнительных материалов</p>
+                  </div>
+                );
+              }
+              
+              // Set the first available tab as active
+              useEffect(() => {
+                for (const [key, value] of Object.entries(hasMaterial)) {
+                  if (value) {
+                    setActiveTab(key);
+                    break;
+                  }
+                }
+              }, []);
+              
+              return (
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  {/* Tab navigation */}
+                  <div className="flex border-b">
+                    <button
+                      className={`px-4 py-2 text-sm font-medium ${activeTab === 'lecture' ? 'bg-white border-blue-500 text-blue-600 border-b-2' : 'text-gray-600 hover:text-gray-800'}`}
+                      onClick={() => setActiveTab('lecture')}
+                    >
+                      Текст
+                    </button>
+                    <button
+                      className={`px-4 py-2 text-sm font-medium ${activeTab === 'video' ? 'bg-white border-blue-500 text-blue-600 border-b-2' : 'text-gray-600 hover:text-gray-800'}`}
+                      onClick={() => setActiveTab('video')}
+                    >
+                      Видео
+                    </button>
+                    <button
+                      className={`px-4 py-2 text-sm font-medium ${activeTab === 'presentation' ? 'bg-white border-blue-500 text-blue-600 border-b-2' : 'text-gray-600 hover:text-gray-800'}`}
+                      onClick={() => setActiveTab('presentation')}
+                    >
+                      Презентация
+                    </button>
+                    <button
+                      className={`px-4 py-2 text-sm font-medium ${activeTab === 'quiz' ? 'bg-white border-blue-500 text-blue-600 border-b-2' : 'text-gray-600 hover:text-gray-800'}`}
+                      onClick={() => setActiveTab('quiz')}
+                    >
+                      Тест
+                    </button>
+                  </div>
+                  
+                  {/* Tab content */}
+                  <div className="p-4">
+                    {/* Lecture tab */}
+                    {activeTab === 'lecture' && (
+                      <div>
+                        {homework.material.lecture ? (
+                          <>
+                            <h5 className="font-medium mb-2">{homework.material.name || "Текстовый материал"}</h5>
+                            <div className="whitespace-pre-wrap">{homework.material.lecture}</div>
+                          </>
+                        ) : (
+                          <p className="text-gray-600 italic">Текстовый материал недоступен</p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Video tab */}
+                    {activeTab === 'video' && (
+                      <div>
+                        {homework.material.videoUrl ? (
+                          <>
+                            <h5 className="font-medium mb-2">Видео материал</h5>
+                            <div className="aspect-w-16 aspect-h-9">
+                              <iframe 
+                                src={homework.material.videoUrl} 
+                                className="w-full h-64 rounded" 
+                                allowFullScreen
+                                title="Video material"
+                              ></iframe>
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-gray-600 italic">Видео материал недоступен</p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Presentation tab */}
+                    {activeTab === 'presentation' && (
+                      <div>
+                        {homework.material.presentationUrl ? (
+                          <>
+                            <h5 className="font-medium mb-2">Презентация</h5>
+                            <a 
+                              href={homework.material.presentationUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center text-blue-600 hover:underline"
+                            >
+                              <FaDownload className="mr-2" />
+                              Скачать презентацию
+                            </a>
+                          </>
+                        ) : (
+                          <p className="text-gray-600 italic">Презентация недоступна</p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Quiz tab */}
+                    {activeTab === 'quiz' && (
+                      <div>
+                        {homework.material.Quiz && homework.material.Quiz.questions && homework.material.Quiz.questions.length > 0 ? (
+                          <>
+                            <h5 className="font-medium mb-2">Тест: {homework.material.Quiz.name}</h5>
+                            <p className="mb-2 text-gray-700">{homework.material.Quiz.description}</p>
+                            
+                            <div className="space-y-4 mt-3">
+                              {homework.material.Quiz.questions.map((question, idx) => (
+                                <div key={question.id} className="border border-gray-200 p-3 rounded">
+                                  <p className="font-medium mb-2">{idx + 1}. {question.question}</p>
+                                  
+                                  {question.answers && (
+                                    <div className="pl-4 space-y-1">
+                                      {question.answers.map((answer) => (
+                                        <div key={answer.id} className="flex items-center">
+                                          <input
+                                            type="radio"
+                                            id={`answer-${answer.id}`}
+                                            name={`question-${question.id}`}
+                                            className="mr-2"
+                                            disabled
+                                          />
+                                          <label htmlFor={`answer-${answer.id}`}>{answer.answer}</label>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-gray-600 italic">Тест недоступен</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
 
         {homework.attachments.length > 0 && (
           <div className="mb-6">
@@ -459,7 +1027,7 @@ const HomeworkDetailsModal: React.FC<{
                     <div>
                       <div className="font-medium">{file.name}</div>
                       <div className="text-sm text-gray-500">
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                        {file.type}
                       </div>
                     </div>
                   </div>
@@ -472,7 +1040,7 @@ const HomeworkDetailsModal: React.FC<{
           </div>
         )}
 
-        {(role === 'student' && homework.status === 'pending') && (
+        {(payload?.role === 'student' && homework.status === 'pending') && (
           <div className="border-t pt-6">
             <h4 className="text-lg font-medium mb-4">Сдать задание</h4>
             <div className="space-y-4">
@@ -551,7 +1119,7 @@ const HomeworkDetailsModal: React.FC<{
                       <div>
                         <div className="font-medium">{file.name}</div>
                         <div className="text-sm text-gray-500">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                          {file.type}
                         </div>
                       </div>
                     </div>
@@ -565,25 +1133,20 @@ const HomeworkDetailsModal: React.FC<{
           </div>
         )}
 
-        {homework.grade && (
+        {homework.grade && homework.feedback && (
           <div className="border-t pt-6">
             <h4 className="text-lg font-medium mb-4">Оценка</h4>
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-2xl font-bold text-green-600">
-                    {homework.grade} из {homework.maxScore}
-                  </div>
-                  <div className="text-sm text-green-600">
-                    {(homework.grade / homework.maxScore * 100).toFixed(0)}%
+                    {homework.grade}
                   </div>
                 </div>
-                {homework.feedback && (
-                  <div className="flex-1 ml-6">
-                    <div className="text-sm text-gray-500 mb-1">Комментарий преподавателя</div>
-                    <div>{homework.feedback}</div>
-                  </div>
-                )}
+                <div className="flex-1 ml-6">
+                  <div className="text-sm text-gray-500 mb-1">Комментарий преподавателя</div>
+                  <div>{homework.feedback}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -594,67 +1157,133 @@ const HomeworkDetailsModal: React.FC<{
 };
 
 const HomeworkPage: React.FC = () => {
-  const { payload: { role } } = useAuth();
+  const { payload } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
   const [filters, setFilters] = useState({
-    subject: '',
     status: '',
-    search: ''
+    search: '',
+    groupId: null as number | null,
+    studyPlanId: null as number | null
   });
 
-  // Функция фильтрации заданий в зависимости от роли
+  // Extract groups and syllabuses from the payload
+  const userGroups = payload?.profile?.group || payload?.profile?.groups || [];
+  const userSyllabuses = payload?.profile?.Syllabus || [];
+
+  // Set default filters when payload changes
+  useEffect(() => {
+    if (payload?.role) {
+      // Initialize with default filters based on role
+      if (payload.role === 'student' && payload.profile && payload.profile.group && payload.profile.group[0]) {
+        // Student sees only their own group's homework
+        setFilters(prev => ({
+          ...prev,
+          groupId: payload.profile?.group?.[0]?.id || null,
+        }));
+      }
+      // For teachers with assigned syllabuses
+      else if (payload.role === 'teacher' && userSyllabuses.length > 0) {
+        setFilters(prev => ({
+          ...prev,
+          studyPlanId: userSyllabuses[0].id,
+          // If syllabus has groups, set first group as default
+          groupId: userSyllabuses[0].group && userSyllabuses[0].group.length > 0
+            ? userSyllabuses[0].group[0].id
+            : null
+        }));
+      }
+    }
+  }, [payload, userGroups, userSyllabuses]);
+
+  // Fetch homework data using SWR
+  const { data: homeworkData, error, isLoading } = useSWR(
+    filters.groupId && filters.studyPlanId
+      ? `/homework?groupId=${filters.groupId}&studyPlanId=${filters.studyPlanId}`
+      : null,
+    () => filters.groupId && filters.studyPlanId
+      ? homeworkApi.getAll(Number(filters.groupId), Number(filters.studyPlanId))
+      : null
+  );
+
+  // Create, update and delete homework
+  const createHomework = async (data: any) => {
+    try {
+      await homeworkApi.create(data);
+      toast.success('Задание успешно создано');
+      // Revalidate the data
+      mutate(`/homework?groupId=${filters.groupId}&studyPlanId=${filters.studyPlanId}`);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error creating homework:', error);
+      toast.error('Ошибка при создании задания');
+    }
+  };
+
+  const updateHomework = async (id: number, data: any) => {
+    try {
+      await homeworkApi.update(id, data);
+      toast.success('Задание успешно обновлено');
+      // Revalidate the data
+      mutate(`/homework?groupId=${filters.groupId}&studyPlanId=${filters.studyPlanId}`);
+    } catch (error) {
+      console.error('Error updating homework:', error);
+      toast.error('Ошибка при обновлении задания');
+    }
+  };
+
+  const deleteHomework = async (id: number) => {
+    try {
+      await homeworkApi.delete(id);
+      toast.success('Задание успешно удалено');
+      // Revalidate the data
+      mutate(`/homework?groupId=${filters.groupId}&studyPlanId=${filters.studyPlanId}`);
+    } catch (error) {
+      console.error('Error deleting homework:', error);
+      toast.error('Ошибка при удалении задания');
+    }
+  };
+
+  // Function to filter homeworks
   const getFilteredHomeworks = () => {
-    let filtered = [...mockHomeworks];
-
-    // Фильтрация по роли
-    switch (role) {
-      case 'student':
-        // Студент видит только свои задания
-        filtered = filtered.filter(hw => hw.classId === '10A'); // В реальном приложении фильтруем по ID студента
-        break;
-      case 'parent':
-        // Родитель видит задания своего ребенка
-        filtered = filtered.filter(hw => hw.classId === '10A'); // В реальном приложении фильтруем по ID ребенка
-        break;
-      case 'teacher':
-        // Учитель видит задания, которые он создал
-        filtered = filtered.filter(hw => hw.teacherId === 'ivanova');
-        break;
-      case 'admin':
-        // Администратор видит все задания
-        break;
+    if (isLoading) return [];
+    if (error) {
+      console.error('Error loading homework:', error);
+      return [];
     }
 
-    // Применяем фильтры
-    if (filters.subject) {
-      filtered = filtered.filter(hw => hw.subjectId === filters.subject);
-    }
+    let homeworks: Homework[] = homeworkData ?
+      homeworkData.map(mapHomeworkResponseToHomework) :
+      [];
+
+    // Apply status filter if selected
     if (filters.status) {
-      filtered = filtered.filter(hw => hw.status === filters.status);
+      homeworks = homeworks.filter(hw => hw.status === filters.status);
     }
+
+    // Apply search filter
     if (filters.search) {
       const search = filters.search.toLowerCase();
-      filtered = filtered.filter(hw =>
-        hw.title.toLowerCase().includes(search) ||
-        hw.description.toLowerCase().includes(search)
+      homeworks = homeworks.filter(hw =>
+        hw.name.toLowerCase().includes(search) ||
+        (hw.description?.toLowerCase() || '').includes(search)
       );
     }
 
-    return filtered;
+    return homeworks;
   };
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
-          {role === 'student' ? 'Мои задания' :
-            role === 'parent' ? 'Задания ребенка' :
-              role === 'teacher' ? 'Управление заданиями' :
+          {payload?.role === 'student' ? 'Мои задания' :
+            payload?.role === 'parent' ? 'Задания ребенка' :
+              payload?.role === 'teacher' ? 'Управление заданиями' :
                 'Все задания'}
         </h1>
 
-        {(role === 'teacher' || role === 'admin') && (
+        {(payload?.role === 'teacher' || payload?.role === 'admin') && (
           <button
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
@@ -666,17 +1295,27 @@ const HomeworkPage: React.FC = () => {
       </div>
 
       {/* Фильтры */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         <select
-          value={filters.subject}
-          onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
+          value={filters.groupId?.toString() || ''}
+          onChange={(e) => setFilters({ ...filters, groupId: e.target.value ? Number(e.target.value) : null })}
           className="w-full px-4 py-2 border border-gray-200 rounded-md"
         >
-          <option value="">Все предметы</option>
-          <option value="math">Математика</option>
-          <option value="physics">Физика</option>
-          <option value="chemistry">Химия</option>
-          <option value="biology">Биология</option>
+          <option value="">Все группы</option>
+          {userGroups.map(group => (
+            <option key={group.id} value={group.id}>{group.name}</option>
+          ))}
+        </select>
+
+        <select
+          value={filters.studyPlanId?.toString() || ''}
+          onChange={(e) => setFilters({ ...filters, studyPlanId: e.target.value ? Number(e.target.value) : null })}
+          className="w-full px-4 py-2 border border-gray-200 rounded-md"
+        >
+          <option value="">Все учебные планы</option>
+          {userSyllabuses.map(syllabus => (
+            <option key={syllabus.id} value={syllabus.id}>{syllabus.name}</option>
+          ))}
         </select>
 
         <select
@@ -703,55 +1342,92 @@ const HomeworkPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Loading state */}
+      {isLoading && (
+        <div className="flex justify-center items-center py-10">
+          <FaSpinner className="animate-spin text-blue-500 mr-2" />
+          <span>Загрузка заданий...</span>
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && !isLoading && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          <strong className="font-bold">Ошибка!</strong>
+          <span className="block sm:inline"> Не удалось загрузить задания. Пожалуйста, попробуйте позже.</span>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!isLoading && !error && getFilteredHomeworks().length === 0 && (
+        <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-10 rounded text-center">
+          <FaExclamationTriangle className="mx-auto text-gray-400 text-4xl mb-4" />
+          <h3 className="text-xl font-medium mb-2">Нет доступных заданий</h3>
+          <p className="text-gray-600">
+            {filters.search || filters.status
+              ? 'Попробуйте изменить параметры фильтрации'
+              : 'Задания еще не были созданы'}
+          </p>
+        </div>
+      )}
+
       {/* Список заданий */}
-      <div className="space-y-4">
-        {getFilteredHomeworks().map(homework => (
-          <div
-            key={homework.id}
-            className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center mb-2">
-                  <span className="text-sm font-medium text-gray-500 mr-2">
-                    {homework.subject}
-                  </span>
-                  <StatusBadge status={homework.status} />
-                  {homework.priority === 'high' && (
-                    <span className="ml-2 px-2 py-1 bg-red-100 text-red-600 text-xs rounded-full">
-                      Важное
+      {!isLoading && !error && getFilteredHomeworks().length > 0 && (
+        <div className="space-y-4">
+          {getFilteredHomeworks().map(homework => (
+            <div
+              key={homework.id}
+              className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center mb-2">
+                    <span className="text-sm font-medium text-gray-500 mr-2">
+                      {homework.Lesson?.Syllabus?.name}
                     </span>
-                  )}
+                    <StatusBadge status={homework.status} />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">{homework.name}</h3>
+                  <p className="text-gray-600 line-clamp-2 mb-4">{homework.description}</p>
+                  <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <span className="flex items-center">
+                      <FaClock className="mr-1" />
+                      Срок: {homework.deadline ? new Date(homework.deadline).toLocaleDateString() : 'Срок не установлен'}
+                    </span>
+                    {homework.grade && (
+                      <span className="flex items-center text-green-600">
+                        <FaStar className="mr-1" />
+                        Оценка: {homework.grade}
+                      </span>
+                    )}
+                    <span className="flex items-center">
+                      <FaUser className="mr-1" />
+                      {homework.Lesson?.Syllabus?.teacher?.name}
+                    </span>
+                  </div>
                 </div>
-                <h3 className="text-lg font-medium mb-2">{homework.title}</h3>
-                <p className="text-gray-600 line-clamp-2 mb-4">{homework.description}</p>
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <span className="flex items-center">
-                    <FaClock className="mr-1" />
-                    Срок: {new Date(homework.dueDate).toLocaleDateString()}
-                  </span>
-                  {homework.grade && (
-                    <span className="flex items-center text-green-600">
-                      <FaStar className="mr-1" />
-                      Оценка: {homework.grade}/{homework.maxScore}
-                    </span>
-                  )}
-                  <span className="flex items-center">
-                    <FaUser className="mr-1" />
-                    {homework.teacherName}
-                  </span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setSelectedHomework(homework)}
+                    className="px-4 py-2 text-blue-500 hover:bg-blue-50 rounded-md"
+                  >
+                    Подробнее
+                  </button>
+                  {(payload.role === 'admin' ||
+                    (payload.role === 'teacher' && homework.Lesson?.Syllabus?.teacher?.id === payload.id)) && (
+                      <button
+                        onClick={() => deleteHomework(homework.id)}
+                        className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-md"
+                      >
+                        Удалить
+                      </button>
+                    )}
                 </div>
               </div>
-              <button
-                onClick={() => setSelectedHomework(homework)}
-                className="px-4 py-2 text-blue-500 hover:bg-blue-50 rounded-md ml-4"
-              >
-                Подробнее
-              </button>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Модальные окна */}
       <AnimatePresence>
@@ -759,10 +1435,7 @@ const HomeworkPage: React.FC = () => {
           <HomeworkModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            onSubmit={(data) => {
-              console.log('New homework:', data);
-              setIsModalOpen(false);
-            }}
+            onSubmit={createHomework}
           />
         )}
         {selectedHomework && (

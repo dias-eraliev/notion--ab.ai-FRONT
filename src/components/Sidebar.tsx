@@ -38,212 +38,7 @@ import {
   FaUserSecret
 } from 'react-icons/fa';
 import { SidebarLink } from './SidebarLink';
-
-// Объект со всеми ссылками и секциями
-const sidebarLinks = {
-  main: [
-    {
-      to: '/',
-      icon: <FaHome />,
-      label: 'Главная',
-      type: 'SidebarLink'
-    }
-  ],
-  app: [
-    {
-      to: '/app/chat',
-      icon: <FaComments />,
-      label: 'Чат',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/app/ai-chat',
-      icon: <FaRobot />,
-      label: 'AI чат',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/app/calendar',
-      icon: <FaCalendar />,
-      label: 'Календарь',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/app/tasks',
-      icon: <FaListUl />,
-      label: 'Список дел',
-      type: 'SidebarLink'
-    },
-    {
-      to: "/app/neuro-abai",
-      icon: <FaBrain />,
-      label: 'UIB College Ai',
-      type: 'SidebarLink'
-    }
-  ],
-  study: [
-    {
-      to: '/academic/journal',
-      icon: <FaBook className="w-4 h-4 mr-3" />,
-      label: 'Учебный журнал',
-      type: 'Link'
-    },
-    {
-      to: '/academic/schedule',
-      icon: <FaCalendarAlt className="w-4 h-4 mr-3" />,
-      label: 'Расписание',
-      type: 'Link'
-    },
-    {
-      to: '/academic/homework',
-      icon: <FaBookOpen className="w-4 h-4 mr-3" />,
-      label: 'Домашние задания',
-      type: 'Link'
-    },
-    {
-      to: '/academic/classrooms',
-      icon: <FaBuilding className="w-4 h-4 mr-3" />,
-      label: 'Аудитории и секции',
-      type: 'Link'
-    },
-    {
-      to: '/study-plans',
-      icon: <FaBook className="w-4 h-4 mr-3" />,
-      label: 'Учебные планы',
-      type: 'Link'
-    }
-  ],
-  students: [
-    {
-      to: '/students',
-      icon: <FaUserGraduate className="w-4 h-4 mr-3" />,
-      label: 'Списки учащихся',
-      type: 'Link'
-    },
-    {
-      to: '/performance',
-      icon: <FaChartLine className="w-4 h-4 mr-3" />,
-      label: 'Успеваемость',
-      type: 'Link'
-    },
-    {
-      to: '/students/emotional-analysis',
-      icon: <FaSmile className="w-4 h-4 mr-3" />,
-      label: 'Эмоциональный анализ',
-      type: 'Link'
-    }
-  ],
-  hr: [
-    {
-      to: '/hr/employees',
-      icon: <FaUserTie className="w-4 h-4 mr-3" />,
-      label: 'Сотрудники и преподаватели',
-      type: 'Link'
-    },
-    {
-      to: '/hr/workload',
-      icon: <FaClipboardList className="w-4 h-4 mr-3" />,
-      label: 'Нагрузки и расписание ставок',
-      type: 'Link',
-    },
-    {
-      to: '/hr/kpi',
-      icon: <FaChartLine className="w-4 h-4 mr-3" />,
-      label: 'KPI и эффективность',
-      type: 'Link',
-    },
-    {
-      to: '/hr/vacation',
-      icon: <FaUmbrellaBeach className="w-4 h-4 mr-3" />,
-      label: 'Отпуска и замены',
-      type: 'Link',
-    },
-    {
-      to: '/hr/fake-positions',
-      icon: <FaUserSecret className="w-4 h-4 mr-3" />,
-      label: 'Контроль фиктивных ставок (AI)',
-      type: 'Link',
-    }
-  ],
-  finance: [
-    {
-      to: '/finance/payments',
-      icon: <FaMoneyBillWave />,
-      label: 'Оплаты и задолженности',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/finance/reports',
-      icon: <FaFileAlt />,
-      label: 'Финансовые отчеты',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/finance/budget',
-      icon: <FaChartBar />,
-      label: 'Бюджет и прогноз',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/finance/payroll',
-      icon: <FaUserTie />,
-      label: 'Управление зарплатой',
-      type: 'SidebarLink'
-    }
-  ],
-  erp: [
-    {
-      to: '/app/erp/inventory',
-      icon: <FaBarcode />,
-      label: 'Digital инвентаризация',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/app/erp/supply',
-      icon: <FaShoppingCart />,
-      label: 'Запросы на снабжение',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/app/erp/security',
-      icon: <FaShieldAlt />,
-      label: 'Безопасность',
-      type: 'SidebarLink'
-    }
-  ],
-  settings: [
-    {
-      to: '/settings/users',
-      icon: <FaUsers />,
-      label: 'Пользователи',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/settings/permissions',
-      icon: <FaLock />,
-      label: 'Права доступа',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/settings/integrations',
-      icon: <FaPlug />,
-      label: 'Интеграции',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/settings/branding',
-      icon: <FaPalette />,
-      label: 'Брендинг',
-      type: 'SidebarLink'
-    },
-    {
-      to: '/settings/system',
-      icon: <FaCogs />,
-      label: 'Система',
-      type: 'SidebarLink'
-    }
-  ]
-};
+import { useAuth } from '../contexts/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({
@@ -251,12 +46,223 @@ export const Sidebar: React.FC = () => {
     students: false,
     hr: false,
     finance: false,
-    analytics: false,
-    settings: false,
-    erp: false
+    erp: false,
+    settings: false
   });
 
   const [isAppOpen, setIsAppOpen] = useState(false);
+  const { payload } = useAuth();
+  const userRole = payload?.role || 'STUDENT';
+
+  // Only teachers and admins can see classrooms
+  const canSeeClassrooms = ['TEACHER', 'ADMIN'].includes(userRole);
+
+  // Объект со всеми ссылками и секциями
+  const sidebarLinks = {
+    main: [
+      {
+        to: '/',
+        icon: <FaHome />,
+        label: 'Главная',
+        type: 'SidebarLink'
+      }
+    ],
+    app: [
+      {
+        to: '/app/chat',
+        icon: <FaComments />,
+        label: 'Чат',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/app/ai-chat',
+        icon: <FaRobot />,
+        label: 'AI чат',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/app/calendar',
+        icon: <FaCalendar />,
+        label: 'Календарь',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/app/tasks',
+        icon: <FaListUl />,
+        label: 'Список дел',
+        type: 'SidebarLink'
+      },
+      {
+        to: "/app/neuro-abai",
+        icon: <FaBrain />,
+        label: 'UIB College Ai',
+        type: 'SidebarLink'
+      }
+    ],
+    study: [
+      {
+        to: '/academic/journal',
+        icon: <FaBook className="w-4 h-4 mr-3" />,
+        label: 'Учебный журнал',
+        type: 'Link'
+      },
+      {
+        to: '/academic/schedule',
+        icon: <FaCalendarAlt className="w-4 h-4 mr-3" />,
+        label: 'Расписание',
+        type: 'Link'
+      },
+      {
+        to: '/academic/homework',
+        icon: <FaBookOpen className="w-4 h-4 mr-3" />,
+        label: 'Домашние задания',
+        type: 'Link'
+      },
+      // Only show classrooms for teachers and admins
+      ...(canSeeClassrooms ? [{
+        to: '/academic/classrooms',
+        icon: <FaBuilding className="w-4 h-4 mr-3" />,
+        label: 'Аудитории и секции',
+        type: 'Link'
+      }] : []),
+      {
+        to: '/study-plans',
+        icon: <FaBook className="w-4 h-4 mr-3" />,
+        label: 'Учебные планы',
+        type: 'Link'
+      }
+    ],
+    students: [
+      {
+        to: '/students',
+        icon: <FaUserGraduate className="w-4 h-4 mr-3" />,
+        label: 'Списки учащихся',
+        type: 'Link'
+      },
+      {
+        to: '/performance',
+        icon: <FaChartLine className="w-4 h-4 mr-3" />,
+        label: 'Успеваемость',
+        type: 'Link'
+      },
+      {
+        to: '/students/emotional-analysis',
+        icon: <FaSmile className="w-4 h-4 mr-3" />,
+        label: 'Эмоциональный анализ',
+        type: 'Link'
+      }
+    ],
+    hr: [
+      {
+        to: '/hr/employees',
+        icon: <FaUserTie className="w-4 h-4 mr-3" />,
+        label: 'Сотрудники и преподаватели',
+        type: 'Link'
+      },
+      {
+        to: '/hr/workload',
+        icon: <FaClipboardList className="w-4 h-4 mr-3" />,
+        label: 'Нагрузки и расписание ставок',
+        type: 'Link',
+      },
+      {
+        to: '/hr/kpi',
+        icon: <FaChartLine className="w-4 h-4 mr-3" />,
+        label: 'KPI и эффективность',
+        type: 'Link',
+      },
+      {
+        to: '/hr/vacation',
+        icon: <FaUmbrellaBeach className="w-4 h-4 mr-3" />,
+        label: 'Отпуска и замены',
+        type: 'Link',
+      },
+      {
+        to: '/hr/fake-positions',
+        icon: <FaUserSecret className="w-4 h-4 mr-3" />,
+        label: 'Контроль фиктивных ставок (AI)',
+        type: 'Link',
+      }
+    ],
+    finance: [
+      {
+        to: '/finance/payments',
+        icon: <FaMoneyBillWave />,
+        label: 'Оплаты и задолженности',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/finance/reports',
+        icon: <FaFileAlt />,
+        label: 'Финансовые отчеты',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/finance/budget',
+        icon: <FaChartBar />,
+        label: 'Бюджет и прогноз',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/finance/payroll',
+        icon: <FaUserTie />,
+        label: 'Управление зарплатой',
+        type: 'SidebarLink'
+      }
+    ],
+    erp: [
+      {
+        to: '/app/erp/inventory',
+        icon: <FaBarcode />,
+        label: 'Digital инвентаризация',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/app/erp/supply',
+        icon: <FaShoppingCart />,
+        label: 'Запросы на снабжение',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/app/erp/security',
+        icon: <FaShieldAlt />,
+        label: 'Безопасность',
+        type: 'SidebarLink'
+      }
+    ],
+    settings: [
+      {
+        to: '/settings/users',
+        icon: <FaUsers />,
+        label: 'Пользователи',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/settings/permissions',
+        icon: <FaLock />,
+        label: 'Права доступа',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/settings/integrations',
+        icon: <FaPlug />,
+        label: 'Интеграции',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/settings/branding',
+        icon: <FaPalette />,
+        label: 'Брендинг',
+        type: 'SidebarLink'
+      },
+      {
+        to: '/settings/system',
+        icon: <FaCogs />,
+        label: 'Система',
+        type: 'SidebarLink'
+      }
+    ]
+  };
 
   const toggleExpand = (key: string) => {
     setExpandedItems(prev => ({

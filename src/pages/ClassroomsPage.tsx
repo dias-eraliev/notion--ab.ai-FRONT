@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FaPlus,
@@ -9,9 +9,13 @@ import {
   FaTimesCircle,
   FaTools,
   FaFileExport,
-  FaChartBar
+  FaChartBar,
+  FaSpinner
 } from 'react-icons/fa';
 import ClassroomModal from '../components/ClassroomModal';
+import CreateClassroomModal from '../components/CreateClassroomModal';
+import { useClassrooms, ClassroomDto, ClassroomUIModel, mapApiClassroomToUI } from '../api/classrooms.api';
+import { useAuth } from '../contexts/AuthContext';
 
 // Типы данных
 type RoomType = 'lecture' | 'computer' | 'laboratory' | 'conference' | 'cabinet';
@@ -54,389 +58,188 @@ interface Classroom {
   documents: ClassroomDocument[];
 }
 
-// Временные данные для примера
-const INITIAL_CLASSROOMS: Classroom[] = [
-  {
-    id: '1',
-    number: '301',
-    name: 'Лекционный зал',
-    type: 'lecture',
-    capacity: 120,
-    status: 'free',
-    equipment: [
-      { name: 'Проектор', status: true },
-      { name: 'Микрофон', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Сатенов Е.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-29',
-    documents: [
-      { type: 'act', name: 'Акт приёма-передачи', url: '/docs/act-301.pdf' }
-    ]
-  },
-  {
-    id: '2',
-    number: '405',
-    name: 'IT-класс',
-    type: 'computer',
-    capacity: 25,
-    status: 'occupied',
-    equipment: [
-      { name: 'ПК', quantity: 25, status: true },
-      { name: 'AR-доска', status: true },
-      { name: 'Проектор', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Иванова Лариса', role: 'Основной' },
-      { name: 'Асылхан Т.', role: 'Техник' }
-    ],
-    lastUpdate: '2025-03-27',
-    documents: [
-      { type: 'act', name: 'Акт приёма-передачи', url: '/docs/act-405.pdf' },
-      { type: 'manual', name: 'Инструкция по ТБ', url: '/docs/manual-405.pdf' }
-    ]
-  },
-  {
-    id: '3',
-    number: '201',
-    name: 'Химическая лаборатория',
-    type: 'laboratory',
-    capacity: 30,
-    status: 'free',
-    equipment: [
-      { name: 'Вытяжной шкаф', status: true },
-      { name: 'Лабораторные столы', quantity: 15, status: true },
-      { name: 'Микроскопы', quantity: 10, status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Петров В.А.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-28',
-    documents: [
-      { type: 'safety', name: 'Инструкция по безопасности', url: '/docs/safety-201.pdf' }
-    ]
-  },
-  {
-    id: '4',
-    number: '302',
-    name: 'Конференц-зал',
-    type: 'conference',
-    capacity: 80,
-    status: 'occupied',
-    equipment: [
-      { name: 'Проектор 4K', status: true },
-      { name: 'Звуковая система', status: true },
-      { name: 'Микрофоны', quantity: 4, status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Ахметов Р.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-26',
-    documents: []
-  },
-  {
-    id: '5',
-    number: '401',
-    name: 'Кабинет физики',
-    type: 'laboratory',
-    capacity: 35,
-    status: 'maintenance',
-    equipment: [
-      { name: 'Демонстрационный стол', status: true },
-      { name: 'Физические приборы', status: false },
-      { name: 'Интерактивная доска', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Смирнова Н.П.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-25',
-    documents: []
-  },
-  {
-    id: '6',
-    number: '202',
-    name: 'Лингафонный кабинет',
-    type: 'computer',
-    capacity: 20,
-    status: 'free',
-    equipment: [
-      { name: 'Аудио система', status: true },
-      { name: 'Компьютеры', quantity: 20, status: true },
-      { name: 'Наушники', quantity: 20, status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Кузнецова М.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-24',
-    documents: []
-  },
-  {
-    id: '7',
-    number: '303',
-    name: 'Малый конференц-зал',
-    type: 'conference',
-    capacity: 40,
-    status: 'free',
-    equipment: [
-      { name: 'ТВ панель', status: true },
-      { name: 'Система конференц-связи', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Попов К.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-23',
-    documents: []
-  },
-  {
-    id: '8',
-    number: '404',
-    name: 'Компьютерный класс',
-    type: 'computer',
-    capacity: 30,
-    status: 'occupied',
-    equipment: [
-      { name: 'ПК', quantity: 30, status: true },
-      { name: 'Проектор', status: true },
-      { name: '3D-принтер', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Морозов Д.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-22',
-    documents: []
-  },
-  {
-    id: '9',
-    number: '203',
-    name: 'Биологическая лаборатория',
-    type: 'laboratory',
-    capacity: 25,
-    status: 'free',
-    equipment: [
-      { name: 'Микроскопы', quantity: 15, status: true },
-      { name: 'Холодильник', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Соколова Е.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-21',
-    documents: []
-  },
-  {
-    id: '10',
-    number: '304',
-    name: 'Лекционная аудитория',
-    type: 'lecture',
-    capacity: 90,
-    status: 'free',
-    equipment: [
-      { name: 'Проектор', status: true },
-      { name: 'Экран', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Волков И.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-20',
-    documents: []
-  },
-  {
-    id: '11',
-    number: '402',
-    name: 'Мультимедийный класс',
-    type: 'computer',
-    capacity: 25,
-    status: 'free',
-    equipment: [
-      { name: 'Графические планшеты', quantity: 25, status: true },
-      { name: 'ПК', quantity: 25, status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Козлов А.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-19',
-    documents: []
-  },
-  {
-    id: '12',
-    number: '204',
-    name: 'Кабинет робототехники',
-    type: 'laboratory',
-    capacity: 20,
-    status: 'occupied',
-    equipment: [
-      { name: 'Наборы робототехники', quantity: 10, status: true },
-      { name: 'ПК', quantity: 10, status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Новиков П.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-18',
-    documents: []
-  },
-  {
-    id: '13',
-    number: '305',
-    name: 'Лекционный зал',
-    type: 'lecture',
-    capacity: 150,
-    status: 'free',
-    equipment: [
-      { name: 'Проектор', status: true },
-      { name: 'Звуковая система', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Федоров М.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-17',
-    documents: []
-  },
-  {
-    id: '14',
-    number: '403',
-    name: 'VR-лаборатория',
-    type: 'laboratory',
-    capacity: 15,
-    status: 'maintenance',
-    equipment: [
-      { name: 'VR-шлемы', quantity: 15, status: false },
-      { name: 'ПК', quantity: 15, status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Григорьев С.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-16',
-    documents: []
-  },
-  {
-    id: '15',
-    number: '205',
-    name: 'Кабинет искусств',
-    type: 'cabinet',
-    capacity: 30,
-    status: 'free',
-    equipment: [
-      { name: 'Мольберты', quantity: 15, status: true },
-      { name: 'Проектор', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Андреева К.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-15',
-    documents: []
-  },
-  {
-    id: '16',
-    number: '306',
-    name: 'Математический кабинет',
-    type: 'cabinet',
-    capacity: 35,
-    status: 'occupied',
-    equipment: [
-      { name: 'Интерактивная доска', status: true },
-      { name: 'Проектор', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Борисов Н.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-14',
-    documents: []
-  },
-  {
-    id: '17',
-    number: '406',
-    name: 'Серверная',
-    type: 'computer',
-    capacity: 10,
-    status: 'maintenance',
-    equipment: [
-      { name: 'Серверные стойки', quantity: 5, status: true },
-      { name: 'Система охлаждения', status: false }
-    ],
-    responsiblePersons: [
-      { name: 'Романов В.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-13',
-    documents: []
-  },
-  {
-    id: '18',
-    number: '206',
-    name: 'Лаборатория электроники',
-    type: 'laboratory',
-    capacity: 20,
-    status: 'free',
-    equipment: [
-      { name: 'Паяльные станции', quantity: 10, status: true },
-      { name: 'Осциллографы', quantity: 5, status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Макаров Д.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-12',
-    documents: []
-  },
-  {
-    id: '19',
-    number: '307',
-    name: 'Медиатека',
-    type: 'computer',
-    capacity: 40,
-    status: 'free',
-    equipment: [
-      { name: 'ПК', quantity: 20, status: true },
-      { name: 'Планшеты', quantity: 20, status: true },
-      { name: 'Проектор', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Степанова О.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-11',
-    documents: []
-  },
-  {
-    id: '20',
-    number: '407',
-    name: 'Конференц-зал премиум',
-    type: 'conference',
-    capacity: 100,
-    status: 'free',
-    equipment: [
-      { name: 'Видеостена', status: true },
-      { name: 'Система звукоусиления', status: true },
-      { name: 'Система видеоконференций', status: true }
-    ],
-    responsiblePersons: [
-      { name: 'Захаров И.', role: 'Основной' }
-    ],
-    lastUpdate: '2025-03-10',
-    documents: []
-  }
-];
+// Map API data to UI model
+const mapApiClassroomsToUi = (apiClassrooms: ClassroomDto[]): Classroom[] => {
+  return apiClassrooms.map(classroom => ({
+    id: classroom.id.toString(),
+    number: classroom.id.toString(), // Using ID as number temporarily
+    name: classroom.name,
+    type: determineRoomType(classroom.type),
+    capacity: classroom.capacity || 0,
+    status: classroom.isFree ? 'free' : 'occupied',
+    equipment: classroom.equipment?.map(eq => ({
+      name: eq.name,
+      quantity: eq.quantity,
+      status: eq.isAvailable
+    })) || [],
+    responsiblePersons: classroom.responsibleStaff
+      ? [{
+        name: `${classroom.responsibleStaff.name} ${classroom.responsibleStaff.surname}`,
+        role: 'Основной'
+      }]
+      : [],
+    lastUpdate: formatDate(classroom.updatedAt),
+    documents: classroom.documents?.map(doc => ({
+      type: doc.type,
+      name: doc.name,
+      url: doc.url
+    })) || [],
+    schedule: classroom.schedule?.map(sch => ({
+      day: sch.day,
+      timeStart: sch.startTime,
+      timeEnd: sch.endTime,
+      status: sch.type
+    }))
+  }));
+};
+
+// Helper functions
+const determineRoomType = (type?: string): RoomType => {
+  if (!type) return 'cabinet';
+  if (type.includes('lecture')) return 'lecture';
+  if (type.includes('lab')) return 'laboratory';
+  if (type.includes('computer')) return 'computer';
+  if (type.includes('conference')) return 'conference';
+  return 'cabinet';
+};
+
+const formatDate = (dateString?: string): string => {
+  if (!dateString) return '—';
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+};
 
 const ClassroomsPage: React.FC = () => {
-  const [classrooms, setClassrooms] = useState<Classroom[]>(INITIAL_CLASSROOMS);
-  const [selectedClassroom, setSelectedClassroom] = useState<Classroom | null>(null);
+  // State for UI
+  const [selectedClassroom, setSelectedClassroom] = useState<ClassroomUIModel | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     type: '',
     status: '',
-    equipment: ''
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Функция фильтрации аудиторий
-  const filteredClassrooms = classrooms.filter(room => {
-    const matchesType = !filters.type || room.type === filters.type;
-    const matchesStatus = !filters.status || room.status === filters.status;
-    const matchesEquipment = !filters.equipment || 
-      room.equipment.some(eq => eq.name.toLowerCase().includes(filters.equipment.toLowerCase()));
-    
-    return matchesType && matchesStatus && matchesEquipment;
+    equipment: '',
+    search: ''
   });
 
-  const handleRowClick = (classroom: Classroom) => {
+  // Auth data
+  const { payload } = useAuth();
+  const isAdmin = payload?.role === 'ADMIN';
+  const canEdit = isAdmin || payload?.role === 'TEACHER';
+
+  // Fetch data
+  const { classrooms, isLoading, isError, mutate } = useClassrooms();
+
+  // Map API data to UI models
+  const classroomsUI = useMemo(() => {
+    if (!classrooms) return [];
+    return classrooms.map(classroom => mapApiClassroomToUI(classroom));
+  }, [classrooms]);
+
+  // Filter classrooms based on filters
+  const filteredClassrooms = useMemo(() => {
+    return classroomsUI.filter(room => {
+      // Type filter
+      if (filters.type && room.type !== filters.type) {
+        return false;
+      }
+
+      // Status filter
+      if (filters.status && room.status !== filters.status) {
+        return false;
+      }
+
+      // Equipment filter
+      if (filters.equipment && !room.equipment.some(eq =>
+        eq.name.toLowerCase().includes(filters.equipment.toLowerCase())
+      )) {
+        return false;
+      }
+
+      // Search filter - check name, number, or building
+      if (filters.search) {
+        const searchTerm = filters.search.toLowerCase();
+        return (
+          room.name.toLowerCase().includes(searchTerm) ||
+          room.number.toLowerCase().includes(searchTerm) ||
+          room.building.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      return true;
+    });
+  }, [classroomsUI, filters]);
+
+  // Handle row click
+  const handleRowClick = (classroom: ClassroomUIModel) => {
     setSelectedClassroom(classroom);
   };
+
+  // Handle export
+  const handleExport = () => {
+    // Create CSV content
+    const headers = ['ID', 'Название', 'Тип', 'Вместимость', 'Статус', 'Корпус', 'Этаж', 'Проектор', 'Компьютеры'];
+    const rows = classroomsUI.map(room => [
+      room.id,
+      room.name,
+      room.type === 'lecture' ? 'Лекционный' :
+        room.type === 'laboratory' ? 'Лаборатория' : 'Семинар',
+      room.capacity.toString(),
+      room.status === 'free' ? 'Свободна' :
+        room.status === 'occupied' ? 'Занята' : 'В ремонте',
+      room.building,
+      room.floor.toString(),
+      room.hasProjector ? 'Да' : 'Нет',
+      room.hasComputers ? 'Да' : 'Нет'
+    ]);
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `classrooms_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Reset filters
+  const resetFilters = () => {
+    setFilters({
+      type: '',
+      status: '',
+      equipment: '',
+      search: ''
+    });
+  };
+
+  // Loading and error states
+  if (isLoading) {
+    return (
+      <div className="p-6 h-screen flex items-center justify-center">
+        <div className="text-center">
+          <FaSpinner className="animate-spin text-blue-500 mx-auto mb-4 text-3xl" />
+          <p className="text-gray-600">Загрузка данных об аудиториях...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6 text-center">
+        <div className="bg-red-100 text-red-700 p-4 rounded-lg inline-block">
+          <p className="font-medium">Ошибка при загрузке данных</p>
+          <p className="text-sm mt-1">Пожалуйста, попробуйте обновить страницу или обратитесь к администратору</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
@@ -444,15 +247,17 @@ const ClassroomsPage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Аудитории</h1>
         <div className="flex space-x-2">
+          {canEdit && (
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
+            >
+              <FaPlus className="mr-2" />
+              Добавить аудиторию
+            </button>
+          )}
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
-          >
-            <FaPlus className="mr-2" />
-            Добавить аудиторию
-          </button>
-          <button
-            onClick={() => {/* Добавить логику экспорта */}}
+            onClick={handleExport}
             className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center"
           >
             <FaFileExport className="mr-2" />
@@ -461,117 +266,152 @@ const ClassroomsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Панель фильтров */}
+      {/* Поиск и фильтры */}
       <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <div className="grid grid-cols-4 gap-4">
-          <div>
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Поиск аудитории..."
+                value={filters.search}
+                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
+              />
+              <FaSearch className="absolute left-3 top-3 text-gray-400" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 md:w-2/3">
             <select
               value={filters.type}
               onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="px-3 py-2 border border-gray-300 rounded-md"
             >
               <option value="">Тип помещения</option>
               <option value="lecture">Лекционный</option>
-              <option value="computer">Компьютерный</option>
               <option value="laboratory">Лаборатория</option>
-              <option value="conference">Конференц-зал</option>
-              <option value="cabinet">Кабинет</option>
+              <option value="seminar">Кабинет/Зал</option>
             </select>
-          </div>
-          <div>
+
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="px-3 py-2 border border-gray-300 rounded-md"
             >
               <option value="">Статус</option>
               <option value="free">Свободна</option>
               <option value="occupied">Занята</option>
               <option value="maintenance">В ремонте</option>
             </select>
+
+            <button
+              onClick={resetFilters}
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Сбросить
+            </button>
           </div>
-          <div>
-            <input
-              type="text"
-              placeholder="Поиск по оснащению..."
-              value={filters.equipment}
-              onChange={(e) => setFilters({ ...filters, equipment: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-          <button
-            onClick={() => setFilters({ type: '', status: '', equipment: '' })}
-            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            Сбросить фильтры
-          </button>
         </div>
       </div>
 
       {/* Таблица аудиторий */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">№</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Вместимость</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Оснащение</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ответственный</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Обновлено</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredClassrooms.map((room) => (
-              <tr
-                key={room.id}
-                onClick={() => handleRowClick(room)}
-                className="hover:bg-gray-50 cursor-pointer"
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{room.number}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{room.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {room.type === 'lecture' ? 'Лекционный' :
-                   room.type === 'computer' ? 'Компьютерный' :
-                   room.type === 'laboratory' ? 'Лаборатория' :
-                   room.type === 'conference' ? 'Конференц-зал' : 'Кабинет'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{room.capacity} чел.</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    room.status === 'free' ? 'bg-green-100 text-green-800' :
-                    room.status === 'occupied' ? 'bg-red-100 text-red-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {room.status === 'free' ? '🟢 Свободна' :
-                     room.status === 'occupied' ? '🔴 Занята' : '🔧 В ремонте'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {room.equipment.map(eq => eq.name + (eq.quantity ? ` × ${eq.quantity}` : '')).join(', ')}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {room.responsiblePersons[0].name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{room.lastUpdate}</td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">№</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Корпус</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Вместимость</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Оснащение</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Обновлено</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredClassrooms.length > 0 ? (
+                filteredClassrooms.map((room) => (
+                  <tr
+                    key={room.id}
+                    onClick={() => handleRowClick(room)}
+                    className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{room.number}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{room.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {room.type === 'lecture' ? 'Лекционный' :
+                        room.type === 'laboratory' ? 'Лаборатория' : 'Кабинет/Зал'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {room.building}, этаж {room.floor}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{room.capacity} чел.</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${room.status === 'free' ? 'bg-green-100 text-green-800' :
+                        room.status === 'occupied' ? 'bg-red-100 text-red-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                        {room.status === 'free' ? '🟢 Свободна' :
+                          room.status === 'occupied' ? '🔴 Занята' : '🔧 В ремонте'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="flex items-center space-x-1">
+                        {room.hasProjector && <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Проектор</span>}
+                        {room.hasComputers && <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded">Компьютеры</span>}
+                        {room.equipment.length > 0 && (
+                          <span className="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded">
+                            +{room.equipment.length} предм.
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{room.lastUpdate}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
+                    <p className="text-lg">Аудитории не найдены</p>
+                    <p className="text-sm mt-1">Попробуйте изменить параметры фильтрации</p>
+                    <button
+                      onClick={resetFilters}
+                      className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    >
+                      Сбросить фильтры
+                    </button>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Модальное окно */}
+      {/* Модальные окна */}
       <AnimatePresence>
         {selectedClassroom && (
           <ClassroomModal
             isOpen={selectedClassroom !== null}
             classroom={selectedClassroom}
             onClose={() => setSelectedClassroom(null)}
+            onMutate={mutate}
           />
         )}
       </AnimatePresence>
+
+      {/* Create Classroom Modal */}
+      <CreateClassroomModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => {
+          mutate();
+          setIsCreateModalOpen(false);
+        }}
+      />
     </div>
   );
 };

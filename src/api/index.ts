@@ -43,4 +43,8 @@ api.interceptors.response.use(
     }
 );
 
+// Import homework API directly
+import homeworkApi from './homework.api';
+export { homeworkApi };
+
 export default api;
