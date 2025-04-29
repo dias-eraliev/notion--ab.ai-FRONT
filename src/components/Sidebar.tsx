@@ -169,7 +169,7 @@ export const Sidebar: React.FC = () => {
           icon: <FaBuilding className="w-4 h-4 mr-3" />,
           label: 'Аудитории и секции',
           type: 'Link',
-          roles: ['ADMIN'] // Только ADMIN
+          roles: ['ADMIN', "TEACHER"] // Только ADMIN
         },
         {
           to: '/study-plans',
