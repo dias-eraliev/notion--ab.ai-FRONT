@@ -51,7 +51,7 @@ const BrandingPage: React.FC = () => {
 
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2 space-y-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold mb-4">Основная информация</h2>
             <div className="space-y-4">
               <div>
@@ -60,7 +60,7 @@ const BrandingPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded-sm"
                   value={settings.schoolName}
                   onChange={(e) => handleColorChange('schoolName', e.target.value)}
                 />
@@ -79,7 +79,7 @@ const BrandingPage: React.FC = () => {
                     )}
                   </div>
                   <div>
-                    <label className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded cursor-pointer flex items-center gap-2">
+                    <label className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-sm cursor-pointer flex items-center gap-2">
                       <FaUpload />
                       <span>Загрузить логотип</span>
                       <input
@@ -98,7 +98,7 @@ const BrandingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold mb-4">Цветовая схема</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -114,7 +114,7 @@ const BrandingPage: React.FC = () => {
                   />
                   <input
                     type="text"
-                    className="flex-1 p-2 border rounded"
+                    className="flex-1 p-2 border rounded-sm"
                     value={settings.primaryColor}
                     onChange={(e) => handleColorChange('primaryColor', e.target.value)}
                   />
@@ -134,7 +134,7 @@ const BrandingPage: React.FC = () => {
                   />
                   <input
                     type="text"
-                    className="flex-1 p-2 border rounded"
+                    className="flex-1 p-2 border rounded-sm"
                     value={settings.secondaryColor}
                     onChange={(e) => handleColorChange('secondaryColor', e.target.value)}
                   />
@@ -154,7 +154,7 @@ const BrandingPage: React.FC = () => {
                   />
                   <input
                     type="text"
-                    className="flex-1 p-2 border rounded"
+                    className="flex-1 p-2 border rounded-sm"
                     value={settings.accentColor}
                     onChange={(e) => handleColorChange('accentColor', e.target.value)}
                   />
@@ -163,14 +163,14 @@ const BrandingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold mb-4">Типографика</h2>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Основной шрифт
               </label>
               <select
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-sm"
                 value={settings.fontFamily}
                 onChange={(e) => handleColorChange('fontFamily', e.target.value)}
               >
@@ -184,7 +184,7 @@ const BrandingPage: React.FC = () => {
         </div>
 
         <div className="col-span-1">
-          <div className="bg-white rounded-lg shadow p-6 sticky top-6">
+          <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
             <h2 className="text-lg font-semibold mb-4">Предпросмотр</h2>
             <div className="space-y-4">
               <div className="border rounded-lg p-4">
@@ -192,7 +192,7 @@ const BrandingPage: React.FC = () => {
                   {previewLogo ? (
                     <img src={previewLogo} alt="Logo" className="w-8 h-8" />
                   ) : (
-                    <div className="w-8 h-8 bg-gray-200 rounded" />
+                    <div className="w-8 h-8 bg-gray-200 rounded-sm" />
                   )}
                   <span className="font-semibold" style={{ color: settings.primaryColor }}>
                     {settings.schoolName}
@@ -200,19 +200,19 @@ const BrandingPage: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   <button
-                    className="w-full py-2 px-4 rounded"
+                    className="w-full py-2 px-4 rounded-sm"
                     style={{ backgroundColor: settings.primaryColor, color: 'white' }}
                   >
                     Основная кнопка
                   </button>
                   <button
-                    className="w-full py-2 px-4 rounded"
+                    className="w-full py-2 px-4 rounded-sm"
                     style={{ backgroundColor: settings.secondaryColor, color: 'white' }}
                   >
                     Вторичная кнопка
                   </button>
                   <div
-                    className="w-full py-2 px-4 rounded"
+                    className="w-full py-2 px-4 rounded-sm"
                     style={{ backgroundColor: settings.accentColor, color: 'white' }}
                   >
                     Акцентный элемент

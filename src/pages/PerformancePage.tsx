@@ -143,7 +143,7 @@ const PerformancePage: React.FC = () => {
 
       {/* Верхние карточки */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-2">Средний балл</h3>
           <div className="flex items-baseline justify-between">
             <div className="text-4xl font-semibold text-gray-900">
@@ -157,7 +157,7 @@ const PerformancePage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-2">Успеваемость</h3>
           <div className="flex items-baseline justify-between">
             <div className="text-4xl font-semibold text-gray-900">78%</div>
@@ -167,7 +167,7 @@ const PerformancePage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-2">Посещаемость</h3>
           <div className="flex items-baseline justify-between">
             <div className="text-4xl font-semibold text-gray-900">92%</div>
@@ -177,7 +177,7 @@ const PerformancePage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-2">Выполнение заданий</h3>
           <div className="flex items-baseline justify-between">
             <div className="text-4xl font-semibold text-gray-900">85%</div>
@@ -191,7 +191,7 @@ const PerformancePage: React.FC = () => {
 
       {/* Основные графики */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-4">Динамика успеваемости</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -212,7 +212,7 @@ const PerformancePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-4">Распределение оценок</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -237,7 +237,7 @@ const PerformancePage: React.FC = () => {
 
       {/* Успеваемость по предметам и радар */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-4">Успеваемость по предметам</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -252,7 +252,7 @@ const PerformancePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-4">Общие показатели</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -269,7 +269,7 @@ const PerformancePage: React.FC = () => {
 
       {/* Списки студентов */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-4">Студенты с низкой успеваемостью</h3>
           <div className="space-y-3">
             {filteredData.lowPerformingStudents.map((student, index) => (
@@ -284,7 +284,7 @@ const PerformancePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-xs p-6">
           <h3 className="text-sm text-gray-600 mb-4">Студенты с высоким прогрессом</h3>
           <div className="space-y-3">
             {filteredData.highProgressStudents.map((student, index) => (

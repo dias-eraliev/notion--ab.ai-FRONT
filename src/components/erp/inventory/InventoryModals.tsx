@@ -80,7 +80,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onClose, item, onS
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
               required
             />
           </div>
@@ -90,7 +90,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onClose, item, onS
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
                 required
               >
                 <option value="">Выберите категорию</option>
@@ -104,7 +104,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onClose, item, onS
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
                 required
               >
                 <option value="active">Активен</option>
@@ -119,14 +119,14 @@ export const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onClose, item, onS
         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button
             type="submit"
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-corporate-primary text-base font-medium text-white hover:bg-corporate-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:ml-3 sm:w-auto sm:text-sm"
+            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-xs px-4 py-2 bg-corporate-primary text-base font-medium text-white hover:bg-corporate-primary/90 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:ml-3 sm:w-auto sm:text-sm"
           >
             Сохранить
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-xs px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
           >
             Отмена
           </button>
@@ -153,7 +153,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, filte
           <select
             value={localFilters.category}
             onChange={(e) => setLocalFilters({ ...localFilters, category: e.target.value })}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
           >
             <option value="">Все категории</option>
             <option value="Техника">Техника</option>
@@ -166,7 +166,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, filte
           <select
             value={localFilters.status}
             onChange={(e) => setLocalFilters({ ...localFilters, status: e.target.value })}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-xs p-2"
           >
             <option value="">Все статусы</option>
             <option value="active">Активен</option>
@@ -180,14 +180,14 @@ export const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, filte
         <button
           type="button"
           onClick={handleApply}
-          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-corporate-primary text-base font-medium text-white hover:bg-corporate-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:ml-3 sm:w-auto sm:text-sm"
+          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-xs px-4 py-2 bg-corporate-primary text-base font-medium text-white hover:bg-corporate-primary/90 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:ml-3 sm:w-auto sm:text-sm"
         >
           Применить
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-xs px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
         >
           Отмена
         </button>
@@ -222,7 +222,7 @@ export const ScannerModal: React.FC<ScannerModalProps> = ({ isOpen, onClose, onS
         <button
           type="button"
           onClick={onClose}
-          className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:w-auto sm:text-sm"
+          className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-xs px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:w-auto sm:text-sm"
         >
           Закрыть
         </button>
@@ -242,7 +242,7 @@ export const ViewModal: React.FC<ViewModalProps> = ({ isOpen, onClose, item }) =
           <h3 className="text-xl font-medium text-gray-900">{item.name}</h3>
           <button
             onClick={onClose}
-            className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
+            className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-hidden"
           >
             <FaTimes />
           </button>
@@ -428,7 +428,7 @@ export const ViewModal: React.FC<ViewModalProps> = ({ isOpen, onClose, item }) =
                 </div>
               </div>
               <button
-                className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-xs text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
                 <FaCamera className="mr-2" />
                 Добавить фото
@@ -441,7 +441,7 @@ export const ViewModal: React.FC<ViewModalProps> = ({ isOpen, onClose, item }) =
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:text-sm"
+          className="inline-flex justify-center rounded-md border border-gray-300 shadow-xs px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary sm:text-sm"
         >
           Закрыть
         </button>

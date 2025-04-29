@@ -622,7 +622,7 @@ const HomeworkModal: React.FC<{
                 id="hasQuiz"
                 checked={formData.hasQuiz}
                 onChange={(e) => setFormData({ ...formData, hasQuiz: e.target.checked })}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-sm"
               />
               <label htmlFor="hasQuiz" className="text-sm font-medium text-gray-700">
                 Добавить тест
@@ -934,7 +934,7 @@ const HomeworkDetailsModal: React.FC<{
                             <div className="aspect-w-16 aspect-h-9">
                               <iframe
                                 src={homework.material.videoUrl}
-                                className="w-full h-64 rounded"
+                                className="w-full h-64 rounded-sm"
                                 allowFullScreen
                                 title="Video material"
                               ></iframe>
@@ -978,7 +978,7 @@ const HomeworkDetailsModal: React.FC<{
 
                             <div className="space-y-4 mt-3">
                               {homework.material.Quiz.questions.map((question, idx) => (
-                                <div key={question.id} className="border border-gray-200 p-3 rounded">
+                                <div key={question.id} className="border border-gray-200 p-3 rounded-sm">
                                   <p className="font-medium mb-2">{idx + 1}. {question.question}</p>
 
                                   {question.answers && (
@@ -1352,7 +1352,7 @@ const HomeworkPage: React.FC = () => {
 
       {/* Error state */}
       {error && !isLoading && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-sm relative mb-4">
           <strong className="font-bold">Ошибка!</strong>
           <span className="block sm:inline"> Не удалось загрузить задания. Пожалуйста, попробуйте позже.</span>
         </div>
@@ -1360,7 +1360,7 @@ const HomeworkPage: React.FC = () => {
 
       {/* Empty state */}
       {!isLoading && !error && getFilteredHomeworks().length === 0 && (
-        <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-10 rounded text-center">
+        <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-10 rounded-sm text-center">
           <FaExclamationTriangle className="mx-auto text-gray-400 text-4xl mb-4" />
           <h3 className="text-xl font-medium mb-2">Нет доступных заданий</h3>
           <p className="text-gray-600">
@@ -1377,7 +1377,7 @@ const HomeworkPage: React.FC = () => {
           {getFilteredHomeworks().map(homework => (
             <div
               key={homework.id}
-              className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">

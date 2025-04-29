@@ -332,7 +332,7 @@ const EmotionalAnalysisPage: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-4">
-          <div className="flex items-center gap-2 bg-white rounded-lg px-4 py-2 shadow-sm">
+          <div className="flex items-center gap-2 bg-white rounded-lg px-4 py-2 shadow-xs">
             <FaFilter className="text-gray-400" />
             <div className="mb-4">
               <label htmlFor="class-filter" className="block text-sm font-medium text-gray-700">
@@ -340,7 +340,7 @@ const EmotionalAnalysisPage: React.FC = () => {
               </label>
               <select
                 id="class-filter"
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-hidden focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
               >
@@ -389,7 +389,7 @@ const EmotionalAnalysisPage: React.FC = () => {
 
       {/* Общая статистика школы */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-lg bg-blue-50">
               <FaSchool className="w-6 h-6 text-blue-500" />
@@ -400,7 +400,7 @@ const EmotionalAnalysisPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-lg bg-green-50">
               <FaSmile className="w-6 h-6 text-green-500" />
@@ -411,7 +411,7 @@ const EmotionalAnalysisPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-lg bg-red-50">
               <FaBrain className="w-6 h-6 text-red-500" />
@@ -422,7 +422,7 @@ const EmotionalAnalysisPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-lg bg-purple-50">
               <FaHeart className="w-6 h-6 text-purple-500" />
@@ -437,7 +437,7 @@ const EmotionalAnalysisPage: React.FC = () => {
 
       {/* Графики */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-6">
             Динамика показателей
             {selectedClass !== 'all' && ` (${selectedClass} группа)`}
@@ -494,7 +494,7 @@ const EmotionalAnalysisPage: React.FC = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-6">
             Статистика по группам
             {selectedClass !== 'all' && ` (${selectedClass} группа)`}
@@ -558,7 +558,7 @@ const EmotionalAnalysisPage: React.FC = () => {
       </div>
 
       {/* События и комментарии */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-white rounded-xl shadow-xs p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-6">
           События и их влияние
           {selectedClass !== 'all' && ` (${selectedClass} группа)`}
@@ -567,7 +567,7 @@ const EmotionalAnalysisPage: React.FC = () => {
           {currentTrends.map((day) => (
             <div key={day.date} className="bg-gray-50 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 bg-white rounded-lg shadow-sm">
+                <div className="p-1.5 bg-white rounded-lg shadow-xs">
                   <FaCalendarAlt className="w-4 h-4 text-blue-500" />
                 </div>
                 <span className="text-sm font-medium text-gray-900">{day.date}</span>
@@ -611,7 +611,7 @@ const EmotionalAnalysisPage: React.FC = () => {
       </div>
 
       {/* Ученики, требующие внимания */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-white rounded-xl shadow-xs p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-medium text-gray-900">
             Ученики, требующие внимания

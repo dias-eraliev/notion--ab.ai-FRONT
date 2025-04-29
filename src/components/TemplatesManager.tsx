@@ -119,13 +119,13 @@ export const TemplatesManager: React.FC<TemplatesManagerProps> = ({
               <input
                 type="text"
                 placeholder="Название шаблона"
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                 value={newTemplate.name}
                 onChange={e => setNewTemplate({ ...newTemplate, name: e.target.value })}
               />
               <textarea
                 placeholder="Описание шаблона"
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                 value={newTemplate.description}
                 onChange={e => setNewTemplate({ ...newTemplate, description: e.target.value })}
               />
@@ -154,18 +154,18 @@ export const TemplatesManager: React.FC<TemplatesManagerProps> = ({
             key={template.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+            className="bg-white p-4 rounded-lg shadow-xs border border-gray-200"
           >
             {editingId === template.id ? (
               <div className="space-y-3">
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                   value={newTemplate.name}
                   onChange={e => setNewTemplate({ ...newTemplate, name: e.target.value })}
                 />
                 <textarea
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                   value={newTemplate.description}
                   onChange={e => setNewTemplate({ ...newTemplate, description: e.target.value })}
                 />

@@ -20,7 +20,7 @@ interface RiskCardProps {
 const RiskCard: React.FC<RiskCardProps> = ({ title, description, trend, value, color }) => (
   <motion.div
     whileHover={{ scale: 1.02 }}
-    className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-notion"
+    className="bg-white/80 backdrop-blur-xs rounded-xl p-6 shadow-notion"
   >
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-lg font-medium text-gray-900">{title}</h3>
@@ -95,7 +95,7 @@ const AIAnalytics: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-notion"
+        className="bg-white/80 backdrop-blur-xs rounded-xl p-6 shadow-notion"
       >
         <h3 className="text-lg font-medium text-gray-900 mb-4">Прогноз успеваемости</h3>
         <div className="h-64 flex items-end justify-between space-x-2">

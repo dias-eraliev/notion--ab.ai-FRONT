@@ -246,7 +246,7 @@ const EmployeesPage: React.FC = () => {
 
   // Компонент таблицы сотрудников
   const EmployeeTable = ({ employees, title }: { employees: Employee[], title: string }) => (
-    <div className="bg-white rounded-lg shadow">
+    <div className="bg-white rounded-lg shadow-sm">
       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
         <h2 className="text-lg font-medium text-gray-900">{title} ({employees.length})</h2>
         <p className="text-sm text-gray-500">Всего: {employees.length} человек</p>

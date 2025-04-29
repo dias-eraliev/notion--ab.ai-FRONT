@@ -23,7 +23,7 @@ export const TopPanel: React.FC = () => {
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-3 py-1.5 text-sm border border-transparent rounded bg-gray-100 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-gray-200"
+            className="block w-full pl-10 pr-3 py-1.5 text-sm border border-transparent rounded-sm bg-gray-100 placeholder-gray-400 focus:outline-hidden focus:bg-white focus:border-gray-200"
             placeholder={t('search')}
           />
         </div>

@@ -476,15 +476,15 @@ const PaymentsPage: React.FC = () => {
 
       {/* Статистика */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className="bg-white p-4 rounded-xl shadow-xs">
           <div className="text-sm text-gray-600 mb-1">Общая сумма к оплате</div>
           <div className="text-2xl font-bold">{stats.totalDue.toLocaleString()} KZT</div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className="bg-white p-4 rounded-xl shadow-xs">
           <div className="text-sm text-gray-600 mb-1">Собрано оплат</div>
           <div className="text-2xl font-bold">{stats.totalPaid.toLocaleString()} KZT</div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className="bg-white p-4 rounded-xl shadow-xs">
           <div className="text-sm text-gray-600 mb-1">Процент сбора</div>
           <div className="text-2xl font-bold">{stats.collectionRate}%</div>
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
@@ -494,14 +494,14 @@ const PaymentsPage: React.FC = () => {
             ></div>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className="bg-white p-4 rounded-xl shadow-xs">
           <div className="text-sm text-gray-600 mb-1">Просроченные оплаты</div>
           <div className="text-2xl font-bold text-red-600">{stats.overdueCount}</div>
         </div>
       </div>
 
       {/* Таблица платежей */}
-      <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0">

@@ -317,7 +317,7 @@ const CalendarPage: React.FC = () => {
                 placeholder="Поиск событий..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary"
+                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary"
               />
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
             </div>
@@ -354,7 +354,7 @@ const CalendarPage: React.FC = () => {
                           setSelectedTypes(selectedTypes.filter(t => t !== type));
                         }
                       }}
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <span className="text-sm text-gray-700">
                       {type === 'meeting' && 'Встреча'}
@@ -385,7 +385,7 @@ const CalendarPage: React.FC = () => {
                           setSelectedParticipants(selectedParticipants.filter(t => t !== type));
                         }
                       }}
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <span className="text-sm text-gray-700">
                       {type === 'teacher' && 'Учителя'}
@@ -415,7 +415,7 @@ const CalendarPage: React.FC = () => {
                           setSelectedGroups(selectedGroups.filter(g => g !== group));
                         }
                       }}
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <span className="text-sm text-gray-700">{group}</span>
                   </label>
@@ -441,7 +441,7 @@ const CalendarPage: React.FC = () => {
       )}
 
       {/* Основная область календаря */}
-      <div className="flex-1 p-4 bg-white rounded-lg shadow-sm">
+      <div className="flex-1 p-4 bg-white rounded-lg shadow-xs">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           headerToolbar={{
@@ -488,7 +488,7 @@ const CalendarPage: React.FC = () => {
           dayHeaderClassNames="text-sm font-semibold text-gray-700 py-2"
           dayCellClassNames="min-h-[120px] p-1 hover:bg-gray-50 transition-colors"
           slotLabelClassNames="text-xs font-medium text-gray-500 w-16"
-          eventClassNames="rounded-lg shadow-sm"
+          eventClassNames="rounded-lg shadow-xs"
           nowIndicatorClassNames="bg-corporate-primary"
           slotEventOverlap={false}
           eventContent={(eventInfo) => {
@@ -511,10 +511,10 @@ const CalendarPage: React.FC = () => {
               `}>
                 <div className="flex flex-col h-full">
                   <div className="flex items-center gap-1.5">
-                    {event?.type === 'class' && <FaChalkboardTeacher size={12} className="text-corporate-primary flex-shrink-0" />}
-                    {event?.type === 'meeting' && <FaUsers size={12} className="text-corporate-secondary flex-shrink-0" />}
-                    {event?.type === 'task' && <FaClock size={12} className="text-corporate-accent flex-shrink-0" />}
-                    {event?.type === 'event' && <FaCalendarAlt size={12} className="text-corporate-tertiary flex-shrink-0" />}
+                    {event?.type === 'class' && <FaChalkboardTeacher size={12} className="text-corporate-primary shrink-0" />}
+                    {event?.type === 'meeting' && <FaUsers size={12} className="text-corporate-secondary shrink-0" />}
+                    {event?.type === 'task' && <FaClock size={12} className="text-corporate-accent shrink-0" />}
+                    {event?.type === 'event' && <FaCalendarAlt size={12} className="text-corporate-tertiary shrink-0" />}
                     <div className="font-semibold text-sm text-gray-800 truncate flex-1">
                       {eventInfo.event.title}
                     </div>
@@ -524,7 +524,7 @@ const CalendarPage: React.FC = () => {
                     <div className="mt-1 space-y-1">
                       {!eventInfo.event.allDay && (
                         <div className="flex items-center gap-1">
-                          <FaClock size={10} className="text-gray-400 flex-shrink-0" />
+                          <FaClock size={10} className="text-gray-400 shrink-0" />
                           <span className="text-xs text-gray-600">
                             {eventInfo.timeText}
                           </span>
@@ -532,7 +532,7 @@ const CalendarPage: React.FC = () => {
                       )}
                       {event?.location && (
                         <div className="flex items-center gap-1">
-                          <FaBuilding size={10} className="text-gray-400 flex-shrink-0" />
+                          <FaBuilding size={10} className="text-gray-400 shrink-0" />
                           <span className="text-xs text-gray-600 truncate">
                             {event.location}
                           </span>
@@ -597,7 +597,7 @@ const CalendarPage: React.FC = () => {
                   onChange={(e) =>
                     setSelectedEvent({ ...selectedEvent, title: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
                   placeholder="Введите название события"
                 />
               </div>
@@ -613,7 +613,7 @@ const CalendarPage: React.FC = () => {
                     onChange={(e) =>
                       setSelectedEvent({ ...selectedEvent, start: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
                   />
                 </div>
                 <div>
@@ -626,7 +626,7 @@ const CalendarPage: React.FC = () => {
                     onChange={(e) =>
                       setSelectedEvent({ ...selectedEvent, end: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
                   />
                 </div>
               </div>
@@ -643,7 +643,7 @@ const CalendarPage: React.FC = () => {
                       type: e.target.value as Event['type']
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
                 >
                   <option value="meeting">Встреча</option>
                   <option value="task">Задача</option>
@@ -666,7 +666,7 @@ const CalendarPage: React.FC = () => {
                       location: classrooms.find(c => c.id === e.target.value)?.name
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary"
                 >
                   <option value="">Выберите аудиторию</option>
                   {classrooms.map(classroom => (
@@ -696,7 +696,7 @@ const CalendarPage: React.FC = () => {
                         }
                         setSelectedEvent({ ...selectedEvent, participants });
                       }}
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <FaChalkboardTeacher className="mr-2 text-corporate-primary" />
                     <span className="text-sm text-gray-700">Учителя</span>
@@ -715,7 +715,7 @@ const CalendarPage: React.FC = () => {
                         }
                         setSelectedEvent({ ...selectedEvent, participants });
                       }}
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <FaUserGraduate className="mr-2 text-corporate-primary" />
                     <span className="text-sm text-gray-700">Ученики</span>
@@ -734,7 +734,7 @@ const CalendarPage: React.FC = () => {
                         }
                         setSelectedEvent({ ...selectedEvent, participants });
                       }}
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <FaUsers className="mr-2 text-corporate-primary" />
                     <span className="text-sm text-gray-700">Родители</span>
@@ -753,7 +753,7 @@ const CalendarPage: React.FC = () => {
                         }
                         setSelectedEvent({ ...selectedEvent, participants });
                       }}
-                      className="mr-2 h-4 w-4 rounded border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <FaUserTie className="mr-2 text-corporate-primary" />
                     <span className="text-sm text-gray-700">Персонал</span>
@@ -773,7 +773,7 @@ const CalendarPage: React.FC = () => {
                       description: e.target.value
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary resize-none"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary focus:ring-1 focus:ring-corporate-primary resize-none"
                   rows={3}
                   placeholder="Добавьте описание события"
                 />

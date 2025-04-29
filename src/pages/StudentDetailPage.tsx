@@ -470,7 +470,7 @@ const StudentDetailPage: React.FC = () => {
                                         </div>
                                         <button
                                             onClick={() => handleChatWithParent(students?.Parent.relation, students?.Parent.user.username)}
-                                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-sm hover:bg-blue-700"
                                         >
                                             Написать
                                         </button>
@@ -506,7 +506,7 @@ const StudentDetailPage: React.FC = () => {
                                     </div>
                                     <button
                                         onClick={() => handleChatWithParent('mother', 'Сатыбалды Айгуль')}
-                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-sm hover:bg-blue-700"
                                     >
                                         Написать
                                     </button>
@@ -537,7 +537,7 @@ const StudentDetailPage: React.FC = () => {
                                     </div>
                                     <button
                                         onClick={() => handleChatWithParent('curator', 'Ахметова Динара')}
-                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-sm hover:bg-blue-700"
                                     >
                                         Написать
                                     </button>
@@ -695,7 +695,7 @@ const StudentDetailPage: React.FC = () => {
                                             <div className="flex items-center gap-2">
                                                 <h3 className="text-base font-medium text-gray-900">{plan.subject}</h3>
                                                 <span
-                                                    className={`px-1.5 py-0.5 rounded text-xs font-medium ${getStatusColor(plan.status)}`}>
+                                                    className={`px-1.5 py-0.5 rounded-sm text-xs font-medium ${getStatusColor(plan.status)}`}>
                           {getStatusText(plan.status)}
                         </span>
                                             </div>
@@ -732,7 +732,7 @@ const StudentDetailPage: React.FC = () => {
                                                             <span className="text-xs text-gray-900">{task.title}</span>
                                                         </div>
                                                         <span
-                                                            className={`px-1.5 py-0.5 rounded text-xs font-medium ${getStatusColor(task.status)}`}>
+                                                            className={`px-1.5 py-0.5 rounded-sm text-xs font-medium ${getStatusColor(task.status)}`}>
                               {getStatusText(task.status)}
                             </span>
                                                     </div>
@@ -1005,7 +1005,7 @@ const StudentDetailPage: React.FC = () => {
                                                 Тип оплаты
                                             </label>
                                             <select
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 value={paymentFormData.type}
                                                 onChange={(e) => setPaymentFormData({
                                                     ...paymentFormData,
@@ -1029,7 +1029,7 @@ const StudentDetailPage: React.FC = () => {
                                             </label>
                                             <input
                                                 type="number"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 value={paymentFormData.amount}
                                                 onChange={(e) => setPaymentFormData({
                                                     ...paymentFormData,
@@ -1045,7 +1045,7 @@ const StudentDetailPage: React.FC = () => {
                                             </label>
                                             <input
                                                 type="date"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 value={paymentFormData.dueDate}
                                                 onChange={(e) => setPaymentFormData({
                                                     ...paymentFormData,
@@ -1063,7 +1063,7 @@ const StudentDetailPage: React.FC = () => {
                                                 type="number"
                                                 min="0"
                                                 max="100"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 value={paymentFormData.discount}
                                                 onChange={(e) => setPaymentFormData({
                                                     ...paymentFormData,
@@ -1077,7 +1077,7 @@ const StudentDetailPage: React.FC = () => {
                                                 Описание
                                             </label>
                                             <textarea
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                 value={paymentFormData.description}
                                                 onChange={(e) => setPaymentFormData({
                                                     ...paymentFormData,
@@ -1286,7 +1286,7 @@ const StudentDetailPage: React.FC = () => {
                             </div>
                             <div className="flex gap-4">
                                 <select
-                                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     value={dateFilter.type}
                                     onChange={(e) => setDateFilter({
                                         ...dateFilter,
@@ -1299,7 +1299,7 @@ const StudentDetailPage: React.FC = () => {
                                     <option value="quarter">Четверть</option>
                                 </select>
                                 <select
-                                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     value={dateFilter.value}
                                     onChange={(e) => setDateFilter({...dateFilter, value: e.target.value})}
                                 >
@@ -1394,7 +1394,7 @@ const StudentDetailPage: React.FC = () => {
                                 <h2 className="text-xl font-medium text-gray-900">Экзамены и результаты</h2>
                                 <div className="flex items-center gap-4">
                                     <select
-                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                         value={examFilter.year}
                                         onChange={(e) => setExamFilter({...examFilter, year: e.target.value})}
                                     >
@@ -1403,7 +1403,7 @@ const StudentDetailPage: React.FC = () => {
                                     </select>
 
                                     <select
-                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                         value={examFilter.quarter}
                                         onChange={(e) => setExamFilter({...examFilter, quarter: e.target.value})}
                                     >
@@ -1415,7 +1415,7 @@ const StudentDetailPage: React.FC = () => {
                                     </select>
 
                                     <select
-                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                         value={examFilter.month}
                                         onChange={(e) => setExamFilter({...examFilter, month: e.target.value})}
                                     >
@@ -1435,7 +1435,7 @@ const StudentDetailPage: React.FC = () => {
                                     </select>
 
                                     <select
-                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                         value={examFilter.examType}
                                         onChange={(e) => setExamFilter({...examFilter, examType: e.target.value})}
                                     >

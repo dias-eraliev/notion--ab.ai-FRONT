@@ -207,7 +207,7 @@ const StudyPlanDetailPage: React.FC = () => {
         {canCreateLesson && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-corporate-primary text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-corporate-primary-dark transition"
+            className="bg-corporate-primary text-white px-6 py-2 rounded-lg font-semibold shadow-sm hover:bg-corporate-primary-dark transition"
           >
             + Создать урок
           </button>
@@ -226,7 +226,7 @@ const StudyPlanDetailPage: React.FC = () => {
                 <div>
                   <label className="block text-gray-700 font-semibold mb-1">Название урока</label>
                   <input
-                    className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-sm"
+                    className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-xs"
                     placeholder="Введите название урока"
                     value={newLesson.title}
                     onChange={e => setNewLesson({ ...newLesson, title: e.target.value })}
@@ -235,13 +235,13 @@ const StudyPlanDetailPage: React.FC = () => {
                 <div>
                   <label className="block text-gray-700 font-semibold mb-1">Описание урока</label>
                   <textarea
-                    className="input-filter w-full min-h-[70px] text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-sm"
+                    className="input-filter w-full min-h-[70px] text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-xs"
                     placeholder="Кратко опишите содержание урока"
                     value={newLesson.description}
                     onChange={e => setNewLesson({ ...newLesson, description: e.target.value })}
                   />
                   <button
-                    className="mt-2 px-4 py-1 rounded bg-corporate-primary/10 text-corporate-primary font-semibold hover:bg-corporate-primary/20 text-sm transition"
+                    className="mt-2 px-4 py-1 rounded-sm bg-corporate-primary/10 text-corporate-primary font-semibold hover:bg-corporate-primary/20 text-sm transition"
                     type="button"
                     onClick={() => setNewLesson({ ...newLesson, description: `В этом уроке рассматриваются основные понятия и методы по теме \"${newLesson.title || '...'}\". Урок включает теорию, примеры и практические задания для закрепления материала.` })}
                   >
@@ -251,7 +251,7 @@ const StudyPlanDetailPage: React.FC = () => {
                 <div>
                   <label className="block text-gray-700 font-semibold mb-1">Дата и время проведения</label>
                   <input
-                    className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-sm"
+                    className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-xs"
                     type="datetime-local"
                     value={newLesson.scheduledDate}
                     onChange={e => setNewLesson({ ...newLesson, scheduledDate: e.target.value })}
@@ -271,14 +271,14 @@ const StudyPlanDetailPage: React.FC = () => {
                   </div>
                   {videoType === 'link' ? (
                     <input
-                      className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-sm"
+                      className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-xs"
                       placeholder="Ссылка на видео (YouTube, Vimeo и т.д.)"
                       value={videoLink}
                       onChange={e => setVideoLink(e.target.value)}
                     />
                   ) : (
                     <input
-                      className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-sm"
+                      className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-xs"
                       type="file"
                       accept="video/*"
                       onChange={e => setVideoFile(e.target.files?.[0] || null)}
@@ -288,7 +288,7 @@ const StudyPlanDetailPage: React.FC = () => {
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                   <div className="font-semibold text-corporate-primary mb-2">Презентация</div>
                   <input
-                    className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-sm"
+                    className="input-filter w-full text-base px-4 py-2 rounded-lg border border-gray-200 focus:border-corporate-primary focus:ring-2 focus:ring-corporate-primary/20 transition shadow-xs"
                     type="file"
                     accept=".pdf,.ppt,.pptx,.odp"
                     onChange={e => setPresentationFile(e.target.files?.[0] || null)}
@@ -297,7 +297,7 @@ const StudyPlanDetailPage: React.FC = () => {
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                   <div className="font-semibold text-corporate-primary mb-2">Тест</div>
                   <button
-                    className="px-4 py-1 rounded bg-corporate-primary/10 text-corporate-primary font-semibold hover:bg-corporate-primary/20 transition"
+                    className="px-4 py-1 rounded-sm bg-corporate-primary/10 text-corporate-primary font-semibold hover:bg-corporate-primary/20 transition"
                     onClick={() => setTestModalOpen(true)}
                   >
                     {testQuestions.length > 0 ? `Вопросов: ${testQuestions.length}` : 'Создать тест'}
@@ -307,13 +307,13 @@ const StudyPlanDetailPage: React.FC = () => {
             </div>
             <div className="sticky bottom-0 left-0 w-full bg-white border-t border-gray-100 shadow-[0_-2px_8px_0_rgba(0,0,0,0.04)] px-8 py-4 flex gap-4 justify-end z-10">
               <button
-                className="px-5 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold border border-gray-200 shadow-sm transition"
+                className="px-5 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold border border-gray-200 shadow-xs transition"
                 onClick={() => setIsModalOpen(false)}
               >
                 Отмена
               </button>
               <button
-                className="px-6 py-2 rounded-lg bg-corporate-primary text-white font-semibold shadow hover:bg-corporate-primary-dark transition disabled:opacity-50"
+                className="px-6 py-2 rounded-lg bg-corporate-primary text-white font-semibold shadow-sm hover:bg-corporate-primary-dark transition disabled:opacity-50"
                 onClick={handleCreateLesson}
                 disabled={!newLesson.title.trim() || isSubmitting}
               >
@@ -373,13 +373,13 @@ const StudyPlanDetailPage: React.FC = () => {
                   >+ Добавить вариант</button>
                   <div className="flex gap-2 justify-end mt-4">
                     <button
-                      className="px-4 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold"
+                      className="px-4 py-1 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold"
                       onClick={() => setTestModalOpen(false)}
                     >
                       Закрыть
                     </button>
                     <button
-                      className="px-4 py-1 rounded bg-corporate-primary text-white font-semibold hover:bg-corporate-primary-dark"
+                      className="px-4 py-1 rounded-sm bg-corporate-primary text-white font-semibold hover:bg-corporate-primary-dark"
                       onClick={() => {
                         if (!currentQuestion.question.trim() || currentQuestion.options.some(opt => !opt.trim())) return;
                         setTestQuestions([...testQuestions, currentQuestion]);
@@ -394,7 +394,7 @@ const StudyPlanDetailPage: React.FC = () => {
                     <div className="font-semibold mb-2">Вопросы:</div>
                     {testQuestions.length === 0 && <div className="text-gray-400">Нет вопросов</div>}
                     {testQuestions.map((q, idx) => (
-                      <div key={idx} className="mb-2 p-2 border rounded">
+                      <div key={idx} className="mb-2 p-2 border rounded-sm">
                         <div className="font-medium">{q.question}</div>
                         <ul className="ml-4 list-disc">
                           {q.options.map((opt: string, i: number) => (

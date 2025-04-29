@@ -642,7 +642,7 @@ const BudgetPage: React.FC = () => {
       {/* Основной контент */}
       <div className="grid grid-cols-3 gap-6 mb-8">
         {/* Доходы */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">Доходы</h2>
             <div className="text-sm text-gray-500">{filters.period}</div>
@@ -680,7 +680,7 @@ const BudgetPage: React.FC = () => {
         </div>
 
         {/* Расходы */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">Расходы</h2>
             <div className="text-sm text-gray-500">{filters.period}</div>
@@ -718,7 +718,7 @@ const BudgetPage: React.FC = () => {
         </div>
 
         {/* Баланс */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-xs p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">Баланс</h2>
             <div className="text-sm text-gray-500">{filters.period}</div>
@@ -761,7 +761,7 @@ const BudgetPage: React.FC = () => {
       {/* Графики */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* График распределения доходов */}
-        <div className="bg-white p-4 rounded-lg shadow">
+        <div className="bg-white p-4 rounded-lg shadow-sm">
           <h3 className="text-md font-medium text-gray-700 mb-2">Структура доходов</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -787,7 +787,7 @@ const BudgetPage: React.FC = () => {
         </div>
         
         {/* График распределения расходов */}
-        <div className="bg-white p-4 rounded-lg shadow">
+        <div className="bg-white p-4 rounded-lg shadow-sm">
           <h3 className="text-md font-medium text-gray-700 mb-2">Структура расходов</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -814,7 +814,7 @@ const BudgetPage: React.FC = () => {
       </div>
 
       {/* График динамики по кварталам */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
         <h3 className="text-md font-medium text-gray-700 mb-2">Динамика доходов и расходов по кварталам</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -891,7 +891,7 @@ const BudgetPage: React.FC = () => {
       </div>
 
       {/* Таблица бюджетных статей */}
-      <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

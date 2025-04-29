@@ -392,7 +392,7 @@ const ReportsPage: React.FC = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4 rounded-t-lg">
+          <div className="bg-linear-to-r from-blue-500 to-blue-600 px-6 py-4 rounded-t-lg">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">{report.title}</h2>
               <button onClick={onClose} className="text-white hover:text-gray-200">
@@ -447,10 +447,10 @@ const ReportsPage: React.FC = () => {
             <div className="border-t pt-4 mt-4 flex items-center justify-between text-sm text-gray-500">
               <span>Создан: {new Date(report.createdAt).toLocaleDateString('ru-RU')}</span>
               <div className="flex gap-2">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-sm hover:bg-blue-600 transition-colors">
                   Экспорт
                 </button>
-                <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition-colors">
+                <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-sm hover:bg-gray-200 transition-colors">
                   Скачать PDF
                 </button>
               </div>
@@ -492,28 +492,28 @@ const ReportsPage: React.FC = () => {
 
       {/* Статистика */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className="bg-white p-4 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Общий доход</div>
             <FaChartLine className="text-blue-600" />
           </div>
           <div className="text-2xl font-bold mt-2">{stats.totalIncome} KZT</div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className="bg-white p-4 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Средний платеж</div>
             <FaMoneyBillWave className="text-blue-600" />
           </div>
           <div className="text-2xl font-bold mt-2">{stats.avgPayment} KZT</div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className="bg-white p-4 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Активных учеников</div>
             <FaUserGraduate className="text-blue-600" />
           </div>
           <div className="text-2xl font-bold mt-2">{stats.activeStudents}</div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className="bg-white p-4 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Рост дохода</div>
             <FaChartBar className="text-blue-600" />
@@ -529,7 +529,7 @@ const ReportsPage: React.FC = () => {
       </div>
 
       {/* График доходов */}
-      <div className="bg-white p-6 rounded-xl shadow-sm mb-6">
+      <div className="bg-white p-6 rounded-xl shadow-xs mb-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Динамика доходов и расходов</h2>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
@@ -559,7 +559,7 @@ const ReportsPage: React.FC = () => {
       </div>
 
       {/* Таблица отчетов */}
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-lg shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

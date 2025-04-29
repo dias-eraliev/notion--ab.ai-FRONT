@@ -24,7 +24,7 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ icon, title, value, change, isPositive, color }) => (
   <motion.div 
     whileHover={{ scale: 1.02 }}
-    className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-notion"
+    className="bg-white/80 backdrop-blur-xs rounded-xl p-4 shadow-notion"
   >
     <div className="flex items-center justify-between">
       <div className={`text-${color}`}>{icon}</div>
@@ -43,7 +43,7 @@ const AlertCard: React.FC<{ message: string; type: 'warning' | 'success' | 'erro
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className={`bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-notion border-l-4 ${
+    className={`bg-white/80 backdrop-blur-xs rounded-xl p-4 shadow-notion border-l-4 ${
       type === 'warning' ? 'border-yellow-500' :
       type === 'success' ? 'border-green-500' :
       'border-red-500'

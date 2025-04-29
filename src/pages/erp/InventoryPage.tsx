@@ -191,7 +191,7 @@ const InventoryPage: React.FC = () => {
             placeholder="Поиск по названию, серийному номеру или штрих-коду..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary"
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary"
           />
           <FaSearch className="absolute left-3 top-3 text-gray-400" />
         </div>
@@ -205,7 +205,7 @@ const InventoryPage: React.FC = () => {
       </div>
 
       {/* Таблица инвентаря */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xs overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

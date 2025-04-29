@@ -19,7 +19,7 @@ const QuickAction: React.FC<QuickActionProps> = ({ icon, title, description }) =
   <motion.button
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
-    className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-notion w-full text-left"
+    className="bg-white/80 backdrop-blur-xs rounded-xl p-4 shadow-notion w-full text-left"
   >
     <div className="flex items-center">
       <div className="text-corporate-primary mr-4">{icon}</div>
@@ -84,7 +84,7 @@ const EducationalProcess: React.FC = () => {
       </div>
 
       {/* Статус расписания */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-notion">
+      <div className="bg-white/80 backdrop-blur-xs rounded-xl p-6 shadow-notion">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Состояние расписания</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {scheduleStatus.map((status, index) => (
@@ -109,7 +109,7 @@ const EducationalProcess: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-notion"
+        className="bg-white/80 backdrop-blur-xs rounded-xl p-6 shadow-notion"
       >
         <h3 className="text-lg font-medium text-gray-900 mb-4">Загруженность по неделям</h3>
         <div className="h-48 flex items-end justify-between space-x-2">
