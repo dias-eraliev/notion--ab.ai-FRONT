@@ -226,10 +226,11 @@ export const createLesson = async (studyPlanId: string, lessonData: CreateLesson
  * Creates a new study plan
  * Only teachers and admins can create study plans
  */
-export const createStudyPlan = async (studyPlanData: any, groupIds: number[]) => {
+export const createStudyPlan = async (studyPlanData: any, groupIds: number[], teacherId: number) => {
     const response = await api.post<StudyPlan>('/study-plans', {
-        CreateStudyPlanDto: studyPlanData,
-        groupIds
+        ...studyPlanData,
+        groupIds,
+        teacherId
     });
     return response.data;
 };

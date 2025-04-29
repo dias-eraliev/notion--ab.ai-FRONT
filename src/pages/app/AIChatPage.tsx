@@ -501,7 +501,7 @@ const AIChatPage: React.FC = () => {
   // Компонент голосового оверлея с CSS-анимацией
   const VoiceOverlay = () => {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex flex-col items-center justify-center">
+      <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center">
         {/* Верхняя часть с инструкцией */}
         <div className="absolute top-8 left-0 right-0 text-center text-white text-xl">
           <p>Говорите, чтобы продолжить диалог</p>
@@ -511,7 +511,7 @@ const AIChatPage: React.FC = () => {
         <div className="relative flex items-center justify-center">
           {/* Фоновая пульсация - используем CSS-анимацию */}
           <div
-            className="absolute rounded-full bg-white bg-opacity-10 animate-pulse-slow"
+            className="absolute rounded-full bg-white/10 animate-pulse-slow"
             style={{
               width: '300px',
               height: '300px'
@@ -584,7 +584,7 @@ const AIChatPage: React.FC = () => {
 
         {/* Отображение текущего ответа */}
         {realtimeText && (
-          <div className="absolute top-24 left-8 right-8 max-h-64 overflow-y-auto bg-gray-800 bg-opacity-80 p-4 rounded-lg text-white">
+          <div className="absolute top-24 left-8 right-8 max-h-64 overflow-y-auto bg-gray-800/80 p-4 rounded-lg text-white">
             <p>{realtimeText}</p>
           </div>
         )}
@@ -642,13 +642,13 @@ const AIChatPage: React.FC = () => {
           </button>
           {showSettings && (
             <div className="mt-2 space-y-2">
-              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-sm">
+              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-xs">
                 Очистить историю
               </button>
-              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-sm">
+              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-xs">
                 Изменить модель AI
               </button>
-              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-sm">
+              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-xs">
                 Справка
               </button>
             </div>
@@ -695,7 +695,7 @@ const AIChatPage: React.FC = () => {
                 {msg.type === 'text' && <p>{msg.text}</p>}
                 {msg.type === 'code' && (
                   <div className="relative">
-                    <pre className="bg-gray-800 text-white p-4 rounded-sm">
+                    <pre className="bg-gray-800 text-white p-4 rounded-xs">
                       <code>{msg.text}</code>
                     </pre>
                     <button

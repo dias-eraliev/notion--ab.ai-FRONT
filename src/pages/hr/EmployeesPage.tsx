@@ -246,7 +246,7 @@ const EmployeesPage: React.FC = () => {
 
   // Компонент таблицы сотрудников
   const EmployeeTable = ({ employees, title }: { employees: Employee[], title: string }) => (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-white rounded-lg shadow-xs">
       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
         <h2 className="text-lg font-medium text-gray-900">{title} ({employees.length})</h2>
         <p className="text-sm text-gray-500">Всего: {employees.length} человек</p>
@@ -411,7 +411,7 @@ const EmployeesPage: React.FC = () => {
 
       {/* Модальное окно сотрудника */}
       {selectedEmployee && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               {/* Заголовок */}
@@ -612,7 +612,7 @@ const EmployeesPage: React.FC = () => {
 
       {/* Модальное окно добавления сотрудника */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-lg">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">

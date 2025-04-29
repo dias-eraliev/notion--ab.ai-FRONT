@@ -188,7 +188,7 @@ const Login: React.FC = () => {
                 <input
                   type="checkbox"
                   name="rememberMe"
-                  className="h-4 w-4 text-corporate-primary focus:ring-corporate-primary border-corporate-primary/20 rounded-sm"
+                  className="h-4 w-4 text-corporate-primary focus:ring-corporate-primary border-corporate-primary/20 rounded-xs"
                 />
                 <label className="ml-2 block text-sm text-gray-700">
                   Запомнить меня

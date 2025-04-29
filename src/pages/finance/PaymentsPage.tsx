@@ -281,7 +281,7 @@ const PaymentsPage: React.FC = () => {
 
   // Компоненты фильтров
   const FilterModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h3 className="text-lg font-semibold mb-4">Фильтры</h3>
         
@@ -358,7 +358,7 @@ const PaymentsPage: React.FC = () => {
     if (!selectedPayment) return null;
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-lg w-[600px]">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Информация о платеже</h3>
@@ -501,7 +501,7 @@ const PaymentsPage: React.FC = () => {
       </div>
 
       {/* Таблица платежей */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+      <div className="bg-white rounded-lg shadow-xs overflow-hidden mb-6">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0">

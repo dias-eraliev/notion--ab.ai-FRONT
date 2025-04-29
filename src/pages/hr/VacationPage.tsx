@@ -706,7 +706,7 @@ const VacationPage: React.FC = () => {
 
       {/* Модальное окно с деталями заявки на отпуск */}
       {isModalOpen && selectedVacation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
@@ -847,7 +847,7 @@ const VacationPage: React.FC = () => {
 
       {/* Модальное окно создания новой заявки */}
       {isNewVacationModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">

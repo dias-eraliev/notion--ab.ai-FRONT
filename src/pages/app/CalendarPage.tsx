@@ -354,7 +354,7 @@ const CalendarPage: React.FC = () => {
                           setSelectedTypes(selectedTypes.filter(t => t !== type));
                         }
                       }}
-                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-xs border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <span className="text-sm text-gray-700">
                       {type === 'meeting' && 'Встреча'}
@@ -385,7 +385,7 @@ const CalendarPage: React.FC = () => {
                           setSelectedParticipants(selectedParticipants.filter(t => t !== type));
                         }
                       }}
-                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-xs border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <span className="text-sm text-gray-700">
                       {type === 'teacher' && 'Учителя'}
@@ -415,7 +415,7 @@ const CalendarPage: React.FC = () => {
                           setSelectedGroups(selectedGroups.filter(g => g !== group));
                         }
                       }}
-                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-xs border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <span className="text-sm text-gray-700">{group}</span>
                   </label>
@@ -499,7 +499,7 @@ const CalendarPage: React.FC = () => {
               <div className={`
                 h-full rounded-lg border-l-4 
                 ${isMonthView ? 'p-1.5' : 'p-2'} 
-                bg-white shadow-sm hover:shadow-md transition-all
+                bg-white shadow-xs hover:shadow-md transition-all
                 ${event?.type === 'class' 
                   ? 'border-corporate-primary' 
                   : event?.type === 'meeting' 
@@ -573,7 +573,7 @@ const CalendarPage: React.FC = () => {
 
       {/* Модальное окно создания/редактирования события */}
       {showEventModal && selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-2xl p-6 shadow-xl">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-corporate-primary">
@@ -696,7 +696,7 @@ const CalendarPage: React.FC = () => {
                         }
                         setSelectedEvent({ ...selectedEvent, participants });
                       }}
-                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-xs border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <FaChalkboardTeacher className="mr-2 text-corporate-primary" />
                     <span className="text-sm text-gray-700">Учителя</span>
@@ -715,7 +715,7 @@ const CalendarPage: React.FC = () => {
                         }
                         setSelectedEvent({ ...selectedEvent, participants });
                       }}
-                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-xs border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <FaUserGraduate className="mr-2 text-corporate-primary" />
                     <span className="text-sm text-gray-700">Ученики</span>
@@ -734,7 +734,7 @@ const CalendarPage: React.FC = () => {
                         }
                         setSelectedEvent({ ...selectedEvent, participants });
                       }}
-                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-xs border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <FaUsers className="mr-2 text-corporate-primary" />
                     <span className="text-sm text-gray-700">Родители</span>
@@ -753,7 +753,7 @@ const CalendarPage: React.FC = () => {
                         }
                         setSelectedEvent({ ...selectedEvent, participants });
                       }}
-                      className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                      className="mr-2 h-4 w-4 rounded-xs border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                     />
                     <FaUserTie className="mr-2 text-corporate-primary" />
                     <span className="text-sm text-gray-700">Персонал</span>

@@ -17,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title, size = 
         xl: 'max-w-5xl',
     }[size] || 'max-w-lg';
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className={`bg-white rounded-lg shadow-xl w-full ${sizeClass} p-6 relative`}>
                 <button
                     onClick={onClose}

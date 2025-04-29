@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaTimes, FaSave, FaPlus, FaTrash, FaSpinner, FaCheck } from 'react-icons/fa';
-import { createClassroom, CreateClassroomDto, InventoryObjectDto } from '../api/classrooms.api';
+import { createClassroom, InventoryObjectDto } from '../api/classrooms.api';
 import useSWR from 'swr';
 import { fetcher } from '../api';
 
@@ -212,7 +212,7 @@ const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}

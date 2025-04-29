@@ -99,7 +99,7 @@ const SchedulePage: React.FC = () => {
           Управление расписанием
         </h1>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="bg-white p-4 rounded-lg shadow-xs">
           <div className="flex flex-wrap items-center gap-4">
             {/* Group Filter */}
             <div className="w-64">
@@ -133,7 +133,7 @@ const SchedulePage: React.FC = () => {
 
       {/* Error state */}
       {hasError && (
-        <div className="bg-red-50 p-4 rounded-lg shadow-sm mb-6">
+        <div className="bg-red-50 p-4 rounded-lg shadow-xs mb-6">
           <p className="text-red-600">
             Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.
           </p>
@@ -142,14 +142,14 @@ const SchedulePage: React.FC = () => {
 
       {/* Main Content */}
       {isLoadingData && !hasError ? (
-        <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+        <div className="bg-white p-8 rounded-lg shadow-xs text-center">
           <FaSpinner className="animate-spin text-gray-400 mx-auto mb-4 text-3xl" />
           <p className="text-lg text-gray-600">
             Загрузка данных...
           </p>
         </div>
       ) : !selectedGroupId ? (
-        <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+        <div className="bg-white p-8 rounded-lg shadow-xs text-center">
           <p className="text-lg text-gray-600">
             Выберите группу, чтобы просмотреть расписание
           </p>

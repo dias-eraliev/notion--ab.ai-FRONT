@@ -292,7 +292,7 @@ const TodoPage: React.FC = () => {
                 key={todo.id}
                 className={`bg-white rounded-lg border ${
                   todo.completed ? 'border-gray-200' : 'border-corporate-primary/20'
-                } p-4 shadow-sm hover:shadow-md transition-shadow`}
+                } p-4 shadow-xs hover:shadow-md transition-shadow`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4">
@@ -675,7 +675,7 @@ const TodoPage: React.FC = () => {
 
       {/* Модальное окно создания/редактирования задачи */}
       {(showAddTodo || editingTodo) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-2xl p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-corporate-primary">
@@ -792,7 +792,7 @@ const TodoPage: React.FC = () => {
                             : editingTodo.watchers.filter(w => w.id !== user.id);
                           setEditingTodo({ ...editingTodo, watchers });
                         }}
-                        className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                        className="mr-2 h-4 w-4 rounded-xs border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                       />
                       <span className="text-sm text-gray-700">{user.name}</span>
                     </label>

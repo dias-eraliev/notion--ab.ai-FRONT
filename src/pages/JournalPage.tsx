@@ -72,7 +72,7 @@ const GradeInfoModal: React.FC<GradeInfoModalProps> = ({ isOpen, onClose, data }
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -184,7 +184,7 @@ const GradeEditModal: React.FC<GradeEditModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -664,7 +664,7 @@ const JournalPage: React.FC = () => {
             </div>
 
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-sm mb-4">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xs mb-4">
                     Ошибка при загрузке данных
                 </div>
             )}
@@ -738,7 +738,7 @@ const JournalPage: React.FC = () => {
                 </div>
             ) : (
                 /* Grades table */
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                <div className="bg-white rounded-lg shadow-xs overflow-hidden border border-gray-200">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                             <thead>

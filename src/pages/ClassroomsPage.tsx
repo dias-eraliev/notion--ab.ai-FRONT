@@ -267,7 +267,7 @@ const ClassroomsPage: React.FC = () => {
       </div>
 
       {/* Поиск и фильтры */}
-      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+      <div className="bg-white p-4 rounded-lg shadow-xs mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -316,7 +316,7 @@ const ClassroomsPage: React.FC = () => {
       </div>
 
       {/* Таблица аудиторий */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -360,10 +360,10 @@ const ClassroomsPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex items-center space-x-1">
-                        {room.hasProjector && <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-sm">Проектор</span>}
-                        {room.hasComputers && <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-sm">Компьютеры</span>}
+                        {room.hasProjector && <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-xs">Проектор</span>}
+                        {room.hasComputers && <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-xs">Компьютеры</span>}
                         {room.equipment.length > 0 && (
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded-sm">
+                          <span className="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded-xs">
                             +{room.equipment.length} предм.
                           </span>
                         )}
@@ -379,7 +379,7 @@ const ClassroomsPage: React.FC = () => {
                     <p className="text-sm mt-1">Попробуйте изменить параметры фильтрации</p>
                     <button
                       onClick={resetFilters}
-                      className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-sm hover:bg-blue-600 transition-colors"
+                      className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-xs hover:bg-blue-600 transition-colors"
                     >
                       Сбросить фильтры
                     </button>

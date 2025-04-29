@@ -108,7 +108,7 @@ const SecurityPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-4 gap-6 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="bg-white p-4 rounded-lg shadow-xs">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Активные тревоги</p>
@@ -117,7 +117,7 @@ const SecurityPage: React.FC = () => {
             <FaBell className="text-red-500 text-2xl" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="bg-white p-4 rounded-lg shadow-xs">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Камеры онлайн</p>
@@ -126,7 +126,7 @@ const SecurityPage: React.FC = () => {
             <FaVideo className="text-green-500 text-2xl" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="bg-white p-4 rounded-lg shadow-xs">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Охрана на смене</p>
@@ -135,7 +135,7 @@ const SecurityPage: React.FC = () => {
             <FaUserShield className="text-blue-500 text-2xl" />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="bg-white p-4 rounded-lg shadow-xs">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Инцидентов за день</p>
@@ -183,7 +183,7 @@ const SecurityPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm">
+      <div className="bg-white rounded-lg shadow-xs">
         {activeTab === 'dashboard' && (
           <div className="p-4">
             <div className="grid grid-cols-2 gap-6">

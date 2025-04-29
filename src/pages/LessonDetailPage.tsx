@@ -169,7 +169,7 @@ const LessonDetailPage: React.FC = () => {
             presentationMaterial ? (
               <iframe
                 src={presentationMaterial}
-                className="w-full h-[500px] rounded-sm"
+                className="w-full h-[500px] rounded-xs"
                 title="Презентация"
               />
             ) : (

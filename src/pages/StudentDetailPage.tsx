@@ -470,7 +470,7 @@ const StudentDetailPage: React.FC = () => {
                                         </div>
                                         <button
                                             onClick={() => handleChatWithParent(students?.Parent.relation, students?.Parent.user.username)}
-                                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-sm hover:bg-blue-700"
+                                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-xs hover:bg-blue-700"
                                         >
                                             Написать
                                         </button>
@@ -506,7 +506,7 @@ const StudentDetailPage: React.FC = () => {
                                     </div>
                                     <button
                                         onClick={() => handleChatWithParent('mother', 'Сатыбалды Айгуль')}
-                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-sm hover:bg-blue-700"
+                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-xs hover:bg-blue-700"
                                     >
                                         Написать
                                     </button>
@@ -537,7 +537,7 @@ const StudentDetailPage: React.FC = () => {
                                     </div>
                                     <button
                                         onClick={() => handleChatWithParent('curator', 'Ахметова Динара')}
-                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-sm hover:bg-blue-700"
+                                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-xs hover:bg-blue-700"
                                     >
                                         Написать
                                     </button>
@@ -695,7 +695,7 @@ const StudentDetailPage: React.FC = () => {
                                             <div className="flex items-center gap-2">
                                                 <h3 className="text-base font-medium text-gray-900">{plan.subject}</h3>
                                                 <span
-                                                    className={`px-1.5 py-0.5 rounded-sm text-xs font-medium ${getStatusColor(plan.status)}`}>
+                                                    className={`px-1.5 py-0.5 rounded-xs text-xs font-medium ${getStatusColor(plan.status)}`}>
                           {getStatusText(plan.status)}
                         </span>
                                             </div>
@@ -732,7 +732,7 @@ const StudentDetailPage: React.FC = () => {
                                                             <span className="text-xs text-gray-900">{task.title}</span>
                                                         </div>
                                                         <span
-                                                            className={`px-1.5 py-0.5 rounded-sm text-xs font-medium ${getStatusColor(task.status)}`}>
+                                                            className={`px-1.5 py-0.5 rounded-xs text-xs font-medium ${getStatusColor(task.status)}`}>
                               {getStatusText(task.status)}
                             </span>
                                                     </div>
@@ -987,7 +987,7 @@ const StudentDetailPage: React.FC = () => {
                     </div>
 
                     {isPaymentModalOpen && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                             <div className="bg-white rounded-lg w-full max-w-lg">
                                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                                     <h2 className="text-lg font-medium text-gray-900">Назначить оплату</h2>
@@ -1573,7 +1573,7 @@ const StudentDetailPage: React.FC = () => {
 
                     {/* Модальное окно с деталями экзамена */}
                     {selectedExam && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                             <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
                                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                                     <h2 className="text-lg font-medium text-gray-900">

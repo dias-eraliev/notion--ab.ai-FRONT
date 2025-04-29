@@ -78,13 +78,13 @@ const StudyPlansPage: React.FC = () => {
       </div>
 
       {/* Фильтр по преподавателю */}
-      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+      <div className="bg-white p-4 rounded-lg shadow-xs mb-6">
         <div className="grid grid-cols-3 gap-4">
           <div>
             <select
               value={filters.teacher}
               onChange={(e) => setFilters({ ...filters, teacher: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="select select-primary w-full"
             >
               <option value="">Преподаватель</option>
               {uniqueTeachers.map(teacher => (
@@ -96,7 +96,7 @@ const StudyPlansPage: React.FC = () => {
             <select
               value={filters.group}
               onChange={(e) => setFilters({ ...filters, group: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="select select-primary w-full"
             >
               <option value="">Группа</option>
               {(payload?.profile?.groups ?? []).map(group => (
@@ -131,7 +131,7 @@ const StudyPlansPage: React.FC = () => {
         ) : (
           <>
             {/* Таблица учебных планов */}
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg shadow-xs overflow-hidden">
               {filteredPlans.length === 0 ? (
                 <div className="p-8 text-center text-gray-500">
                   {plans.length === 0
@@ -196,7 +196,7 @@ const StudyPlansPage: React.FC = () => {
 
         {/* Модальное окно детального просмотра */}
         {selectedPlan && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
               {/* Шапка модального окна */}
               <div className="p-6 border-b border-gray-200">

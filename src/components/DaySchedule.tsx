@@ -38,7 +38,7 @@ const DaySchedule: React.FC<DayScheduleProps> = ({
     });
 
     return (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-xs overflow-hidden">
             {/* Day Header */}
             <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
                 <h3 className="text-lg font-semibold">{formatDayName(day)}</h3>

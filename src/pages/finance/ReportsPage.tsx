@@ -292,7 +292,7 @@ const ReportsPage: React.FC = () => {
 
   // Компоненты фильтров
   const FilterModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h3 className="text-lg font-semibold mb-4">Фильтры</h3>
         
@@ -390,7 +390,7 @@ const ReportsPage: React.FC = () => {
     };
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="bg-linear-to-r from-blue-500 to-blue-600 px-6 py-4 rounded-t-lg">
             <div className="flex justify-between items-center">
@@ -447,10 +447,10 @@ const ReportsPage: React.FC = () => {
             <div className="border-t pt-4 mt-4 flex items-center justify-between text-sm text-gray-500">
               <span>Создан: {new Date(report.createdAt).toLocaleDateString('ru-RU')}</span>
               <div className="flex gap-2">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-sm hover:bg-blue-600 transition-colors">
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-xs hover:bg-blue-600 transition-colors">
                   Экспорт
                 </button>
-                <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-sm hover:bg-gray-200 transition-colors">
+                <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-xs hover:bg-gray-200 transition-colors">
                   Скачать PDF
                 </button>
               </div>
@@ -559,7 +559,7 @@ const ReportsPage: React.FC = () => {
       </div>
 
       {/* Таблица отчетов */}
-      <div className="bg-white rounded-lg shadow-sm">
+      <div className="bg-white rounded-lg shadow-xs">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
