@@ -40,6 +40,8 @@ const SchedulePage: React.FC = () => {
 
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchSchedule = async () => {
             try {
                 const GetSchedule = await ScheduleReq.getScheduleAll();
@@ -61,6 +63,10 @@ const SchedulePage: React.FC = () => {
         };
 
         fetchSchedule();
+
+        return () => {
+            isMounted = false; // предотвращает setState после размонтирования
+        };
     }, []);
 
 
