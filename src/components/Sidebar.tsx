@@ -363,7 +363,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-4">
         <div className="flex items-center mb-8">
           <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold bg-gradient-to-r from-[#1C7E66] to-white bg-clip-text text-transparent">UIB College Ai</span>
+            <span className="text-2xl font-bold bg-linear-to-r from-[#1C7E66] to-white bg-clip-text text-transparent">UIB College Ai</span>
           </Link>
         </div>
 
@@ -373,7 +373,7 @@ export const Sidebar: React.FC = () => {
             <input
               type="text"
               placeholder="Поиск..."
-              className="bg-transparent w-full text-sm focus:outline-none text-gray-600"
+              className="bg-transparent w-full text-sm focus:outline-hidden text-gray-600"
             />
           </div>
         </div>

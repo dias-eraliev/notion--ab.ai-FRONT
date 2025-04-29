@@ -141,7 +141,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="min-h-[calc(100vh-64px)] bg-gray-50">
       {/* Обложка */}
-      <div className="relative h-64 bg-gradient-to-r from-blue-500 to-blue-600">
+      <div className="relative h-64 bg-linear-to-r from-blue-500 to-blue-600">
         <div className="absolute inset-0 bg-black bg-opacity-30" />
         {isEditing && (
           <button className="absolute right-4 top-4 rounded-full bg-white p-2 text-gray-600 hover:bg-gray-100">

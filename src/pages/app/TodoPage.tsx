@@ -198,7 +198,7 @@ const TodoPage: React.FC = () => {
                 onClick={() => setView('list')}
                 className={`p-2 rounded-lg transition-colors ${
                   view === 'list'
-                    ? 'bg-white text-corporate-primary shadow-sm'
+                    ? 'bg-white text-corporate-primary shadow-xs'
                     : 'text-gray-500 hover:text-corporate-primary'
                 }`}
               >
@@ -208,7 +208,7 @@ const TodoPage: React.FC = () => {
                 onClick={() => setView('kanban')}
                 className={`p-2 rounded-lg transition-colors ${
                   view === 'kanban'
-                    ? 'bg-white text-corporate-primary shadow-sm'
+                    ? 'bg-white text-corporate-primary shadow-xs'
                     : 'text-gray-500 hover:text-corporate-primary'
                 }`}
               >
@@ -228,7 +228,7 @@ const TodoPage: React.FC = () => {
                 placeholder="Поиск задач..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary"
+                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary"
               />
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
             </div>
@@ -414,7 +414,7 @@ const TodoPage: React.FC = () => {
                                 className={`bg-white rounded-lg p-4 mb-2 ${
                                   snapshot.isDragging
                                     ? 'shadow-lg ring-2 ring-corporate-primary/20'
-                                    : 'shadow-sm hover:shadow-md'
+                                    : 'shadow-xs hover:shadow-md'
                                 } transition-all`}
                                 style={{
                                   ...provided.draggableProps.style,
@@ -483,7 +483,7 @@ const TodoPage: React.FC = () => {
                                 className={`bg-white rounded-lg p-4 mb-2 ${
                                   snapshot.isDragging
                                     ? 'shadow-lg ring-2 ring-corporate-primary/20'
-                                    : 'shadow-sm hover:shadow-md'
+                                    : 'shadow-xs hover:shadow-md'
                                 } transition-all`}
                                 style={{
                                   ...provided.draggableProps.style,
@@ -552,7 +552,7 @@ const TodoPage: React.FC = () => {
                                 className={`bg-white rounded-lg p-4 mb-2 ${
                                   snapshot.isDragging
                                     ? 'shadow-lg ring-2 ring-corporate-primary/20'
-                                    : 'shadow-sm hover:shadow-md'
+                                    : 'shadow-xs hover:shadow-md'
                                 } transition-all`}
                                 style={{
                                   ...provided.draggableProps.style,
@@ -621,7 +621,7 @@ const TodoPage: React.FC = () => {
                                 className={`bg-white rounded-lg p-4 mb-2 ${
                                   snapshot.isDragging
                                     ? 'shadow-lg ring-2 ring-corporate-primary/20'
-                                    : 'shadow-sm hover:shadow-md'
+                                    : 'shadow-xs hover:shadow-md'
                                 } transition-all`}
                                 style={{
                                   ...provided.draggableProps.style,
@@ -704,7 +704,7 @@ const TodoPage: React.FC = () => {
                       ? setEditingTodo({ ...editingTodo, title: e.target.value })
                       : null
                   }
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary"
                   placeholder="Введите название задачи"
                 />
               </div>
@@ -724,7 +724,7 @@ const TodoPage: React.FC = () => {
                       : null
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary resize-none"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary resize-none"
                   placeholder="Добавьте описание задачи"
                 />
               </div>
@@ -745,7 +745,7 @@ const TodoPage: React.FC = () => {
                           })
                         : null
                     }
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary"
                   />
                 </div>
 
@@ -763,7 +763,7 @@ const TodoPage: React.FC = () => {
                           })
                         : null
                     }
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-corporate-primary"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-hidden focus:border-corporate-primary"
                   >
                     <option value="">Выберите ответственного</option>
                     {users.map(user => (
@@ -792,7 +792,7 @@ const TodoPage: React.FC = () => {
                             : editingTodo.watchers.filter(w => w.id !== user.id);
                           setEditingTodo({ ...editingTodo, watchers });
                         }}
-                        className="mr-2 h-4 w-4 rounded border-gray-300 text-corporate-primary focus:ring-corporate-primary"
+                        className="mr-2 h-4 w-4 rounded-sm border-gray-300 text-corporate-primary focus:ring-corporate-primary"
                       />
                       <span className="text-sm text-gray-700">{user.name}</span>
                     </label>

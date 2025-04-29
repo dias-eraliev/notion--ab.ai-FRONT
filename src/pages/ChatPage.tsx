@@ -165,7 +165,7 @@ const ChatPage: React.FC = () => {
             <input
               type="text"
               placeholder="Поиск..."
-              className="w-full px-3 py-2 bg-[#FFFFFF] border border-[#E5E5E5] rounded-md pl-9 text-sm focus:outline-none focus:ring-1 focus:ring-[#E5E5E5] transition-all"
+              className="w-full px-3 py-2 bg-[#FFFFFF] border border-[#E5E5E5] rounded-md pl-9 text-sm focus:outline-hidden focus:ring-1 focus:ring-[#E5E5E5] transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -183,7 +183,7 @@ const ChatPage: React.FC = () => {
               onClick={() => setSelectedChat(chat.id)}
             >
               <div className="flex items-center gap-3">
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <img
                     src={chat.avatar}
                     alt={chat.name}
@@ -320,7 +320,7 @@ const ChatPage: React.FC = () => {
               <input
                 type="text"
                 placeholder={isRecording ? `Запись: ${formatRecordingTime(recordingTime)}` : "Введите сообщение..."}
-                className="flex-1 px-4 py-2 bg-white border border-[#E5E5E5] rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#E5E5E5] transition-all placeholder-[#9B9B9B]"
+                className="flex-1 px-4 py-2 bg-white border border-[#E5E5E5] rounded-md text-sm focus:outline-hidden focus:ring-1 focus:ring-[#E5E5E5] transition-all placeholder-[#9B9B9B]"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}

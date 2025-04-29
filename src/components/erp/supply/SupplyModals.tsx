@@ -88,7 +88,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
                 <label className="block mb-1">Название</label>
                 <input
                   type="text"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded-sm"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 />
@@ -96,7 +96,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
               <div>
                 <label className="block mb-1">Описание</label>
                 <textarea
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded-sm"
                   rows={4}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -105,7 +105,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
               <div>
                 <label className="block mb-1">Категория</label>
                 <select
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded-sm"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 >
@@ -123,7 +123,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
               <div>
                 <label className="block mb-1">Приоритет</label>
                 <select
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded-sm"
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                 >
@@ -136,7 +136,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
                 <label className="block mb-1">Предполагаемая стоимость</label>
                 <input
                   type="number"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded-sm"
                   value={formData.estimatedCost}
                   onChange={(e) => setFormData({ ...formData, estimatedCost: e.target.value })}
                 />
@@ -146,7 +146,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
                 <input
                   type="file"
                   multiple
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded-sm"
                   onChange={(e) => setFormData({ ...formData, files: Array.from(e.target.files || []) })}
                 />
               </div>
@@ -156,7 +156,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
           {activeStep === 3 && (
             <div className="space-y-4">
               <h3 className="font-bold">Проверьте введенные данные</h3>
-              <div className="bg-gray-50 p-4 rounded">
+              <div className="bg-gray-50 p-4 rounded-sm">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="font-semibold">Название</div>
@@ -188,7 +188,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
               <button
                 type="button"
                 onClick={() => setActiveStep(activeStep - 1)}
-                className="px-4 py-2 border rounded hover:bg-gray-50"
+                className="px-4 py-2 border rounded-sm hover:bg-gray-50"
               >
                 Назад
               </button>
@@ -197,14 +197,14 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
               <button
                 type="button"
                 onClick={() => setActiveStep(activeStep + 1)}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ml-auto"
+                className="px-4 py-2 bg-blue-500 text-white rounded-sm hover:bg-blue-600 ml-auto"
               >
                 Далее
               </button>
             ) : (
               <button
                 type="submit"
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-auto"
+                className="px-4 py-2 bg-green-500 text-white rounded-sm hover:bg-green-600 ml-auto"
               >
                 Создать заявку
               </button>
@@ -269,7 +269,7 @@ export const ViewRequestModal: React.FC<ViewModalProps> = ({ isOpen, onClose, re
                   <div className="space-y-2">
                     <div>
                       <span className="text-gray-500">Статус:</span>
-                      <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded">
+                      <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-sm">
                         {request.status}
                       </span>
                     </div>
@@ -351,11 +351,11 @@ export const ViewRequestModal: React.FC<ViewModalProps> = ({ isOpen, onClose, re
             <div className="space-y-4">
               <div className="mb-4">
                 <textarea
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded-sm"
                   rows={3}
                   placeholder="Добавить комментарий..."
                 />
-                <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-sm hover:bg-blue-600">
                   Отправить
                 </button>
               </div>

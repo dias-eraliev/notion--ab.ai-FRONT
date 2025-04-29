@@ -221,7 +221,7 @@ const GradeEditModal: React.FC<GradeEditModalProps> = ({
                                 <textarea
                                     value={absenceReason}
                                     onChange={(e) => setAbsenceReason(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     rows={2}
                                     required={isAbsent}
                                     placeholder="Укажите причину отсутствия"
@@ -244,7 +244,7 @@ const GradeEditModal: React.FC<GradeEditModalProps> = ({
                                     max="100"
                                     value={classworkGrade.value}
                                     onChange={(e) => setClassworkGrade({ ...classworkGrade, value: Number(e.target.value) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     disabled={isAbsent}
                                 />
                             </div>
@@ -256,7 +256,7 @@ const GradeEditModal: React.FC<GradeEditModalProps> = ({
                                     type="date"
                                     value={classworkGrade.date}
                                     onChange={(e) => setClassworkGrade({ ...classworkGrade, date: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     disabled={isAbsent}
                                 />
                             </div>
@@ -267,7 +267,7 @@ const GradeEditModal: React.FC<GradeEditModalProps> = ({
                                 <textarea
                                     value={classworkGrade.comment || ''}
                                     onChange={(e) => setClassworkGrade({ ...classworkGrade, comment: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     rows={2}
                                     disabled={isAbsent}
                                 />
@@ -289,7 +289,7 @@ const GradeEditModal: React.FC<GradeEditModalProps> = ({
                                     max="100"
                                     value={homeworkGrade.value}
                                     onChange={(e) => setHomeworkGrade({ ...homeworkGrade, value: Number(e.target.value) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     disabled={isAbsent}
                                 />
                             </div>
@@ -301,7 +301,7 @@ const GradeEditModal: React.FC<GradeEditModalProps> = ({
                                     type="date"
                                     value={homeworkGrade.date}
                                     onChange={(e) => setHomeworkGrade({ ...homeworkGrade, date: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     disabled={isAbsent}
                                 />
                             </div>
@@ -312,7 +312,7 @@ const GradeEditModal: React.FC<GradeEditModalProps> = ({
                                 <textarea
                                     value={homeworkGrade.comment || ''}
                                     onChange={(e) => setHomeworkGrade({ ...homeworkGrade, comment: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                                     rows={2}
                                     disabled={isAbsent}
                                 />
@@ -664,7 +664,7 @@ const JournalPage: React.FC = () => {
             </div>
 
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-sm mb-4">
                     Ошибка при загрузке данных
                 </div>
             )}
@@ -677,7 +677,7 @@ const JournalPage: React.FC = () => {
                         <select
                             value={selectedGroup}
                             onChange={(e) => setSelectedGroup(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500 appearance-none"
                             disabled={isLoading}
                         >
                             <option value="">Выберите группу</option>
@@ -698,7 +698,7 @@ const JournalPage: React.FC = () => {
                     <select
                         value={selectedSyllabus}
                         onChange={(e) => setSelectedSyllabus(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                        className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500 appearance-none"
                         disabled={isLoading}
                     >
                         <option value="">Выберите учебный план</option>
@@ -721,7 +721,7 @@ const JournalPage: React.FC = () => {
                             placeholder="Поиск по имени"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                             disabled={isLoading}
                         />
                         <button className="px-4 py-2 bg-white border border-l-0 border-gray-200 rounded-r-md hover:bg-gray-50">
@@ -738,7 +738,7 @@ const JournalPage: React.FC = () => {
                 </div>
             ) : (
                 /* Grades table */
-                <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                             <thead>

@@ -70,7 +70,7 @@ const PermissionsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow">
+          <div className="bg-white rounded-lg shadow-sm">
             {filteredRoles.map(role => (
               <div
                 key={role.id}
@@ -88,7 +88,7 @@ const PermissionsPage: React.FC = () => {
 
         <div className="col-span-2">
           {selectedRole ? (
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h2 className="text-xl font-bold">{selectedRole.name}</h2>

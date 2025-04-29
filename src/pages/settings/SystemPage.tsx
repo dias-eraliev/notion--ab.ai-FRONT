@@ -66,7 +66,7 @@ const SystemPage: React.FC = () => {
 
       <div className="grid grid-cols-4 gap-6">
         <div className="col-span-1">
-          <div className="bg-white rounded-lg shadow">
+          <div className="bg-white rounded-lg shadow-sm">
             <button
               className={`w-full p-4 flex items-center gap-3 ${
                 activeTab === 'general' ? 'bg-blue-50 text-blue-600' : ''
@@ -116,7 +116,7 @@ const SystemPage: React.FC = () => {
         </div>
 
         <div className="col-span-3">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             {activeTab === 'general' && (
               <div className="space-y-6">
                 <h2 className="text-lg font-semibold">Общие настройки</h2>
@@ -126,7 +126,7 @@ const SystemPage: React.FC = () => {
                       Часовой пояс
                     </label>
                     <select
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.timezone}
                       onChange={(e) => handleSettingChange('timezone', e.target.value)}
                     >
@@ -139,7 +139,7 @@ const SystemPage: React.FC = () => {
                       Формат даты
                     </label>
                     <select
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.dateFormat}
                       onChange={(e) => handleSettingChange('dateFormat', e.target.value)}
                     >
@@ -153,7 +153,7 @@ const SystemPage: React.FC = () => {
                       Язык по умолчанию
                     </label>
                     <select
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.defaultLanguage}
                       onChange={(e) => handleSettingChange('defaultLanguage', e.target.value)}
                     >
@@ -168,7 +168,7 @@ const SystemPage: React.FC = () => {
                     </label>
                     <input
                       type="number"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.maxUploadSize}
                       onChange={(e) => handleSettingChange('maxUploadSize', parseInt(e.target.value))}
                     />
@@ -187,7 +187,7 @@ const SystemPage: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.emailServer}
                       onChange={(e) => handleSettingChange('emailServer', e.target.value)}
                     />
@@ -198,7 +198,7 @@ const SystemPage: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.emailPort}
                       onChange={(e) => handleSettingChange('emailPort', e.target.value)}
                     />
@@ -208,7 +208,7 @@ const SystemPage: React.FC = () => {
                       Шифрование
                     </label>
                     <select
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.emailEncryption}
                       onChange={(e) => handleSettingChange('emailEncryption', e.target.value)}
                     >
@@ -266,7 +266,7 @@ const SystemPage: React.FC = () => {
                     </label>
                     <input
                       type="number"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.sessionTimeout}
                       onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
                     />
@@ -302,7 +302,7 @@ const SystemPage: React.FC = () => {
                       Частота резервного копирования
                     </label>
                     <select
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={settings.backupFrequency}
                       onChange={(e) => handleSettingChange('backupFrequency', e.target.value)}
                     >
@@ -312,7 +312,7 @@ const SystemPage: React.FC = () => {
                       <option value="monthly">Ежемесячно</option>
                     </select>
                   </div>
-                  <button className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded flex items-center gap-2">
+                  <button className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-sm flex items-center gap-2">
                     <FaDownload /> Скачать резервную копию
                   </button>
                 </div>

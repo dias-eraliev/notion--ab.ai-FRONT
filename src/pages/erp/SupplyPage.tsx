@@ -200,7 +200,7 @@ const SupplyPage: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-lg shadow-sm">
         {activeTab === 'requests' && (
           <div className="p-4">
             <table className="w-full">

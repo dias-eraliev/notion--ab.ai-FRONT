@@ -299,7 +299,7 @@ const WorkloadPage: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-900">Нагрузки и расписание ставок</h1>
             <p className="text-sm text-gray-500">Управление педагогической нагрузкой и ставками</p>
           </div>
-          <div className="flex items-center gap-2 bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+          <div className="flex items-center gap-2 bg-white rounded-lg shadow-xs border border-gray-200 p-1">
             <select
               className="pl-8 pr-2 py-1.5 text-sm border-0 bg-transparent focus:ring-0 appearance-none cursor-pointer"
               value={periodType}

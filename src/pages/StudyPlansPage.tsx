@@ -78,7 +78,7 @@ const StudyPlansPage: React.FC = () => {
       </div>
 
       {/* Фильтр по преподавателю */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
         <div className="grid grid-cols-3 gap-4">
           <div>
             <select
@@ -131,7 +131,7 @@ const StudyPlansPage: React.FC = () => {
         ) : (
           <>
             {/* Таблица учебных планов */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               {filteredPlans.length === 0 ? (
                 <div className="p-8 text-center text-gray-500">
                   {plans.length === 0

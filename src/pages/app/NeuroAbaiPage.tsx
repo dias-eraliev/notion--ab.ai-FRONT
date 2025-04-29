@@ -83,7 +83,7 @@ function FileUploadArea({ files, onFileChange, onRemoveFile, disabled }: FileUpl
     return (
         <div className="mt-4">
             <input ref={fileInputRef} type="file" multiple onChange={onFileChange} disabled={disabled} className="hidden" />
-            <div onClick={handleClick} onDragOver={handleDragOver} onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDrop={handleDrop} className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-4 transition-colors ${isDragging ? "border-[#1C7E66]/50 bg-[#1C7E66]/5" : "border-gray-300 bg-gray-50 hover:bg-gray-100"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}> <div className="rounded-full bg-white p-2 shadow-sm"><Paperclip className="h-5 w-5 text-gray-400" /></div><div className="text-center"><p className="text-sm font-medium">Нажмите для выбора файлов</p><p className="text-xs text-gray-400">или перетащите файлы сюда</p></div></div>
+            <div onClick={handleClick} onDragOver={handleDragOver} onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDrop={handleDrop} className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-4 transition-colors ${isDragging ? "border-[#1C7E66]/50 bg-[#1C7E66]/5" : "border-gray-300 bg-gray-50 hover:bg-gray-100"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}> <div className="rounded-full bg-white p-2 shadow-xs"><Paperclip className="h-5 w-5 text-gray-400" /></div><div className="text-center"><p className="text-sm font-medium">Нажмите для выбора файлов</p><p className="text-xs text-gray-400">или перетащите файлы сюда</p></div></div>
             {files.length > 0 && (
                 <div className="mt-3 space-y-2">
                     <p className="text-sm font-medium">Выбранные файлы:</p>
@@ -144,7 +144,7 @@ export default function NeuroAbaiPage() {
                     <h1 className="text-center text-xl font-bold text-[#1C7E66]">UIB College AI</h1>
                     <div className="mt-4">
                         <div className="relative">
-                            <select value={scenario} onChange={e => setScenario(e.target.value)} className="w-full appearance-none rounded-lg border bg-white px-3 py-2 pr-10 text-sm shadow-sm focus:border-[#1C7E66] focus:outline-none focus:ring-2 focus:ring-[#1C7E66]/20">
+                            <select value={scenario} onChange={e => setScenario(e.target.value)} className="w-full appearance-none rounded-lg border bg-white px-3 py-2 pr-10 text-sm shadow-xs focus:border-[#1C7E66] focus:outline-hidden focus:ring-2 focus:ring-[#1C7E66]/20">
                                 {SCENARIOS.map(s => (<option key={s.label} value={s.value}>{s.label}</option>))}
                             </select>
                             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -178,7 +178,7 @@ export default function NeuroAbaiPage() {
                 </div>
                 <div className="border-t p-4">
                     <div className="relative rounded-lg border bg-white focus-within:ring-2 focus-within:ring-[#1C7E66]/20">
-                        <textarea value={input} onChange={e => setInput(e.target.value)} placeholder="Введите сообщение..." className="min-h-[80px] w-full resize-none rounded-lg border-0 bg-transparent p-3 text-sm shadow-none focus:outline-none focus:ring-0" onKeyDown={handleKeyDown} disabled={loading} />
+                        <textarea value={input} onChange={e => setInput(e.target.value)} placeholder="Введите сообщение..." className="min-h-[80px] w-full resize-none rounded-lg border-0 bg-transparent p-3 text-sm shadow-none focus:outline-hidden focus:ring-0" onKeyDown={handleKeyDown} disabled={loading} />
                         <div className="flex flex-col items-center justify-between border-t p-2">
                             <div className="flex-1 w-full pb-4">
                                 <FileUploadArea files={files} onFileChange={handleFileChange} onRemoveFile={handleRemoveFile} disabled={loading} />

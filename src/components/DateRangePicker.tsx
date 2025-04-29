@@ -108,7 +108,7 @@ const calendarStyles = `
 
 const CustomInput = forwardRef<HTMLDivElement, CustomInputProps>(({ value, onClick }, ref) => (
   <div
-    className="w-full px-4 py-2.5 border border-gray-200 rounded-md bg-white text-gray-700 flex items-center cursor-pointer hover:border-blue-500 transition-colors shadow-sm"
+    className="w-full px-4 py-2.5 border border-gray-200 rounded-md bg-white text-gray-700 flex items-center cursor-pointer hover:border-blue-500 transition-colors shadow-xs"
     onClick={onClick}
     ref={ref}
   >
@@ -243,7 +243,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ startDate, endDate, o
               fn: (state) => state
             },
           ]}
-          calendarClassName="!bg-white !border-gray-200 !shadow-xl !rounded-lg !p-2"
+          calendarClassName="bg-white! border-gray-200! shadow-xl! rounded-lg! p-2!"
         />
       </div>
     </div>

@@ -62,7 +62,7 @@ const IntegrationsPage: React.FC = () => {
         {integrations.map(integration => (
           <div
             key={integration.id}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow cursor-pointer"
+            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer"
             onClick={() => setSelectedIntegration(integration)}
           >
             <div className="flex items-start justify-between mb-4">
@@ -131,7 +131,7 @@ const IntegrationsPage: React.FC = () => {
                     <label className="block text-sm text-gray-600 mb-1">API Key</label>
                     <input
                       type="text"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value={selectedIntegration.apiKey || ''}
                       placeholder="Введите API ключ"
                     />
@@ -140,7 +140,7 @@ const IntegrationsPage: React.FC = () => {
                     <label className="block text-sm text-gray-600 mb-1">Webhook URL</label>
                     <input
                       type="text"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded-sm"
                       value="https://api.school.edu/webhooks/integration"
                       disabled
                     />
@@ -170,7 +170,7 @@ const IntegrationsPage: React.FC = () => {
               >
                 Отмена
               </button>
-              <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+              <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-sm">
                 Сохранить
               </button>
             </div>

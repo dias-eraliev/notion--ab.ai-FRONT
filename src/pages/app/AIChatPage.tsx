@@ -642,13 +642,13 @@ const AIChatPage: React.FC = () => {
           </button>
           {showSettings && (
             <div className="mt-2 space-y-2">
-              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
+              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-sm">
                 Очистить историю
               </button>
-              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
+              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-sm">
                 Изменить модель AI
               </button>
-              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
+              <button className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded-sm">
                 Справка
               </button>
             </div>
@@ -695,7 +695,7 @@ const AIChatPage: React.FC = () => {
                 {msg.type === 'text' && <p>{msg.text}</p>}
                 {msg.type === 'code' && (
                   <div className="relative">
-                    <pre className="bg-gray-800 text-white p-4 rounded">
+                    <pre className="bg-gray-800 text-white p-4 rounded-sm">
                       <code>{msg.text}</code>
                     </pre>
                     <button
@@ -743,7 +743,7 @@ const AIChatPage: React.FC = () => {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={isRealtimeActive ? "Голосовой режим активен..." : "Введите сообщение..."}
-                className={`w-full px-4 py-2 border ${isRealtimeActive ? 'bg-gray-100' : 'bg-white'} border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 resize-none`}
+                className={`w-full px-4 py-2 border ${isRealtimeActive ? 'bg-gray-100' : 'bg-white'} border-gray-200 rounded-lg focus:outline-hidden focus:border-blue-500 resize-none`}
                 rows={1}
                 disabled={isRealtimeActive}
               />

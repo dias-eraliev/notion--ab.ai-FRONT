@@ -100,7 +100,7 @@ const Login: React.FC = () => {
           variants={formVariants}
           initial="hidden"
           animate="visible"
-          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-notion p-8 relative"
+          className="bg-white/80 backdrop-blur-xs rounded-xl shadow-notion p-8 relative"
         >
           <AnimatePresence>
             {isSuccess && (
@@ -108,7 +108,7 @@ const Login: React.FC = () => {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
-                className="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-xl z-20"
+                className="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-xs rounded-xl z-20"
               >
                 <motion.div
                   initial={{ scale: 0 }}
@@ -188,7 +188,7 @@ const Login: React.FC = () => {
                 <input
                   type="checkbox"
                   name="rememberMe"
-                  className="h-4 w-4 text-corporate-primary focus:ring-corporate-primary border-corporate-primary/20 rounded"
+                  className="h-4 w-4 text-corporate-primary focus:ring-corporate-primary border-corporate-primary/20 rounded-sm"
                 />
                 <label className="ml-2 block text-sm text-gray-700">
                   Запомнить меня
@@ -209,7 +209,7 @@ const Login: React.FC = () => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoading}
-              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-corporate-primary hover:bg-corporate-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary transition-all duration-200 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-xs text-sm font-medium text-white bg-corporate-primary hover:bg-corporate-primary/90 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary transition-all duration-200 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {isLoading ? (
                 <motion.div

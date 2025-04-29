@@ -67,7 +67,7 @@ const DashboardGrid: React.FC = () => {
           <select
             value={selectedTemplate}
             onChange={(e) => setSelectedTemplate(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-lg bg-white/80 backdrop-blur-sm"
+            className="px-4 py-2 border border-gray-200 rounded-lg bg-white/80 backdrop-blur-xs"
           >
             {Object.entries(templates).map(([key, value]) => (
               <option key={key} value={key}>{value}</option>
@@ -94,7 +94,7 @@ const DashboardGrid: React.FC = () => {
             as={motion.div}
             layout
             className={`
-              bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-notion
+              bg-white/80 backdrop-blur-xs rounded-xl p-6 shadow-notion
               ${widget.size === 'small' ? 'col-span-3' : widget.size === 'medium' ? 'col-span-6' : 'col-span-12'}
             `}
           >
@@ -127,7 +127,7 @@ const DashboardGrid: React.FC = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50"
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}

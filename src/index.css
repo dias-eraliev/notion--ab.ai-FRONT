@@ -1,6 +1,72 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-corporate-primary: #1c7e66;
+  --color-corporate-secondary: #fff;
+  --color-corporate-bg: #f8fafc;
+
+  --color-notion-gray-light: #f7f6f3;
+  --color-notion-gray: #e6e6e6;
+  --color-notion-gray-dark: #d3d3d3;
+
+  --color-notion-text: #37352f;
+  --color-notion-text-light: #6b6b6b;
+
+  --color-event-meeting: #4299e1;
+  --color-event-task: #e53e3e;
+  --color-event-reminder: #9f7aea;
+  --color-event-event: #ecc94b;
+  --color-event-class: #ed8936;
+
+  --font-inter: Inter, sans-serif;
+
+  --spacing-sidebar: 250px;
+
+  --shadow-notion:
+    0 0 0 1px rgba(15, 15, 15, 0.1), 0 2px 4px rgba(15, 15, 15, 0.1);
+  --shadow-notion-hover:
+    0 0 0 1px rgba(15, 15, 15, 0.1), 0 3px 6px rgba(15, 15, 15, 0.15);
+  --shadow-calendar-event: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  --animate-wiggle: wiggle 0.3s ease-in-out infinite;
+
+  --min-height-widget: 200px;
+  --min-height-widget-lg: 300px;
+
+  --grid-template-columns-auto-fit: repeat(auto-fit, minmax(300px, 1fr));
+  --grid-template-columns-auto-fill: repeat(auto-fill, minmax(300px, 1fr));
+
+
+}
+
+@keyframes wiggle {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(1deg);
+  }
+
+  75% {
+    transform: rotate(-1deg);
+  }
+}
+
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
 
 @layer base {
   body {
@@ -13,41 +79,15 @@
   }
 }
 
-@layer components {
-  .shadow-notion {
-    box-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px,
-                rgba(15, 15, 15, 0.1) 0px 2px 4px;
-  }
-
-  .bg-corporate-primary {
-    background-color: var(--corporate-primary);
-  }
-
-  .text-corporate-primary {
-    color: var(--corporate-primary);
-  }
-
-  .bg-corporate-bg {
-    background-color: var(--corporate-bg);
-  }
-
-  .hover\:bg-corporate-primary:hover {
-    background-color: var(--corporate-primary);
-  }
-
-  .hover\:text-corporate-primary:hover {
-    color: var(--corporate-primary);
-  }
-}
-
-/* Кастомные стили для анимаций */
 @keyframes float {
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -57,12 +97,12 @@
   animation: float 6s ease-in-out infinite;
 }
 
-/* Анимации */
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -109,4 +149,4 @@
 .button-hover:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-} 
+}

@@ -160,7 +160,7 @@ const SettingsPage: React.FC = () => {
           <select
             value={setting.value}
             onChange={(e) => handleSettingChange(setting.id, e.target.value)}
-            className="block w-full max-w-xs rounded-lg border border-gray-200 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+            className="block w-full max-w-xs rounded-lg border border-gray-200 bg-white px-3 py-2 focus:border-blue-500 focus:outline-hidden"
           >
             {setting.options?.map((option) => (
               <option key={option.value} value={option.value}>
@@ -175,7 +175,7 @@ const SettingsPage: React.FC = () => {
             type="text"
             value={setting.value}
             onChange={(e) => handleSettingChange(setting.id, e.target.value)}
-            className="block w-full max-w-xs rounded-lg border border-gray-200 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+            className="block w-full max-w-xs rounded-lg border border-gray-200 bg-white px-3 py-2 focus:border-blue-500 focus:outline-hidden"
           />
         );
       case 'button':
@@ -227,7 +227,7 @@ const SettingsPage: React.FC = () => {
         <div className="mx-auto max-w-3xl space-y-6">
           {/* Профиль */}
           {activeCategory === 'profile' && (
-            <div className="rounded-lg bg-white p-6 shadow-sm">
+            <div className="rounded-lg bg-white p-6 shadow-xs">
               <h3 className="mb-4 text-lg font-semibold text-gray-800">
                 Профиль пользователя
               </h3>
@@ -247,7 +247,7 @@ const SettingsPage: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none"
+                      className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-hidden"
                       placeholder="Введите имя"
                     />
                   </div>
@@ -257,7 +257,7 @@ const SettingsPage: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none"
+                      className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-hidden"
                       placeholder="Введите фамилию"
                     />
                   </div>
@@ -267,7 +267,7 @@ const SettingsPage: React.FC = () => {
                     </label>
                     <input
                       type="email"
-                      className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none"
+                      className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-hidden"
                       placeholder="Введите email"
                     />
                   </div>
@@ -277,7 +277,7 @@ const SettingsPage: React.FC = () => {
                     </label>
                     <input
                       type="tel"
-                      className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-none"
+                      className="mt-1 block w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-500 focus:outline-hidden"
                       placeholder="Введите телефон"
                     />
                   </div>
@@ -299,7 +299,7 @@ const SettingsPage: React.FC = () => {
                 .map((setting) => (
                   <div
                     key={setting.id}
-                    className="rounded-lg bg-white p-6 shadow-sm"
+                    className="rounded-lg bg-white p-6 shadow-xs"
                   >
                     <div className="flex items-center justify-between">
                       <div>

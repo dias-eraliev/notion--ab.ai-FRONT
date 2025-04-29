@@ -215,7 +215,7 @@ const PayrollPage: React.FC = () => {
         <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="relative">
             {/* Шапка */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-xl text-white">
+            <div className="bg-linear-to-r from-blue-600 to-blue-800 p-6 rounded-t-xl text-white">
               <button 
                 onClick={() => setSelectedEmployee(null)}
                 className="absolute top-4 right-4 text-white hover:text-gray-200"
@@ -361,7 +361,7 @@ const PayrollPage: React.FC = () => {
 
       {/* Основные показатели */}
       <div className="grid grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Фонд оплаты труда</div>
             <FaChartLine className="text-blue-600" />
@@ -374,7 +374,7 @@ const PayrollPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Средняя зарплата</div>
             <FaUserTie className="text-blue-600" />
@@ -387,7 +387,7 @@ const PayrollPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Сотрудников</div>
             <FaUsers className="text-blue-600" />
@@ -400,7 +400,7 @@ const PayrollPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Премиальный фонд</div>
             <FaChartLine className="text-blue-600" />
@@ -416,7 +416,7 @@ const PayrollPage: React.FC = () => {
 
       {/* Анализ по отделам */}
       <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-xs">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Распределение по отделам</h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -438,7 +438,7 @@ const PayrollPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-xs">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Динамика ФОТ</h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -464,7 +464,7 @@ const PayrollPage: React.FC = () => {
       </div>
 
       {/* Таблица сотрудников */}
-      <div className="bg-white rounded-xl shadow-sm">
+      <div className="bg-white rounded-xl shadow-xs">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-800">Список сотрудников</h2>
         </div>
