@@ -23,7 +23,7 @@ export const StudentModal: React.FC<StudentModalProps> = ({student, onClose, onV
                                     alt={student.name} className="w-32 h-32 object-cover"/>
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-800">{student.name + " " + student.surname + " " + student.lastname}</h2>
+                                <h2 className="text-2xl font-bold text-gray-800">{student.name + " " + student.surname}</h2>
                                 <p className="text-gray-600">Группа: {student.group.name}</p>
                             </div>
                         </div>
@@ -67,7 +67,7 @@ export const StudentModal: React.FC<StudentModalProps> = ({student, onClose, onV
                                 {student.Parent.user.username && (
                                     <div className="flex items-center">
                                         <FaUserGraduate className="w-5 h-5 text-gray-500 mr-3"/>
-                                        <span>{student.Parent.user.username}</span>
+                                        <span>{student.student.Parent.user.username}</span>
                                     </div>
                                 )}
                                 {/*{student.parentPhone && (*/}
