@@ -336,34 +336,32 @@ const EmployeesPage: React.FC = () => {
                 <div className="flex items-center">
                   <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
                     <span className="text-blue-600 text-xl font-medium">
-                      {selectedEmployee.fullName.split(' ').map(n => n[0]).join('')}
+                      {selectedEmployee.name.split(' ').map(n => n[0]).join('')}
                     </span>
-                                    </div>
-                                    <div className="ml-4">
-                                        <div className="flex items-center gap-2">
-                                            <h2 className="text-2xl font-bold text-gray-900">{selectedEmployee.fullName}</h2>
-                                            <span className="text-sm text-gray-500">ИИН: {selectedEmployee.iin}</span>
-                                        </div>
-                                        <p className="text-gray-600">{selectedEmployee.position}</p>
-                                        <div className="flex gap-2 mt-2">
-                                            <span
-                                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status)}`}>
-                                                {getStatusText(selectedEmployee.status)}
-                                            </span>
-                                            <span
-                                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentType)}`}>
-                                                {getEmploymentTypeText(selectedEmployee.employmentType)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button
-                                    className="text-gray-400 hover:text-gray-500"
-                                    onClick={() => setSelectedEmployee(null)}
-                                >
-                                    <FaTimes className="w-6 h-6" />
-                                </button>
-                            </div>
+                  </div>
+                  <div className="ml-4">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl font-bold text-gray-900">{selectedEmployee.name}</h2>
+                      <span className="text-sm text-gray-500">ИИН: {selectedEmployee.iin}</span>
+                    </div>
+                    <p className="text-gray-600">{selectedEmployee.position}</p>
+                    <div className="flex gap-2 mt-2">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status)}`}>
+                        {getStatusText(selectedEmployee.status)}
+                      </span>
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentType)}`}>
+                        {getEmploymentTypeText(selectedEmployee.employmentType)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  className="text-gray-400 hover:text-gray-500"
+                  onClick={() => setSelectedEmployee(null)}
+                >
+                  <FaTimes className="w-6 h-6" />
+                </button>
+              </div>
 
                             {/* Основная информация */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
