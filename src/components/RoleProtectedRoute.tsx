@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { AuthPayload, useAuth } from '../contexts/AuthContext';
 
 interface RoleProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles: string[];
+  allowedRoles: AuthPayload["role"][];
 }
 
 export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ 
