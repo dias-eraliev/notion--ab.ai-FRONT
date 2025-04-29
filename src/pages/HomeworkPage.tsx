@@ -5,102 +5,22 @@ import {
   FaBook,
   FaUpload,
   FaDownload,
-  FaCheck,
   FaTimes,
   FaClock,
-  FaComment,
   FaPaperclip,
   FaPlus,
   FaExclamationTriangle,
-  FaFilter,
   FaSearch,
   FaUser,
   FaUsers,
   FaStar,
   FaSpinner
 } from 'react-icons/fa';
-import { useAuth, AuthPayload } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { homeworkApi } from '../api';
-import { HomeworkResponse, CreateHomeworkDto } from '../api/homework.api';
+import { CreateHomeworkDto } from '../api/homework.api';
 import { toast } from 'react-toastify';
-
-// Updated Homework interface to match backend data structure
-interface Homework {
-  id: number;
-  name: string;
-  description: string | null;
-  deadline: string | null;
-  date: string | null;
-  createdAt: string;
-  updatedAt: string;
-  lessonId: number;
-  materialId: number | null;
-  // Derived fields
-  status: 'pending' | 'submitted' | 'graded' | 'overdue';
-  attachments: {
-    id: string;
-    name: string;
-    type: string;
-  }[];
-  // Lesson info
-  Lesson?: {
-    id: number;
-    name: string;
-    description: string;
-    syllabusId: number;
-    date: string;
-    Syllabus?: {
-      id: number;
-      name: string;
-      description: string;
-      teacherId: number;
-      group?: Array<{
-        id: number;
-        name: string;
-      }>;
-      teacher?: {
-        id: number;
-        name: string;
-        surname: string;
-      };
-    };
-  };
-  // Material info
-  material?: {
-    id: number;
-    name: string;
-    videoUrl: string | null;
-    lecture: string | null;
-    presentationUrl: string | null;
-    quizId: number | null;
-    Quiz?: {
-      id: number;
-      name: string;
-      description: string;
-      questions?: Array<{
-        id: number;
-        question: string;
-        answers?: Array<{
-          id: number;
-          answer: string;
-          isCorrect: boolean;
-        }>;
-      }>;
-    };
-  };
-  // Submission and feedback
-  grade?: number;
-  feedback?: string;
-  submission?: {
-    files: {
-      id: string;
-      name: string;
-      type: string;
-    }[];
-    comment?: string;
-    submittedAt?: string;
-  };
-}
+import { Homework, HomeworkModalData } from '@/Interfeces/Homework.imterface';
 
 // Function to convert backend data to our frontend model
 const mapHomeworkResponseToHomework = (homework: any): Homework => {
@@ -187,31 +107,6 @@ const StatusBadge: React.FC<{ status: Homework['status'] }> = ({ status }) => {
   );
 };
 
-interface HomeworkModalData {
-  title: string;
-  description: string;
-  deadline: string;
-  date: string;
-  lessonId: string;
-  groupId: string;
-  studyPlanId: string;
-  materialType: string;
-  materialContent: string;
-  materialUrl: string;
-  hasQuiz: boolean;
-  quizTitle: string;
-  quizDescription: string;
-  questions: Array<{
-    question: string;
-    options: string[];
-    correctOption: number;
-    answers?: Array<{
-      text: string;
-      isCorrect: boolean;
-    }>;
-  }>;
-}
-
 // Fix the formatDate helper to handle null values properly
 const formatDate = (dateString: string | null): string => {
   if (!dateString) return 'Не указано';
@@ -257,7 +152,7 @@ const HomeworkModal: React.FC<{
   const { payload } = useAuth();
 
   // Extract groups and syllabuses from the payload
-  const userGroups = payload?.profile?.group || payload?.profile?.groups || [];
+  const userGroups = payload?.profile?.groups || payload?.profile?.groups || [];
   const userSyllabuses = payload?.profile?.Syllabus || [];
 
   // Create a state for lessons based on selected syllabus
@@ -1040,7 +935,7 @@ const HomeworkDetailsModal: React.FC<{
           </div>
         )}
 
-        {(payload?.role === 'student' && homework.status === 'pending') && (
+        {(payload?.role === 'STUDENT' && homework.status === 'pending') && (
           <div className="border-t pt-6">
             <h4 className="text-lg font-medium mb-4">Сдать задание</h4>
             <div className="space-y-4">
@@ -1168,22 +1063,22 @@ const HomeworkPage: React.FC = () => {
   });
 
   // Extract groups and syllabuses from the payload
-  const userGroups = payload?.profile?.groups || [payload?.profile?.group] || [];
+  const userGroups = payload?.profile?.groups || [payload?.profile?.groups] || [];
   const userSyllabuses = payload?.profile?.Syllabus || [];
 
   // Set default filters when payload changes
   useEffect(() => {
     if (payload?.role) {
       // Initialize with default filters based on role
-      if (payload.role === 'student' && payload.profile && payload.profile.group && payload.profile.group[0]) {
+      if (payload.role === 'STUDENT' && payload.profile && payload.profile.groups && payload.profile.groups[0]) {
         // Student sees only their own group's homework
         setFilters(prev => ({
           ...prev,
-          groupId: payload.profile?.group?.[0]?.id || null,
+          groupId: payload.profile?.groups?.[0]?.id || null,
         }));
       }
       // For teachers with assigned syllabuses
-      else if (payload.role === 'teacher' && userSyllabuses.length > 0) {
+      else if (payload.role === 'TEACHER' && userSyllabuses.length > 0) {
         setFilters(prev => ({
           ...prev,
           studyPlanId: userSyllabuses[0].id,
@@ -1277,13 +1172,13 @@ const HomeworkPage: React.FC = () => {
     <div className="p-6 max-w-[1600px] mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
-          {payload?.role === 'student' ? 'Мои задания' :
-            payload?.role === 'parent' ? 'Задания ребенка' :
-              payload?.role === 'teacher' ? 'Управление заданиями' :
+          {payload?.role === 'STUDENT' ? 'Мои задания' :
+            payload?.role === 'PARENT' ? 'Задания ребенка' :
+              payload?.role === 'TEACHER' ? 'Управление заданиями' :
                 'Все задания'}
         </h1>
 
-        {(payload?.role === 'teacher' || payload?.role === 'admin') && (
+        {(payload?.role === 'TEACHER' || payload?.role === 'ADMIN') && (
           <button
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
@@ -1303,7 +1198,7 @@ const HomeworkPage: React.FC = () => {
         >
           <option value="">Все группы</option>
           {userGroups.map(group => (
-            <option key={group.id} value={group.id}>{group.name}</option>
+            <option key={group?.id} value={group?.id}>{group?.name}</option>
           ))}
         </select>
 
@@ -1413,8 +1308,8 @@ const HomeworkPage: React.FC = () => {
                   >
                     Подробнее
                   </button>
-                  {(payload.role === 'admin' ||
-                    (payload.role === 'teacher' && homework.Lesson?.Syllabus?.teacher?.id === payload.id)) && (
+                  {(payload.role === 'ADMIN' ||
+                    (payload.role === 'TEACHER' && homework.Lesson?.Syllabus?.teacher?.id === payload.id)) && (
                       <button
                         onClick={() => deleteHomework(homework.id)}
                         className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-md"
