@@ -106,10 +106,10 @@ export interface IStudent {
     courseNumber: number;
     user: IUser;
     group: IGroup;
-    Parent: IParent;
+    Parent: IParent[];
     Syllabus: ISyllabus;
     payments: any[]; // Пока нет данных о структуре платежей
     Attendance: IAttendance[];
-    lessonGrades: ILessonGrade[];
+    grades: ILessonGrade[];
     homeworkGrades: IHomeworkGrade[];
 }
