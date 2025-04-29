@@ -56,7 +56,6 @@ import {examResults, examSummary, examTypes} from '@/api/MockDataBase/examResult
 import {emotionalStates} from "@/api/MockDataBase/emotionalStates.db.ts";
 import {attendanceData, performanceData, skillsData} from '@/api/MockDataBase/charts.db';
 import {developmentPlans} from '@/api/MockDataBase/developmentPlans.db';
-import {attendanceHistory} from '@/api/MockDataBase/attendanceHistory.db';
 import {attendanceStats} from "@/api/MockDataBase/attendanceStats.db.ts";
 import {paymentTypes} from "@/api/MockDataBase/paymentTypes.db.ts";
 import {financialSummary, payments, paymentTrends} from "@/api/MockDataBase/payments.db.ts";
@@ -64,7 +63,6 @@ import {schedule} from '@/api/MockDataBase/schedule.db';
 import {extracurricularActivities} from "@/api/MockDataBase/extracurricularActivities.db.ts";
 import {getStatusColor} from "@/Types/getStatusColor.type.ts";
 import {getStatusText} from "@/Types/getStatusText.type.ts";
-import {getAttendanceTypeText} from "@/Types/getAttendanceTypeText.type.ts";
 import {getTypeText} from "@/Types/getTypeText.type.ts";
 
 

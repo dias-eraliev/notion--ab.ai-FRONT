@@ -1,17 +1,13 @@
 import { createContext, useContext } from "react";
 
 export interface AuthPayload {
-  role: string;
+  role: "ADMIN" | "TEACHER" | "STUDENT" | "PARENT";
   id: number;
   username: string;
   profile?: {
     id: number;
     name: string;
     surname: string;
-    group?: Array<{
-      id: number;
-      name: string;
-    }>;
     groups?: Array<{
       id: number;
       name: string;
