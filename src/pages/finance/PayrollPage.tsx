@@ -127,7 +127,7 @@ const PayrollPage: React.FC = () => {
 
   // Компонент модального окна фильтров
   const FilterModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h3 className="text-lg font-semibold mb-4">Фильтры</h3>
         
@@ -211,7 +211,7 @@ const PayrollPage: React.FC = () => {
     if (!selectedEmployee) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="relative">
             {/* Шапка */}

@@ -254,7 +254,7 @@ const ChatPage: React.FC = () => {
                       msg.sender === 'user'
                         ? 'bg-blue-500 text-white rounded-l-lg rounded-br-lg'
                         : 'bg-white text-gray-800 rounded-r-lg rounded-bl-lg'
-                    } p-4 shadow-sm`}
+                    } p-4 shadow-xs`}
                   >
                     {msg.attachments?.length === 1 ? (
                       <div className="flex items-center space-x-3">

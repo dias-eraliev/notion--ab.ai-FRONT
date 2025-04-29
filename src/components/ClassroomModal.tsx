@@ -277,7 +277,7 @@ const ClassroomModal: React.FC<ClassroomModalProps> = ({ isOpen, onClose, classr
   const currentTimeFormatted = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -319,7 +319,7 @@ const ClassroomModal: React.FC<ClassroomModalProps> = ({ isOpen, onClose, classr
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-100 text-red-700 p-4 mb-4 mx-6 mt-4 rounded-sm">
+          <div className="bg-red-100 text-red-700 p-4 mb-4 mx-6 mt-4 rounded-xs">
             {error}
           </div>
         )}
@@ -381,14 +381,14 @@ const ClassroomModal: React.FC<ClassroomModalProps> = ({ isOpen, onClose, classr
                   <div className="mt-3 flex justify-end">
                     <button
                       onClick={() => setIsEditing(false)}
-                      className="px-3 py-1 mr-2 border border-gray-300 rounded-sm text-gray-600"
+                      className="px-3 py-1 mr-2 border border-gray-300 rounded-xs text-gray-600"
                       disabled={loading}
                     >
                       Отмена
                     </button>
                     <button
                       onClick={handleSaveChanges}
-                      className="px-3 py-1 bg-blue-500 text-white rounded-sm flex items-center"
+                      className="px-3 py-1 bg-blue-500 text-white rounded-xs flex items-center"
                       disabled={loading}
                     >
                       {loading ? (
@@ -484,7 +484,7 @@ const ClassroomModal: React.FC<ClassroomModalProps> = ({ isOpen, onClose, classr
                             </span>
                             <button
                               onClick={() => handleAddEquipment(item.id)}
-                              className="text-xs bg-blue-500 text-white px-2 py-1 rounded-sm"
+                              className="text-xs bg-blue-500 text-white px-2 py-1 rounded-xs"
                               disabled={loading}
                             >
                               {loading ? (
@@ -521,7 +521,7 @@ const ClassroomModal: React.FC<ClassroomModalProps> = ({ isOpen, onClose, classr
                           {isEditing && isAdmin && (
                             <button
                               onClick={() => handleRemoveEquipment(item.id)}
-                              className="text-xs bg-red-500 text-white px-2 py-1 rounded-sm"
+                              className="text-xs bg-red-500 text-white px-2 py-1 rounded-xs"
                               disabled={loading}
                             >
                               {loading ? (

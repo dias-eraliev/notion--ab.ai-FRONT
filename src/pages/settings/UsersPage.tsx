@@ -64,7 +64,7 @@ const UsersPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xs overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>

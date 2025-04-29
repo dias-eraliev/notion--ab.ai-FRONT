@@ -207,7 +207,7 @@ const StudyPlanDetailPage: React.FC = () => {
         {canCreateLesson && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-corporate-primary text-white px-6 py-2 rounded-lg font-semibold shadow-sm hover:bg-corporate-primary-dark transition"
+            className="bg-corporate-primary text-white px-6 py-2 rounded-lg font-semibold shadow-xs hover:bg-corporate-primary-dark transition"
           >
             + Создать урок
           </button>
@@ -241,7 +241,7 @@ const StudyPlanDetailPage: React.FC = () => {
                     onChange={e => setNewLesson({ ...newLesson, description: e.target.value })}
                   />
                   <button
-                    className="mt-2 px-4 py-1 rounded-sm bg-corporate-primary/10 text-corporate-primary font-semibold hover:bg-corporate-primary/20 text-sm transition"
+                    className="mt-2 px-4 py-1 rounded-xs bg-corporate-primary/10 text-corporate-primary font-semibold hover:bg-corporate-primary/20 text-sm transition"
                     type="button"
                     onClick={() => setNewLesson({ ...newLesson, description: `В этом уроке рассматриваются основные понятия и методы по теме \"${newLesson.title || '...'}\". Урок включает теорию, примеры и практические задания для закрепления материала.` })}
                   >
@@ -297,7 +297,7 @@ const StudyPlanDetailPage: React.FC = () => {
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                   <div className="font-semibold text-corporate-primary mb-2">Тест</div>
                   <button
-                    className="px-4 py-1 rounded-sm bg-corporate-primary/10 text-corporate-primary font-semibold hover:bg-corporate-primary/20 transition"
+                    className="px-4 py-1 rounded-xs bg-corporate-primary/10 text-corporate-primary font-semibold hover:bg-corporate-primary/20 transition"
                     onClick={() => setTestModalOpen(true)}
                   >
                     {testQuestions.length > 0 ? `Вопросов: ${testQuestions.length}` : 'Создать тест'}
@@ -313,7 +313,7 @@ const StudyPlanDetailPage: React.FC = () => {
                 Отмена
               </button>
               <button
-                className="px-6 py-2 rounded-lg bg-corporate-primary text-white font-semibold shadow-sm hover:bg-corporate-primary-dark transition disabled:opacity-50"
+                className="px-6 py-2 rounded-lg bg-corporate-primary text-white font-semibold shadow-xs hover:bg-corporate-primary-dark transition disabled:opacity-50"
                 onClick={handleCreateLesson}
                 disabled={!newLesson.title.trim() || isSubmitting}
               >
@@ -373,13 +373,13 @@ const StudyPlanDetailPage: React.FC = () => {
                   >+ Добавить вариант</button>
                   <div className="flex gap-2 justify-end mt-4">
                     <button
-                      className="px-4 py-1 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold"
+                      className="px-4 py-1 rounded-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold"
                       onClick={() => setTestModalOpen(false)}
                     >
                       Закрыть
                     </button>
                     <button
-                      className="px-4 py-1 rounded-sm bg-corporate-primary text-white font-semibold hover:bg-corporate-primary-dark"
+                      className="px-4 py-1 rounded-xs bg-corporate-primary text-white font-semibold hover:bg-corporate-primary-dark"
                       onClick={() => {
                         if (!currentQuestion.question.trim() || currentQuestion.options.some(opt => !opt.trim())) return;
                         setTestQuestions([...testQuestions, currentQuestion]);
@@ -394,7 +394,7 @@ const StudyPlanDetailPage: React.FC = () => {
                     <div className="font-semibold mb-2">Вопросы:</div>
                     {testQuestions.length === 0 && <div className="text-gray-400">Нет вопросов</div>}
                     {testQuestions.map((q, idx) => (
-                      <div key={idx} className="mb-2 p-2 border rounded-sm">
+                      <div key={idx} className="mb-2 p-2 border rounded-xs">
                         <div className="font-medium">{q.question}</div>
                         <ul className="ml-4 list-disc">
                           {q.options.map((opt: string, i: number) => (

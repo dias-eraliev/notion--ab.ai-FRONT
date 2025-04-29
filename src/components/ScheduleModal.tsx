@@ -174,7 +174,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black bg-opacity-50"
+        className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
 

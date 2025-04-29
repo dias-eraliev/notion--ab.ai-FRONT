@@ -255,7 +255,7 @@ const BookingRequestsPage: React.FC = () => {
       </div>
 
       {/* Таблица запросов */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xs overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -328,7 +328,7 @@ const BookingRequestsPage: React.FC = () => {
 
       {/* Модальное окно создания запроса */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-lg w-full">
             <h2 className="text-xl font-bold mb-4">Новый запрос на бронирование</h2>
             
@@ -429,7 +429,7 @@ const BookingRequestsPage: React.FC = () => {
 
       {/* Модальное окно подробной информации */}
       {selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Подробная информация о запросе</h2>

@@ -142,53 +142,27 @@ const SchedulePage: React.FC = () => {
                         Управление расписанием
                     </h1>
 
-                    <FilterToggleButtons/>
-                </div>
-
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <div className="flex flex-wrap items-center gap-4">
-
-
-                        {/*День недели*/}
-                        <div className="w-64">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                День недели
-                            </label>
-                            <select
-                                value={selectedGroupId || ''}
-                                onChange={(e) => setSelectedGroupId(e.target.value ? Number(e.target.value) : undefined)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                disabled={isLoadingData || !!hasError}
-                            >
-                                <option value="">День недели</option>
-                                {groups?.map((group: GroupDto) => (
-                                    <option key={group.id} value={group.id}>
-                                        {group.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-
-                        {/* Group Filter */}
-                        <div className="w-64">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Группа
-                            </label>
-                            <select
-                                value={selectedGroupId || ''}
-                                onChange={(e) => setSelectedGroupId(e.target.value ? Number(e.target.value) : undefined)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                disabled={isLoadingData || !!hasError}
-                            >
-                                <option value="">Выберите группу</option>
-                                {groups?.map((group: GroupDto) => (
-                                    <option key={group.id} value={group.id}>
-                                        {group.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+        <div className="bg-white p-4 rounded-lg shadow-xs">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Group Filter */}
+            <div className="w-64">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Группа
+              </label>
+              <select
+                value={selectedGroupId || ''}
+                onChange={(e) => setSelectedGroupId(e.target.value ? Number(e.target.value) : undefined)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                disabled={isLoadingData || !!hasError}
+              >
+                <option value="">Выберите группу</option>
+                {groups?.map((group: GroupDto) => (
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
                         {/*Преподаватель*/}
 
@@ -237,44 +211,44 @@ const SchedulePage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Error state */}
-            {hasError && (
-                <div className="bg-red-50 p-4 rounded-lg shadow mb-6">
-                    <p className="text-red-600">
-                        Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.
-                    </p>
-                </div>
-            )}
+      {/* Error state */}
+      {hasError && (
+        <div className="bg-red-50 p-4 rounded-lg shadow-xs mb-6">
+          <p className="text-red-600">
+            Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.
+          </p>
+        </div>
+      )}
 
-            {/* Main Content */}
-            {isLoadingData && !hasError ? (
-                <div className="bg-white p-8 rounded-lg shadow text-center">
-                    <FaSpinner className="animate-spin text-gray-400 mx-auto mb-4 text-3xl"/>
-                    <p className="text-lg text-gray-600">
-                        Загрузка данных...
-                    </p>
-                </div>
-            ) : !selectedGroupId ? (
-                <div className="bg-white p-8 rounded-lg shadow text-center">
-                    <p className="text-lg text-gray-600">
-                        Выберите группу, чтобы просмотреть расписание
-                    </p>
-                </div>
-            ) : (
-                /* Days of Week Schedule */
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {daysOfWeek.map(day => (
-                        <DaySchedule
-                            key={day}
-                            day={day}
-                            schedules={schedulesByDay[day] || []}
-                            onAddClick={handleAddSchedule}
-                            onEditClick={handleEditSchedule}
-                            onDeleteClick={handleDeleteSchedule}
-                        />
-                    ))}
-                </div>
-            )}
+      {/* Main Content */}
+      {isLoadingData && !hasError ? (
+        <div className="bg-white p-8 rounded-lg shadow-xs text-center">
+          <FaSpinner className="animate-spin text-gray-400 mx-auto mb-4 text-3xl" />
+          <p className="text-lg text-gray-600">
+            Загрузка данных...
+          </p>
+        </div>
+      ) : !selectedGroupId ? (
+        <div className="bg-white p-8 rounded-lg shadow-xs text-center">
+          <p className="text-lg text-gray-600">
+            Выберите группу, чтобы просмотреть расписание
+          </p>
+        </div>
+      ) : (
+        /* Days of Week Schedule */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {daysOfWeek.map(day => (
+            <DaySchedule
+              key={day}
+              day={day}
+              schedules={schedulesByDay[day] || []}
+              onAddClick={handleAddSchedule}
+              onEditClick={handleEditSchedule}
+              onDeleteClick={handleDeleteSchedule}
+            />
+          ))}
+        </div>
+      )}
 
             {/* Schedule Modal */}
             <AnimatePresence>

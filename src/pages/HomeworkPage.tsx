@@ -420,22 +420,22 @@ const HomeworkModal: React.FC<{
 
     if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <motion.div
-                initial={{scale: 0.9, opacity: 0}}
-                animate={{scale: 1, opacity: 1}}
-                exit={{scale: 0.9, opacity: 0}}
-                className="bg-white rounded-lg p-6 w-[700px] max-h-[80vh] overflow-y-auto"
-            >
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium">
-                        {initialData ? 'Редактировать задание' : 'Новое задание'}
-                    </h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                        <FaTimes/>
-                    </button>
-                </div>
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white rounded-lg p-6 w-[700px] max-h-[80vh] overflow-y-auto"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">
+            {initialData ? 'Редактировать задание' : 'Новое задание'}
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <FaTimes />
+          </button>
+        </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-4">
@@ -635,6 +635,18 @@ const HomeworkModal: React.FC<{
                                 Добавить тест
                             </label>
                         </div>
+            <div className="flex items-center space-x-2 mt-4">
+              <input
+                type="checkbox"
+                id="hasQuiz"
+                checked={formData.hasQuiz}
+                onChange={(e) => setFormData({ ...formData, hasQuiz: e.target.checked })}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-xs"
+              />
+              <label htmlFor="hasQuiz" className="text-sm font-medium text-gray-700">
+                Добавить тест
+              </label>
+            </div>
 
                         {formData.hasQuiz && (
                             <div className="space-y-4 border-t pt-4">
@@ -802,6 +814,18 @@ const HomeworkDetailsModal: React.FC<{
                     <div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">{homework.name}</h3>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto"
+      >
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{homework.name}</h3>
+            <div className="flex items-center space-x-4 text-sm text-gray-500">
               <span className="flex items-center">
                 <FaBook className="mr-1"/>
                   {homework.Lesson?.name || 'Урок'}
@@ -954,6 +978,26 @@ const HomeworkDetailsModal: React.FC<{
                                                 )}
                                             </div>
                                         )}
+                    {/* Video tab */}
+                    {activeTab === 'video' && (
+                      <div>
+                        {homework.material.videoUrl ? (
+                          <>
+                            <h5 className="font-medium mb-2">Видео материал</h5>
+                            <div className="aspect-w-16 aspect-h-9">
+                              <iframe
+                                src={homework.material.videoUrl}
+                                className="w-full h-64 rounded-xs"
+                                allowFullScreen
+                                title="Video material"
+                              ></iframe>
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-gray-600 italic">Видео материал недоступен</p>
+                        )}
+                      </div>
+                    )}
 
                                         {/* Presentation tab */}
                                         {activeTab === 'presentation' && (
@@ -990,6 +1034,10 @@ const HomeworkDetailsModal: React.FC<{
                                                                 <div key={question.id}
                                                                      className="border border-gray-200 p-3 rounded">
                                                                     <p className="font-medium mb-2">{idx + 1}. {question.question}</p>
+                            <div className="space-y-4 mt-3">
+                              {homework.material.Quiz.questions.map((question, idx) => (
+                                <div key={question.id} className="border border-gray-200 p-3 rounded-xs">
+                                  <p className="font-medium mb-2">{idx + 1}. {question.question}</p>
 
                                                                     {question.answers && (
                                                                         <div className="pl-4 space-y-1">
@@ -1386,6 +1434,13 @@ const HomeworkPage: React.FC = () => {
                     <span className="block sm:inline">Не удалось загрузить задания. Пожалуйста, попробуйте позже.</span>
                 </div>
             )}
+      {/* Error state */}
+      {error && !isLoading && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xs relative mb-4">
+          <strong className="font-bold">Ошибка!</strong>
+          <span className="block sm:inline"> Не удалось загрузить задания. Пожалуйста, попробуйте позже.</span>
+        </div>
+      )}
 
             {!isLoading && !error && getFilteredHomeworks.length === 0 && (
                 <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-10 rounded text-center">
@@ -1398,6 +1453,18 @@ const HomeworkPage: React.FC = () => {
                     </p>
                 </div>
             )}
+      {/* Empty state */}
+      {!isLoading && !error && getFilteredHomeworks().length === 0 && (
+        <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-10 rounded-xs text-center">
+          <FaExclamationTriangle className="mx-auto text-gray-400 text-4xl mb-4" />
+          <h3 className="text-xl font-medium mb-2">Нет доступных заданий</h3>
+          <p className="text-gray-600">
+            {filters.search || filters.status
+              ? 'Попробуйте изменить параметры фильтрации'
+              : 'Задания еще не были созданы'}
+          </p>
+        </div>
+      )}
 
             {/* Список заданий */}
             {!isLoading && !error && getFilteredHomeworks.length > 0 && (
@@ -1454,6 +1521,63 @@ const HomeworkPage: React.FC = () => {
                     ))}
                 </div>
             )}
+      {/* Список заданий */}
+      {!isLoading && !error && getFilteredHomeworks().length > 0 && (
+        <div className="space-y-4">
+          {getFilteredHomeworks().map(homework => (
+            <div
+              key={homework.id}
+              className="bg-white rounded-lg shadow-xs p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center mb-2">
+                    <span className="text-sm font-medium text-gray-500 mr-2">
+                      {homework.Lesson?.Syllabus?.name}
+                    </span>
+                    <StatusBadge status={homework.status} />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">{homework.name}</h3>
+                  <p className="text-gray-600 line-clamp-2 mb-4">{homework.description}</p>
+                  <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <span className="flex items-center">
+                      <FaClock className="mr-1" />
+                      Срок: {homework.deadline ? new Date(homework.deadline).toLocaleDateString() : 'Срок не установлен'}
+                    </span>
+                    {homework.grade && (
+                      <span className="flex items-center text-green-600">
+                        <FaStar className="mr-1" />
+                        Оценка: {homework.grade}
+                      </span>
+                    )}
+                    <span className="flex items-center">
+                      <FaUser className="mr-1" />
+                      {homework.Lesson?.Syllabus?.teacher?.name}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setSelectedHomework(homework)}
+                    className="px-4 py-2 text-blue-500 hover:bg-blue-50 rounded-md"
+                  >
+                    Подробнее
+                  </button>
+                  {(payload.role === 'admin' ||
+                    (payload.role === 'teacher' && homework.Lesson?.Syllabus?.teacher?.id === payload.id)) && (
+                      <button
+                        onClick={() => deleteHomework(homework.id)}
+                        className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-md"
+                      >
+                        Удалить
+                      </button>
+                    )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
             {/* Create/Update Homework Modal */}
             <AnimatePresence>
