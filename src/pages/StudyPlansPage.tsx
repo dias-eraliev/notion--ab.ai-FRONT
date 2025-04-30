@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { FaDownload, FaSearch, FaEye, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import { FaDownload, FaSearch, FaEye, FaCheck, FaTimes, FaExclamationTriangle, FaPlus, FaVideo, FaFile, FaCalendar } from 'react-icons/fa';
 import { useNavigate, Link } from 'react-router-dom';
 
 interface StudyPlan {
   id: string;
   subject: string;
-  class: string;
+  group: string;
   teacher: string;
   totalLessons: number;
   completedLessons: number;
@@ -22,14 +22,21 @@ interface StudyPlan {
   }>;
 }
 
+const groups = [
+  { id: 'MK24-1M', name: 'Менеджмент' },
+  { id: 'MK24-2M', name: 'Менеджмент' },
+  { id: 'ПК24-1П', name: 'Программирование' },
+  { id: 'ПР24-1Ю', name: 'Право' },
+  { id: 'ПР24-2Ю', name: 'Право' },
+];
+
 const StudyPlansPage: React.FC = () => {
   const navigate = useNavigate();
-  // Временные данные для примера
   const [plans, setPlans] = useState<StudyPlan[]>([
     {
       id: '1',
       subject: 'Алгебра',
-      class: '10A',
+      group: 'MK24-1M',
       teacher: 'Иванова Л.',
       totalLessons: 36,
       completedLessons: 36,
@@ -70,7 +77,7 @@ const StudyPlansPage: React.FC = () => {
     {
       id: '2',
       subject: 'Биология',
-      class: '8Б',
+      group: 'ПК24-1П',
       teacher: 'Алиев А.',
       totalLessons: 34,
       completedLessons: 28,
@@ -80,7 +87,7 @@ const StudyPlansPage: React.FC = () => {
     {
       id: '3',
       subject: 'Физика',
-      class: '11Б',
+      group: 'ПР24-1Ю',
       teacher: 'Тулегенов М.',
       totalLessons: 30,
       completedLessons: 12,
@@ -91,7 +98,7 @@ const StudyPlansPage: React.FC = () => {
 
   const [selectedPlan, setSelectedPlan] = useState<StudyPlan | null>(null);
   const [filters, setFilters] = useState({
-    class: '',
+    group: '',
     subject: '',
     teacher: ''
   });
@@ -146,7 +153,7 @@ const StudyPlansPage: React.FC = () => {
     <div className="p-6 max-w-[1600px] mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Учебные планы</h1>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center">
+        <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center">
           <FaDownload className="mr-2" />
           Скачать в Excel
         </button>
@@ -169,14 +176,16 @@ const StudyPlansPage: React.FC = () => {
           </div>
           <div>
             <select
-              value={filters.class}
-              onChange={(e) => setFilters({ ...filters, class: e.target.value })}
+              value={filters.group}
+              onChange={(e) => setFilters({ ...filters, group: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             >
               <option value="">Группа</option>
-              <option value="10A">10A</option>
-              <option value="8Б">8Б</option>
-              <option value="11Б">11Б</option>
+              {groups.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.id} ({group.name})
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -220,14 +229,14 @@ const StudyPlansPage: React.FC = () => {
                   {index + 1}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {plan.class}
+                  {plan.group} ({groups.find((g) => g.id === plan.group)?.name})
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <Link 
                     to={`/study-plans/${plan.id}`}
-                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                    className="text-green-600 hover:text-green-800 hover:underline"
                   >
-                    {plan.subject} - {plan.class}
+                    {plan.subject} - {plan.group}
                   </Link>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -247,7 +256,7 @@ const StudyPlansPage: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <button 
-                    className="text-blue-600 hover:text-blue-800 flex items-center"
+                    className="text-green-600 hover:text-green-800 flex items-center"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/study-plans/${plan.id}`);
@@ -272,7 +281,7 @@ const StudyPlansPage: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800">
-                    {selectedPlan.subject} - {selectedPlan.class}
+                    {selectedPlan.subject} - {selectedPlan.group}
                   </h2>
                   <div className="mt-2 flex items-center space-x-4 text-gray-600">
                     <div className="flex items-center">
@@ -323,7 +332,7 @@ const StudyPlansPage: React.FC = () => {
                           <td className="px-6 py-4 text-sm text-gray-900">{lesson.topic}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             {lesson.scheduledDate ? (
-                              <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                              <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
                                 {new Date(lesson.scheduledDate).toLocaleString('ru-RU', {
                                   day: '2-digit',
                                   month: '2-digit',
@@ -337,17 +346,17 @@ const StudyPlansPage: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasVideo ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                              {lesson.hasVideo ? '✓' : '×'}
+                              {lesson.hasVideo ? <FaVideo className="text-green-600" /> : '×'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasPresentation ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                              {lesson.hasPresentation ? '✓' : '×'}
+                              {lesson.hasPresentation ? <FaFile className="text-green-600" /> : '×'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             <span className={`flex items-center justify-center w-6 h-6 rounded-full ${lesson.hasTest ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                              {lesson.hasTest ? '✓' : '×'}
+                              {lesson.hasTest ? <FaCalendar className="text-green-600" /> : '×'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{lesson.addedDate || '—'}</td>
@@ -393,4 +402,4 @@ const StudyPlansPage: React.FC = () => {
   );
 };
 
-export default StudyPlansPage; 
+export default StudyPlansPage;

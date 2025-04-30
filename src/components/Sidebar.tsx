@@ -283,7 +283,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-4">
         <div className="flex items-center mb-8">
           <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-[#1E5945]">UIB.AI</span>
+            <span className="text-2xl font-bold text-[#1C7E66]">UIB.AI</span>
           </Link>
         </div>
 
@@ -308,7 +308,7 @@ export const Sidebar: React.FC = () => {
           <div className="sidebar-item">
             <button
               onClick={() => setIsAppOpen(!isAppOpen)}
-              className="sidebar-button flex items-center w-full px-4 py-2 text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945]"
+              className="sidebar-button flex items-center w-full px-4 py-2 text-gray-600 hover:bg-gray-100"
             >
               <FaThLarge className="mr-3" />
               <span>Приложение</span>
@@ -327,7 +327,7 @@ export const Sidebar: React.FC = () => {
           {/* Учебный процесс */}
           <div className="group">
             <div
-              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.study ? 'bg-[#1E5945]/10 text-[#1E5945]' : ''}`}
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.study ? 'bg-green-50 text-green-600' : ''}`}
               onClick={() => toggleExpand('study')}
             >
               <div className="flex items-center">
@@ -343,7 +343,7 @@ export const Sidebar: React.FC = () => {
                   <Link
                     key={link.to}
                     to={link.to}
-                    className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-lg transition-all duration-150"
+                    className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-150"
                   >
                     {link.icon}
                     <span>{link.label}</span>
@@ -356,7 +356,7 @@ export const Sidebar: React.FC = () => {
           {/* Студенты */}
           <div className="group">
             <div
-              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.students ? 'bg-[#1E5945]/10 text-[#1E5945]' : ''}`}
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.students ? 'bg-green-50 text-green-600' : ''}`}
               onClick={() => toggleExpand('students')}
             >
               <div className="flex items-center">
@@ -372,7 +372,7 @@ export const Sidebar: React.FC = () => {
                   <Link
                     key={link.to}
                     to={link.to}
-                    className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-lg transition-all duration-150"
+                    className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-150"
                   >
                     {link.icon}
                     <span>{link.label}</span>
@@ -385,7 +385,7 @@ export const Sidebar: React.FC = () => {
           {/* HR (Персонал) */}
           <div className="group">
             <div
-              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.hr ? 'bg-[#1E5945]/10 text-[#1E5945]' : ''}`}
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.hr ? 'bg-green-50 text-green-600' : ''}`}
               onClick={() => toggleExpand('hr')}
             >
               <div className="flex items-center">
@@ -401,7 +401,7 @@ export const Sidebar: React.FC = () => {
                   <Link
                     key={link.to}
                     to={link.to}
-                    className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-lg transition-all duration-150"
+                    className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-150"
                   >
                     {link.icon}
                     <span>{link.label}</span>
@@ -414,7 +414,7 @@ export const Sidebar: React.FC = () => {
           {/* Финансы */}
           <div className="group">
             <div
-              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.finance ? 'bg-[#1E5945]/10 text-[#1E5945]' : ''}`}
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.finance ? 'bg-green-50 text-green-600' : ''}`}
               onClick={() => toggleExpand('finance')}
             >
               <div className="flex items-center">
@@ -442,14 +442,15 @@ export const Sidebar: React.FC = () => {
           <div className="mb-4">
             <button
               onClick={() => toggleExpand('erp')}
-              className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-lg transition-all duration-150"
+              className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-150"
             >
               <div className="flex items-center">
                 <FaWarehouse className="w-4 h-4 mr-3" />
                 <span>ERP система</span>
               </div>
               <FaChevronDown
-                className={`w-4 h-4 transition-transform duration-200 ${expandedItems.erp ? 'transform rotate-180' : ''}`}
+                className={`w-4 h-4 transition-transform duration-200 ${expandedItems.erp ? 'transform rotate-180' : ''
+                  }`}
               />
             </button>
 
@@ -470,7 +471,7 @@ export const Sidebar: React.FC = () => {
           {/* Настройки */}
           <div className="group">
             <div
-              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-[#1E5945]/10 hover:text-[#1E5945] rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.settings ? 'bg-[#1E5945]/10 text-[#1E5945]' : ''}`}
+              className={`flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded-xl cursor-pointer transition-all duration-150 ${expandedItems.settings ? 'bg-green-50 text-green-600' : ''}`}
               onClick={() => toggleExpand('settings')}
             >
               <div className="flex items-center">

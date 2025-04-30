@@ -482,7 +482,7 @@ const KpiPage: React.FC = () => {
           <p className="text-sm text-gray-500">Оценка эффективности и ключевые показатели деятельности персонала</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center">
+          <button className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center">
             <FaChartLine className="mr-2" />
             Настроить KPI
           </button>
@@ -579,7 +579,7 @@ const KpiPage: React.FC = () => {
                   <div className="flex items-center">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center 
                       ${employee.totalScore >= 4.5 ? 'bg-green-100 text-green-800' : 
-                        employee.totalScore >= 3.5 ? 'bg-blue-100 text-blue-800' : 
+                        employee.totalScore >= 3.5 ? 'bg-green-100 text-green-800' : 
                         employee.totalScore >= 2.5 ? 'bg-yellow-100 text-yellow-800' : 
                         'bg-red-100 text-red-800'}`}>
                       <span className="font-semibold">{employee.totalScore.toFixed(1)}</span>
@@ -626,7 +626,7 @@ const KpiPage: React.FC = () => {
                 <div className="flex items-center">
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center mr-4
                     ${selectedEmployee.totalScore >= 4.5 ? 'bg-green-100 text-green-800' : 
-                      selectedEmployee.totalScore >= 3.5 ? 'bg-blue-100 text-blue-800' : 
+                      selectedEmployee.totalScore >= 3.5 ? 'bg-green-100 text-green-800' : 
                       selectedEmployee.totalScore >= 2.5 ? 'bg-yellow-100 text-yellow-800' : 
                       'bg-red-100 text-red-800'}`}>
                     <span className="font-bold text-2xl">{selectedEmployee.totalScore.toFixed(1)}</span>
@@ -689,8 +689,8 @@ const KpiPage: React.FC = () => {
                     >
                       <defs>
                         <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.2}/>
-                          <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#1E5945" stopOpacity={0.2}/>
+                          <stop offset="95%" stopColor="#1E5945" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
@@ -720,11 +720,11 @@ const KpiPage: React.FC = () => {
                       <Area
                         type="monotone"
                         dataKey="score"
-                        stroke="#8B5CF6"
+                        stroke="#1E5945"
                         strokeWidth={2}
                         fill="url(#scoreGradient)"
-                        dot={{ fill: '#8B5CF6', strokeWidth: 2 }}
-                        activeDot={{ r: 6, fill: '#8B5CF6', stroke: 'white', strokeWidth: 2 }}
+                        dot={{ fill: '#1E5945', strokeWidth: 2 }}
+                        activeDot={{ r: 6, fill: '#1E5945', stroke: 'white', strokeWidth: 2 }}
                       />
                       <Line
                         type="monotone"
@@ -839,7 +839,7 @@ const KpiPage: React.FC = () => {
                                   <td className="px-4 py-3 whitespace-nowrap">
                                     <div className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
                                       ${employeeMetric.score >= 4.5 ? 'bg-green-100 text-green-800' : 
-                                        employeeMetric.score >= 3.5 ? 'bg-blue-100 text-blue-800' : 
+                                        employeeMetric.score >= 3.5 ? 'bg-green-100 text-green-800' : 
                                         employeeMetric.score >= 2.5 ? 'bg-yellow-100 text-yellow-800' : 
                                         'bg-red-100 text-red-800'}`}>
                                       {employeeMetric.score.toFixed(1)}
@@ -865,7 +865,7 @@ const KpiPage: React.FC = () => {
                 <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md mr-2">
                   Выгрузить отчет
                 </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
+                <button className="px-4 py-2 bg-green-600 text-white rounded-md">
                   Редактировать KPI
                 </button>
               </div>
@@ -877,4 +877,4 @@ const KpiPage: React.FC = () => {
   );
 };
 
-export default KpiPage; 
+export default KpiPage;

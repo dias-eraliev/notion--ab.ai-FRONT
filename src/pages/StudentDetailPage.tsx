@@ -454,7 +454,7 @@ const StudentDetailPage: React.FC = () => {
 
   const getScoreColor = (score: number) => {
     if (score >= 85) return 'bg-green-100 text-green-800';
-    if (score >= 70) return 'bg-blue-100 text-blue-800';
+    if (score >= 70) return 'bg-green-100 text-green-800';
     if (score >= 50) return 'bg-yellow-100 text-yellow-800';
     return 'bg-red-100 text-red-800';
   };
@@ -473,11 +473,11 @@ const StudentDetailPage: React.FC = () => {
   const getStateIcon = (category: string) => {
     switch (category) {
       case 'Общее настроение':
-        return <FaSmile className="w-8 h-8 text-yellow-400" />;
+        return <FaSmile className="w-8 h-8 text-green-400" />;
       case 'Концентрация':
-        return <FaBrain className="w-8 h-8 text-purple-400" />;
+        return <FaBrain className="w-8 h-8 text-green-400" />;
       case 'Социализация':
-        return <FaUsers className="w-8 h-8 text-blue-400" />;
+        return <FaUsers className="w-8 h-8 text-green-400" />;
       case 'Учебная мотивация':
         return <FaBookReader className="w-8 h-8 text-green-400" />;
       default:
@@ -1290,7 +1290,7 @@ const StudentDetailPage: React.FC = () => {
               </div>
               <button
                 onClick={() => navigate('/chat')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
               >
                 <FaComments className="w-4 h-4" />
                 Написать
@@ -1303,7 +1303,7 @@ const StudentDetailPage: React.FC = () => {
           <button
             className={`pb-4 px-2 text-sm font-medium ${
               activeTab === 'overview'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => setActiveTab('overview')}
@@ -1313,7 +1313,7 @@ const StudentDetailPage: React.FC = () => {
           <button
             className={`pb-4 px-2 text-sm font-medium ${
               activeTab === 'performance'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => setActiveTab('performance')}
@@ -1323,7 +1323,7 @@ const StudentDetailPage: React.FC = () => {
           <button
             className={`pb-4 px-2 text-sm font-medium ${
               activeTab === 'attendance'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => setActiveTab('attendance')}
@@ -1333,7 +1333,7 @@ const StudentDetailPage: React.FC = () => {
           <button
             className={`pb-4 px-2 text-sm font-medium ${
               activeTab === 'finance'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => setActiveTab('finance')}
@@ -1343,7 +1343,7 @@ const StudentDetailPage: React.FC = () => {
           <button
             className={`pb-4 px-2 text-sm font-medium ${
               activeTab === 'schedule'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => setActiveTab('schedule')}
@@ -1353,7 +1353,7 @@ const StudentDetailPage: React.FC = () => {
           <button
             className={`pb-4 px-2 text-sm font-medium ${
               activeTab === 'exams'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => setActiveTab('exams')}
@@ -1363,7 +1363,7 @@ const StudentDetailPage: React.FC = () => {
           <button
             className={`pb-4 px-2 text-sm font-medium ${
               activeTab === 'extracurricular'
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-green-600 border-b-2 border-green-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => setActiveTab('extracurricular')}
@@ -1418,7 +1418,7 @@ const StudentDetailPage: React.FC = () => {
                   </div>
                   <button
                     onClick={() => handleChatWithParent('father', 'Сатыбалды Нурлан')}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                    className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                   >
                     Написать
                   </button>
@@ -1449,7 +1449,7 @@ const StudentDetailPage: React.FC = () => {
                   </div>
                   <button
                     onClick={() => handleChatWithParent('mother', 'Сатыбалды Айгуль')}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                    className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                   >
                     Написать
                   </button>
@@ -1480,7 +1480,7 @@ const StudentDetailPage: React.FC = () => {
                   </div>
                   <button
                     onClick={() => handleChatWithParent('curator', 'Ахметова Динара')}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                    className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                   >
                     Написать
                   </button>
@@ -1552,7 +1552,7 @@ const StudentDetailPage: React.FC = () => {
               {gradesData.map((subject, index) => (
                 <div 
                   key={index}
-                  className="bg-white border border-gray-100 rounded-lg hover:border-blue-100 transition-all duration-200"
+                  className="bg-white border border-gray-100 rounded-lg hover:border-green-100 transition-all duration-200"
                 >
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-3">
@@ -1629,7 +1629,7 @@ const StudentDetailPage: React.FC = () => {
               {developmentPlans.map((plan, index) => (
                 <div 
                   key={index}
-                  className="bg-white border border-gray-100 rounded-lg hover:border-blue-100 transition-all duration-200"
+                  className="bg-white border border-gray-100 rounded-lg hover:border-green-100 transition-all duration-200"
                 >
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-3">
@@ -1653,7 +1653,7 @@ const StudentDetailPage: React.FC = () => {
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-1">
                         <div 
-                          className="bg-blue-600 h-1 rounded-full transition-all duration-300"
+                          className="bg-green-600 h-1 rounded-full transition-all duration-300"
                           style={{ width: `${(plan.currentLevel / plan.targetLevel) * 100}%` }}
                         ></div>
                       </div>
@@ -1763,7 +1763,7 @@ const StudentDetailPage: React.FC = () => {
               {attendanceHistory.map((record, index) => (
                 <div 
                   key={index} 
-                  className="border border-gray-200 rounded-lg hover:border-blue-200 transition-all duration-200"
+                  className="border border-gray-200 rounded-lg hover:border-green-200 transition-all duration-200"
                 >
                   <div className="border-b border-gray-100 p-4">
                     <div className="flex items-center justify-between">
@@ -1899,7 +1899,7 @@ const StudentDetailPage: React.FC = () => {
         <div className="space-y-4">
           <div className="flex justify-end gap-4 mb-6">
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
               onClick={() => setIsPaymentModalOpen(true)}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
@@ -1933,7 +1933,7 @@ const StudentDetailPage: React.FC = () => {
                         Тип оплаты
                       </label>
                       <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         value={paymentFormData.type}
                         onChange={(e) => setPaymentFormData({
                           ...paymentFormData,
@@ -1957,7 +1957,7 @@ const StudentDetailPage: React.FC = () => {
                       </label>
                       <input
                         type="number"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         value={paymentFormData.amount}
                         onChange={(e) => setPaymentFormData({
                           ...paymentFormData,
@@ -1973,7 +1973,7 @@ const StudentDetailPage: React.FC = () => {
                       </label>
                       <input
                         type="date"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         value={paymentFormData.dueDate}
                         onChange={(e) => setPaymentFormData({
                           ...paymentFormData,
@@ -1991,7 +1991,7 @@ const StudentDetailPage: React.FC = () => {
                         type="number"
                         min="0"
                         max="100"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         value={paymentFormData.discount}
                         onChange={(e) => setPaymentFormData({
                           ...paymentFormData,
@@ -2005,7 +2005,7 @@ const StudentDetailPage: React.FC = () => {
                         Описание
                       </label>
                       <textarea
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         value={paymentFormData.description}
                         onChange={(e) => setPaymentFormData({
                           ...paymentFormData,
@@ -2026,7 +2026,7 @@ const StudentDetailPage: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                     >
                       Назначить
                     </button>
@@ -2214,7 +2214,7 @@ const StudentDetailPage: React.FC = () => {
               </div>
               <div className="flex gap-4">
                 <select
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   value={dateFilter.type}
                   onChange={(e) => setDateFilter({ ...dateFilter, type: e.target.value as DateFilter['type'] })}
                 >
@@ -2224,7 +2224,7 @@ const StudentDetailPage: React.FC = () => {
                   <option value="quarter">Четверть</option>
                 </select>
                 <select
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   value={dateFilter.value}
                   onChange={(e) => setDateFilter({ ...dateFilter, value: e.target.value })}
                 >
@@ -2318,7 +2318,7 @@ const StudentDetailPage: React.FC = () => {
                 <h2 className="text-xl font-medium text-gray-900">Экзамены и результаты</h2>
                 <div className="flex items-center gap-4">
                   <select 
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     value={examFilter.year}
                     onChange={(e) => setExamFilter({ ...examFilter, year: e.target.value })}
                   >
@@ -2327,7 +2327,7 @@ const StudentDetailPage: React.FC = () => {
                   </select>
 
                   <select 
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     value={examFilter.quarter}
                     onChange={(e) => setExamFilter({ ...examFilter, quarter: e.target.value })}
                   >
@@ -2339,7 +2339,7 @@ const StudentDetailPage: React.FC = () => {
                   </select>
 
                   <select 
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     value={examFilter.month}
                     onChange={(e) => setExamFilter({ ...examFilter, month: e.target.value })}
                   >
@@ -2359,7 +2359,7 @@ const StudentDetailPage: React.FC = () => {
                   </select>
 
                   <select 
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     value={examFilter.examType}
                     onChange={(e) => setExamFilter({ ...examFilter, examType: e.target.value })}
                   >
@@ -2384,7 +2384,7 @@ const StudentDetailPage: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-gray-500">Процент</div>
-                  <div className="text-2xl font-bold text-blue-600">{examSummary.percentage}%</div>
+                  <div className="text-2xl font-bold text-green-600">{examSummary.percentage}%</div>
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-gray-500">Результат</div>
@@ -2465,7 +2465,7 @@ const StudentDetailPage: React.FC = () => {
                       <td className="px-4 py-3 text-sm text-gray-900">
                         Получено баллов: {filteredExamSummary.totalScore}
                       </td>
-                      <td className="px-4 py-3 text-sm text-blue-600">
+                      <td className="px-4 py-3 text-sm text-green-600">
                         Процент: {filteredExamSummary.percentage.toFixed(2)}%
                       </td>
                     </tr>
@@ -2489,7 +2489,7 @@ const StudentDetailPage: React.FC = () => {
               </div>
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <div className="text-sm text-gray-500 mb-1">Средний балл</div>
-                <div className="text-2xl font-bold text-blue-600">{filteredExamSummary.averageScore.toFixed(1)}</div>
+                <div className="text-2xl font-bold text-green-600">{filteredExamSummary.averageScore.toFixed(1)}</div>
               </div>
             </div>
           </div>
@@ -2560,7 +2560,7 @@ const StudentDetailPage: React.FC = () => {
                           </div>
                           <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
                             <div 
-                              className="bg-blue-600 h-2 rounded-full"
+                              className="bg-green-600 h-2 rounded-full"
                               style={{ width: `${(topic.score / topic.maxScore) * 100}%` }}
                             ></div>
                           </div>
@@ -2605,7 +2605,7 @@ const StudentDetailPage: React.FC = () => {
               {extracurricularActivities.map((activity) => (
                 <div 
                   key={activity.id}
-                  className="bg-white border border-gray-200 rounded-lg hover:border-blue-200 transition-all duration-200"
+                  className="bg-white border border-gray-200 rounded-lg hover:border-green-200 transition-all duration-200"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
@@ -2684,7 +2684,7 @@ const StudentDetailPage: React.FC = () => {
                                 <div className="flex items-center gap-2 mt-1">
                                   <span className="text-xs text-gray-500">{achievement.date}</span>
                                   {achievement.place && (
-                                    <span className="text-xs font-medium text-blue-600">
+                                    <span className="text-xs font-medium text-green-600">
                                       {achievement.place}
                                     </span>
                                   )}
@@ -2770,4 +2770,4 @@ const StudentDetailPage: React.FC = () => {
   );
 };
 
-export default StudentDetailPage; 
+export default StudentDetailPage;

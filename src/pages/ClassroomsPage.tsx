@@ -11,6 +11,7 @@ import {
   FaFileExport,
   FaChartBar
 } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import ClassroomModal from '../components/ClassroomModal';
 
 // Типы данных
@@ -423,6 +424,7 @@ const ClassroomsPage: React.FC = () => {
     equipment: ''
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Функция фильтрации аудиторий
   const filteredClassrooms = classrooms.filter(room => {
@@ -436,6 +438,10 @@ const ClassroomsPage: React.FC = () => {
 
   const handleRowClick = (classroom: Classroom) => {
     setSelectedClassroom(classroom);
+  };
+
+  const handleBookingClick = () => {
+    navigate('/booking');
   };
 
   return (
@@ -569,11 +575,18 @@ const ClassroomsPage: React.FC = () => {
             isOpen={selectedClassroom !== null}
             classroom={selectedClassroom}
             onClose={() => setSelectedClassroom(null)}
-          />
+          >
+            <button
+              onClick={handleBookingClick}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            >
+              Забронировать
+            </button>
+          </ClassroomModal>
         )}
       </AnimatePresence>
     </div>
   );
 };
 
-export default ClassroomsPage; 
+export default ClassroomsPage;

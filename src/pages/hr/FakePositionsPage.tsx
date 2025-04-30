@@ -279,7 +279,7 @@ const FakePositionsPage: React.FC = () => {
     switch (level) {
       case 'high': return 'bg-red-100 text-red-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-blue-100 text-blue-800';
+      case 'low': return 'bg-green-100 text-green-800';
       case 'none': return 'bg-green-100 text-green-800';
     }
   };
@@ -306,7 +306,7 @@ const FakePositionsPage: React.FC = () => {
     }
   };
 
-  const COLORS = ['#FF8042', '#FFBB28', '#00C49F', '#0088FE'];
+  const COLORS = ['#FF8042', '#FFBB28', '#00C49F', '#1E5945'];
 
   // Обработчики событий
   const handleAlertClick = (alert: FakePositionAlert) => {
@@ -322,7 +322,7 @@ const FakePositionsPage: React.FC = () => {
           <p className="text-sm text-gray-500">Система обнаружения потенциальных нарушений с помощью искусственного интеллекта</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center">
+          <button className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center">
             <FaRobot className="mr-2" />
             Запустить проверку
           </button>
@@ -382,7 +382,7 @@ const FakePositionsPage: React.FC = () => {
                   const colors = {
                     'Высокий': '#EF4444',
                     'Средний': '#F59E0B',
-                    'Низкий': '#3B82F6',
+                    'Низкий': '#1E5945',
                     'Нет': '#10B981'
                   };
                   return (
@@ -414,13 +414,13 @@ const FakePositionsPage: React.FC = () => {
               const colors = {
                 'Высокий': 'bg-red-500',
                 'Средний': 'bg-yellow-500',
-                'Низкий': 'bg-blue-500',
+                'Низкий': 'bg-green-500',
                 'Нет': 'bg-green-500'
               };
               const textColors = {
                 'Высокий': 'text-red-700',
                 'Средний': 'text-yellow-700',
-                'Низкий': 'text-blue-700',
+                'Низкий': 'text-green-700',
                 'Нет': 'text-green-700'
               };
               return (
@@ -449,7 +449,7 @@ const FakePositionsPage: React.FC = () => {
               <XAxis type="number" />
               <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={150} />
               <Tooltip />
-              <Bar dataKey="value" fill="#8884d8" />
+              <Bar dataKey="value" fill="#1E5945" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -464,7 +464,7 @@ const FakePositionsPage: React.FC = () => {
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="alerts" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="alerts" stroke="#1E5945" activeDot={{ r: 8 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -617,7 +617,7 @@ const FakePositionsPage: React.FC = () => {
                   <div className={`p-3 rounded-lg mr-4 ${
                     selectedAlert.riskLevel === 'high' ? 'bg-red-100 text-red-800' : 
                     selectedAlert.riskLevel === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
-                    selectedAlert.riskLevel === 'low' ? 'bg-blue-100 text-blue-800' : 
+                    selectedAlert.riskLevel === 'low' ? 'bg-green-100 text-green-800' : 
                     'bg-green-100 text-green-800'
                   }`}>
                     <FaExclamationTriangle className="w-8 h-8" />
@@ -776,4 +776,4 @@ const FakePositionsPage: React.FC = () => {
   );
 };
 
-export default FakePositionsPage; 
+export default FakePositionsPage;

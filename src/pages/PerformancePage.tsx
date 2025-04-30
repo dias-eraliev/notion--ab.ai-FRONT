@@ -117,7 +117,7 @@ const PerformancePage: React.FC = () => {
         </div>
         <div className="relative">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-md">
+            <button className="px-4 py-2 bg-green-600 text-white rounded-md">
               Все группы
             </button>
             {classes.map((cls) => (
@@ -125,7 +125,7 @@ const PerformancePage: React.FC = () => {
                 key={cls.id}
                 className={`flex flex-col items-center justify-center px-6 py-4 rounded-lg transition-all
                   ${selectedClass === cls.id 
-                    ? 'bg-blue-500 text-white shadow-lg' 
+                    ? 'bg-green-600 text-white shadow-lg' 
                     : 'bg-white text-gray-700 hover:bg-gray-50'}`}
                 onClick={() => setSelectedClass(cls.id)}
               >
@@ -206,7 +206,7 @@ const PerformancePage: React.FC = () => {
                 <XAxis dataKey="month" axisLine={false} tickLine={false} />
                 <YAxis domain={[2, 5]} axisLine={false} tickLine={false} />
                 <Tooltip />
-                <Area type="monotone" dataKey="value" stroke="#1C7E66" fillOpacity={1} fill="url(#colorValue)" />
+                <Area type="monotone" dataKey="value" stroke="#1E5945" fillOpacity={1} fill="url(#colorValue)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -244,9 +244,9 @@ const PerformancePage: React.FC = () => {
               <BarChart data={filteredData.subjects} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                 <XAxis type="number" domain={[0, 5]} />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, width: 100, wordBreak: 'break-word' }} />
                 <Tooltip />
-                <Bar dataKey="grade" fill="#1C7E66" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="grade" fill="#1E5945" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -260,7 +260,7 @@ const PerformancePage: React.FC = () => {
                 <PolarGrid />
                 <PolarAngleAxis dataKey="subject" />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar name="Показатели" dataKey="value" data={filteredData.performanceMetrics} fill="#1C7E66" fillOpacity={0.6} />
+                <Radar name="Показатели" dataKey="value" data={filteredData.performanceMetrics} fill="#1E5945" fillOpacity={0.6} />
               </RadarChart>
             </ResponsiveContainer>
           </div>

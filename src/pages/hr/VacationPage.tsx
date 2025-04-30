@@ -265,7 +265,7 @@ const VacationPage: React.FC = () => {
   const getTypeBadgeClass = (type: VacationType) => {
     switch (type) {
       case 'vacation':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-green-100 text-green-800';
       case 'sick-leave':
         return 'bg-red-100 text-red-800';
       case 'maternity-leave':
@@ -299,14 +299,14 @@ const VacationPage: React.FC = () => {
       case 'rejected':
         return <FaTimes className="text-red-500" />;
       case 'completed':
-        return <FaUserCheck className="text-blue-500" />;
+        return <FaUserCheck className="text-green-500" />;
     }
   };
 
   const getTypeIcon = (type: VacationType) => {
     switch (type) {
       case 'vacation':
-        return <FaCalendarAlt className="text-blue-500" />;
+        return <FaCalendarAlt className="text-green-500" />;
       case 'sick-leave':
         return <FaExclamationTriangle className="text-red-500" />;
       case 'maternity-leave':
@@ -445,7 +445,7 @@ const VacationPage: React.FC = () => {
           <a 
             key={index}
             href={doc.url}
-            className="flex items-center text-blue-600 hover:text-blue-800 text-sm"
+            className="flex items-center text-green-600 hover:text-green-800 text-sm"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -466,7 +466,7 @@ const VacationPage: React.FC = () => {
         </div>
         <div className="flex gap-2">
           <button 
-            className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center"
+            className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center"
             onClick={() => setIsNewVacationModalOpen(true)}
           >
             <FaPlus className="mr-2" />
@@ -486,7 +486,7 @@ const VacationPage: React.FC = () => {
               onClick={() => setActiveTab('current')}
               className={`py-4 px-6 text-sm font-medium ${
                 activeTab === 'current'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  ? 'border-b-2 border-green-500 text-green-600'
                   : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -496,7 +496,7 @@ const VacationPage: React.FC = () => {
               onClick={() => setActiveTab('summary')}
               className={`py-4 px-6 text-sm font-medium ${
                 activeTab === 'summary'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  ? 'border-b-2 border-green-500 text-green-600'
                   : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -734,7 +734,7 @@ const VacationPage: React.FC = () => {
                 <div>
                   <div className="text-sm text-gray-500 mb-1">Период</div>
                   <div className="flex items-center text-gray-900">
-                    <FaCalendarAlt className="text-blue-500 mr-2" />
+                    <FaCalendarAlt className="text-green-500 mr-2" />
                     <span>
                       {formatDate(selectedVacation.startDate)} — {formatDate(selectedVacation.endDate)}
                     </span>
@@ -748,7 +748,7 @@ const VacationPage: React.FC = () => {
                       selectedVacation.status === 'approved' ? 'text-green-600' :
                       selectedVacation.status === 'rejected' ? 'text-red-600' :
                       selectedVacation.status === 'pending' ? 'text-yellow-600' :
-                      'text-blue-600'
+                      'text-green-600'
                     }`}>
                       {getStatusLabel(selectedVacation.status)}
                     </span>
@@ -789,7 +789,7 @@ const VacationPage: React.FC = () => {
                     {selectedVacation.documents.map((doc, idx) => (
                       <div key={idx} className="p-3 bg-gray-50 rounded-lg flex items-center justify-between">
                         <div className="flex items-center">
-                          <FaFilePdf className="text-red-500 mr-2" />
+                          <FaFilePdf className="text-green-500 mr-2" />
                           <div>
                             <div className="font-medium">{doc.name}</div>
                             <div className="text-xs text-gray-500">
@@ -800,7 +800,7 @@ const VacationPage: React.FC = () => {
                         <a 
                           href={doc.url} 
                           download={doc.name}
-                          className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50"
+                          className="p-2 text-green-600 hover:text-green-800 rounded-full hover:bg-green-50"
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
@@ -825,12 +825,12 @@ const VacationPage: React.FC = () => {
                   </>
                 )}
                 {selectedVacation.status === 'approved' && (
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
+                  <button className="px-4 py-2 bg-green-600 text-white rounded-md">
                     Изменить
                   </button>
                 )}
                 {selectedVacation.status === 'rejected' && (
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
+                  <button className="px-4 py-2 bg-green-600 text-white rounded-md">
                     Создать новую заявку
                   </button>
                 )}
@@ -870,7 +870,7 @@ const VacationPage: React.FC = () => {
                       name="type"
                       value={newVacation.type}
                       onChange={handleNewVacationChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       required
                     >
                       {vacationTypes.map(type => (
@@ -891,7 +891,7 @@ const VacationPage: React.FC = () => {
                         name="startDate"
                         value={newVacation.startDate}
                         onChange={handleNewVacationChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         required
                       />
                     </div>
@@ -904,7 +904,7 @@ const VacationPage: React.FC = () => {
                         name="endDate"
                         value={newVacation.endDate}
                         onChange={handleNewVacationChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         required
                       />
                     </div>
@@ -918,7 +918,7 @@ const VacationPage: React.FC = () => {
                       name="substituteId"
                       value={newVacation.substituteId}
                       onChange={handleNewVacationChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     >
                       <option value="">Выберите сотрудника</option>
                       <option value="001">Иванов Иван Иванович</option>
@@ -942,7 +942,7 @@ const VacationPage: React.FC = () => {
                         <div className="space-y-1 text-center">
                           {newVacation.document ? (
                             <div className="flex flex-col items-center">
-                              <FaFilePdf className="h-12 w-12 text-red-500" />
+                              <FaFilePdf className="h-12 w-12 text-green-500" />
                               <span className="text-sm text-gray-900">{newVacation.document.name}</span>
                               <span className="text-xs text-gray-500">{formatFileSize(newVacation.document.size)}</span>
                             </div>
@@ -952,7 +952,7 @@ const VacationPage: React.FC = () => {
                               <div className="flex text-sm text-gray-600">
                                 <label
                                   htmlFor="file-upload"
-                                  className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                                  className="relative cursor-pointer rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none"
                                 >
                                   <span>Загрузите файл</span>
                                   <input 
@@ -996,7 +996,7 @@ const VacationPage: React.FC = () => {
                       name="comment"
                       value={newVacation.comment}
                       onChange={handleNewVacationChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       rows={3}
                       placeholder="Например: После обследования в поликлинике №4"
                     />
@@ -1012,7 +1012,7 @@ const VacationPage: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
                     >
                       Подать заявку
                     </button>
@@ -1027,4 +1027,4 @@ const VacationPage: React.FC = () => {
   );
 };
 
-export default VacationPage; 
+export default VacationPage;

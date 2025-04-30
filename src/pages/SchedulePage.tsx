@@ -676,7 +676,12 @@ const SchedulePage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
+    <div className="p-6 max-w-[1600px] mx-auto print:p-0">
+      <h1 className="text-3xl font-bold text-gray-900 print:text-2xl">Генератор расписания</h1>
+      <p className="mt-2 text-gray-700 print:text-sm">
+        Сформируйте автоматическое расписание на неделю для всех групп и преподавателей с учётом ограничений
+      </p>
+
       {/* Заголовок и кнопки */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">

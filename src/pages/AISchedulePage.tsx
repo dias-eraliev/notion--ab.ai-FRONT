@@ -19,19 +19,20 @@ interface Teacher {
   };
 }
 
-interface ClassGroup {
+interface Group {
   id: string;
   name: string;
   subgroups: string[];
   daysPerWeek: number;
   maxLessonsPerDay: number;
+  specialization: string;
 }
 
 interface Subject {
   id: string;
   name: string;
   requiresSpecialRoom: boolean;
-  hoursPerWeek: Record<string, number>; // класс -> часов
+  hoursPerWeek: Record<string, number>; // группа -> часов
   splitGroups: boolean;
 }
 
@@ -47,7 +48,7 @@ interface Constraint {
   id: string;
   type: 'general' | 'personal';
   description: string;
-  target?: 'class' | 'teacher' | 'subject';
+  target?: 'group' | 'teacher' | 'subject';
   targetId?: string;
   rule: string;
 }
@@ -56,7 +57,7 @@ interface ScheduleItem {
   id: string;
   day: string;
   lesson: number;
-  classId: string;
+  groupId: string;
   subgroupId?: string;
   subject: string;
   teacherId: string;
@@ -146,23 +147,23 @@ const mockTeachers: Teacher[] = [
   }
 ];
 
-const mockClasses: ClassGroup[] = [
-  { id: '1', name: '7А', subgroups: ['1', '2'], daysPerWeek: 5, maxLessonsPerDay: 6 },
-  { id: '2', name: '7Б', subgroups: ['1', '2'], daysPerWeek: 5, maxLessonsPerDay: 6 },
-  { id: '3', name: '8А', subgroups: ['1', '2'], daysPerWeek: 5, maxLessonsPerDay: 6 },
-  { id: '4', name: '8Б', subgroups: ['1', '2'], daysPerWeek: 5, maxLessonsPerDay: 6 },
-  { id: '5', name: '9А', subgroups: ['1', '2', '3'], daysPerWeek: 5, maxLessonsPerDay: 7 }
+const mockGroups: Group[] = [
+  { id: '1', name: 'МК24-1М', subgroups: ['1', '2'], daysPerWeek: 5, maxLessonsPerDay: 6, specialization: 'Менеджмент' },
+  { id: '2', name: 'МК24-2М', subgroups: ['1', '2'], daysPerWeek: 5, maxLessonsPerDay: 6, specialization: 'Менеджмент' },
+  { id: '3', name: 'ПК24-1П', subgroups: ['1', '2'], daysPerWeek: 5, maxLessonsPerDay: 6, specialization: 'Программирование' },
+  { id: '4', name: 'ПР24-1Ю', subgroups: ['1', '2'], daysPerWeek: 5, maxLessonsPerDay: 6, specialization: 'Право' },
+  { id: '5', name: 'ПР24-2Ю', subgroups: ['1', '2', '3'], daysPerWeek: 5, maxLessonsPerDay: 7, specialization: 'Право' }
 ];
 
 const mockSubjects: Subject[] = [
-  { id: '1', name: 'Математика', requiresSpecialRoom: false, hoursPerWeek: {'7А': 5, '7Б': 5, '8А': 5, '8Б': 5, '9А': 6}, splitGroups: false },
-  { id: '2', name: 'Физика', requiresSpecialRoom: true, hoursPerWeek: {'7А': 2, '7Б': 2, '8А': 3, '8Б': 3, '9А': 3}, splitGroups: false },
-  { id: '3', name: 'Химия', requiresSpecialRoom: true, hoursPerWeek: {'7А': 0, '7Б': 0, '8А': 2, '8Б': 2, '9А': 2}, splitGroups: false },
-  { id: '4', name: 'Биология', requiresSpecialRoom: false, hoursPerWeek: {'7А': 2, '7Б': 2, '8А': 2, '8Б': 2, '9А': 2}, splitGroups: false },
-  { id: '5', name: 'Русский язык', requiresSpecialRoom: false, hoursPerWeek: {'7А': 4, '7Б': 4, '8А': 4, '8Б': 4, '9А': 4}, splitGroups: false },
-  { id: '6', name: 'Литература', requiresSpecialRoom: false, hoursPerWeek: {'7А': 2, '7Б': 2, '8А': 2, '8Б': 2, '9А': 3}, splitGroups: false },
-  { id: '7', name: 'Физкультура', requiresSpecialRoom: true, hoursPerWeek: {'7А': 3, '7Б': 3, '8А': 3, '8Б': 3, '9А': 3}, splitGroups: true },
-  { id: '8', name: 'Информатика', requiresSpecialRoom: true, hoursPerWeek: {'7А': 1, '7Б': 1, '8А': 1, '8Б': 1, '9А': 2}, splitGroups: true }
+  { id: '1', name: 'Математика', requiresSpecialRoom: false, hoursPerWeek: {'МК24-1М': 4, 'МК24-2М': 4, 'ПК24-1П': 5, 'ПР24-1Ю': 3, 'ПР24-2Ю': 3}, splitGroups: false },
+  { id: '2', name: 'Информатика', requiresSpecialRoom: true, hoursPerWeek: {'МК24-1М': 2, 'МК24-2М': 2, 'ПК24-1П': 5, 'ПР24-1Ю': 2, 'ПР24-2Ю': 2}, splitGroups: true },
+  { id: '3', name: 'Основы права', requiresSpecialRoom: false, hoursPerWeek: {'МК24-1М': 2, 'МК24-2М': 2, 'ПК24-1П': 0, 'ПР24-1Ю': 5, 'ПР24-2Ю': 5}, splitGroups: false },
+  { id: '4', name: 'Основы программирования', requiresSpecialRoom: true, hoursPerWeek: {'МК24-1М': 0, 'МК24-2М': 0, 'ПК24-1П': 6, 'ПР24-1Ю': 0, 'ПР24-2Ю': 0}, splitGroups: true },
+  { id: '5', name: 'Менеджмент', requiresSpecialRoom: false, hoursPerWeek: {'МК24-1М': 4, 'МК24-2М': 4, 'ПК24-1П': 0, 'ПР24-1Ю': 1, 'ПР24-2Ю': 1}, splitGroups: false },
+  { id: '6', name: 'Экономика', requiresSpecialRoom: false, hoursPerWeek: {'МК24-1М': 3, 'МК24-2М': 3, 'ПК24-1П': 2, 'ПР24-1Ю': 3, 'ПР24-2Ю': 3}, splitGroups: false },
+  { id: '7', name: 'Физкультура', requiresSpecialRoom: true, hoursPerWeek: {'МК24-1М': 3, 'МК24-2М': 3, 'ПК24-1П': 3, 'ПР24-1Ю': 3, 'ПР24-2Ю': 3}, splitGroups: true },
+  { id: '8', name: 'Иностранный язык', requiresSpecialRoom: false, hoursPerWeek: {'МК24-1М': 4, 'МК24-2М': 4, 'ПК24-1П': 4, 'ПР24-1Ю': 4, 'ПР24-2Ю': 4}, splitGroups: true }
 ];
 
 const mockRooms: Room[] = [
@@ -179,7 +180,7 @@ const mockConstraints: Constraint[] = [
   { id: '2', type: 'general', description: 'Физкультура только в 1-3 урок', rule: 'sportEarly' },
   { id: '3', type: 'general', description: 'Математика не позднее 5 урока', rule: 'mathEarly' },
   { id: '4', type: 'personal', target: 'teacher', targetId: '1', description: 'Иванова А.П. преподает только до 13:00', rule: 'teacherTimeLimit' },
-  { id: '5', type: 'personal', target: 'class', targetId: '5', description: '9А класс - не более 2 точных наук в день', rule: 'classScientificLimit' }
+  { id: '5', type: 'personal', target: 'group', targetId: '5', description: '9А группа - не более 2 точных наук в день', rule: 'groupScientificLimit' }
 ];
 
 // Вспомогательные компоненты
@@ -201,14 +202,15 @@ const TeacherCard: React.FC<{ teacher: Teacher }> = ({ teacher }) => {
   );
 };
 
-const ClassCard: React.FC<{ classGroup: ClassGroup }> = ({ classGroup }) => {
+const GroupCard: React.FC<{ group: Group }> = ({ group }) => {
   return (
     <div className="border p-4 rounded-lg shadow-sm bg-white">
-      <h3 className="font-bold text-lg">{classGroup.name}</h3>
+      <h3 className="font-bold text-lg">{group.name}</h3>
       <div className="text-sm mt-2">
-        <div>Подгруппы: {classGroup.subgroups.join(', ')}</div>
-        <div>Дней в неделю: {classGroup.daysPerWeek}</div>
-        <div>Макс. уроков в день: {classGroup.maxLessonsPerDay}</div>
+        <div>Подгруппы: {group.subgroups.join(', ')}</div>
+        <div>Дней в неделю: {group.daysPerWeek}</div>
+        <div>Макс. уроков в день: {group.maxLessonsPerDay}</div>
+        <div>Специализация: {group.specialization}</div>
       </div>
     </div>
   );
@@ -221,10 +223,10 @@ const SubjectCard: React.FC<{ subject: Subject }> = ({ subject }) => {
       <div className="text-sm mt-2">
         <div>Спец. кабинет: {subject.requiresSpecialRoom ? 'Да' : 'Нет'}</div>
         <div>Деление на группы: {subject.splitGroups ? 'Да' : 'Нет'}</div>
-        <div>Часы по классам:</div>
+        <div>Часы по группам:</div>
         <ul className="list-disc pl-5 text-xs">
-          {Object.entries(subject.hoursPerWeek).map(([className, hours]) => (
-            <li key={className}>{className}: {hours} ч/нед</li>
+          {Object.entries(subject.hoursPerWeek).map(([groupName, hours]) => (
+            <li key={groupName}>{groupName}: {hours} ч/нед</li>
           ))}
         </ul>
       </div>
@@ -289,7 +291,7 @@ const LessonCard: React.FC<LessonCardProps> = ({ item, onRemove, teachers, rooms
           <FaTimes size={12} />
         </button>
       </div>
-      <div className="text-xs text-gray-600">{item.classId} {item.subgroupId ? `(Группа ${item.subgroupId})` : ''}</div>
+      <div className="text-xs text-gray-600">{item.groupId} {item.subgroupId ? `(Группа ${item.subgroupId})` : ''}</div>
       <div className="text-xs text-gray-600">{teacher?.name?.split(' ').map(n => n[0]).join('.')}</div>
       <div className="text-xs text-gray-600">Каб. {rooms.find(r => r.id === item.roomId)?.name}</div>
       
@@ -363,7 +365,7 @@ interface AddLessonModalProps {
   day: string;
   lesson: number;
   teachers: Teacher[];
-  classes: ClassGroup[];
+  groups: Group[];
   subjects: Subject[];
   rooms: Room[];
 }
@@ -375,14 +377,14 @@ const AddLessonModal: React.FC<AddLessonModalProps> = ({
   day,
   lesson,
   teachers,
-  classes,
+  groups,
   subjects,
   rooms
 }) => {
   const [formData, setFormData] = useState<Partial<ScheduleItem>>({
     day,
     lesson,
-    classId: '',
+    groupId: '',
     subject: '',
     teacherId: '',
     roomId: '',
@@ -390,7 +392,7 @@ const AddLessonModal: React.FC<AddLessonModalProps> = ({
   });
 
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
-  const [selectedClass, setSelectedClass] = useState<ClassGroup | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
   // Фильтрация учителей по выбранному предмету
   const filteredTeachers = formData.subject
@@ -414,11 +416,11 @@ const AddLessonModal: React.FC<AddLessonModalProps> = ({
     setSelectedSubject(subjects.find(s => s.name === subjectName) || null);
   };
 
-  // Обработчик изменения класса
-  const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const classId = e.target.value;
-    setFormData({ ...formData, classId, subgroupId: undefined });
-    setSelectedClass(classes.find(c => c.id === classId) || null);
+  // Обработчик изменения группы
+  const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const groupId = e.target.value;
+    setFormData({ ...formData, groupId, subgroupId: undefined });
+    setSelectedGroup(groups.find(g => g.id === groupId) || null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -477,22 +479,22 @@ const AddLessonModal: React.FC<AddLessonModalProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Класс
+              Группа
             </label>
             <select
-              value={formData.classId || ''}
-              onChange={handleClassChange}
+              value={formData.groupId || ''}
+              onChange={handleGroupChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
             >
-              <option value="">Выберите класс</option>
-              {classes.map(cls => (
-                <option key={cls.id} value={cls.id}>{cls.name}</option>
+              <option value="">Выберите группу</option>
+              {groups.map(group => (
+                <option key={group.id} value={group.id}>{group.name}</option>
               ))}
             </select>
           </div>
 
-          {selectedClass && selectedClass.subgroups.length > 1 && (
+          {selectedGroup && selectedGroup.subgroups.length > 1 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Подгруппа
@@ -502,8 +504,8 @@ const AddLessonModal: React.FC<AddLessonModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, subgroupId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               >
-                <option value="">Весь класс</option>
-                {selectedClass.subgroups.map(sg => (
+                <option value="">Вся группа</option>
+                {selectedGroup.subgroups.map(sg => (
                   <option key={sg} value={sg}>Группа {sg}</option>
                 ))}
               </select>
@@ -617,7 +619,7 @@ const AISchedulePage: React.FC = () => {
   const [conflicts, setConflicts] = useState<{ id: string; description: string }[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCell, setSelectedCell] = useState<{ day: string; lesson: number } | null>(null);
-  const [viewMode, setViewMode] = useState<'all' | 'class' | 'teacher' | 'room'>('all');
+  const [viewMode, setViewMode] = useState<'all' | 'group' | 'teacher' | 'room'>('all');
   const [viewFilter, setViewFilter] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
@@ -644,11 +646,11 @@ const AISchedulePage: React.FC = () => {
             ))}
           </div>
         );
-      case 'classes':
+      case 'groups':
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockClasses.map(classGroup => (
-              <ClassCard key={classGroup.id} classGroup={classGroup} />
+            {mockGroups.map(group => (
+              <GroupCard key={group.id} group={group} />
             ))}
           </div>
         );
@@ -688,8 +690,8 @@ const AISchedulePage: React.FC = () => {
     }
 
     switch (viewMode) {
-      case 'class':
-        return schedule.filter(item => item.classId === viewFilter);
+      case 'group':
+        return schedule.filter(item => item.groupId === viewFilter);
       case 'teacher':
         return schedule.filter(item => item.teacherId === viewFilter);
       case 'room':
@@ -755,15 +757,15 @@ const AISchedulePage: React.FC = () => {
             item1.lesson === item2.lesson) {
           
           const teacher = mockTeachers.find(t => t.id === item1.teacherId);
-          const class1 = mockClasses.find(c => c.id === item1.classId)?.name || item1.classId;
-          const class2 = mockClasses.find(c => c.id === item2.classId)?.name || item2.classId;
+          const group1 = mockGroups.find(g => g.id === item1.groupId)?.name || item1.groupId;
+          const group2 = mockGroups.find(g => g.id === item2.groupId)?.name || item2.groupId;
           
           item1.conflicts.push('teacher');
           item2.conflicts.push('teacher');
           
           newConflicts.push({
             id: `teacher-${item1.id}-${item2.id}`,
-            description: `Учитель ${teacher?.name} не может одновременно вести уроки в классах ${class1} и ${class2} (${days.find(d => d.id === item1.day)?.label}, ${item1.lesson} урок)`
+            description: `Учитель ${teacher?.name} не может одновременно вести уроки в группах ${group1} и ${group2} (${days.find(d => d.id === item1.day)?.label}, ${item1.lesson} урок)`
           });
         }
 
@@ -773,32 +775,32 @@ const AISchedulePage: React.FC = () => {
             item1.lesson === item2.lesson) {
           
           const room = mockRooms.find(r => r.id === item1.roomId);
-          const class1 = mockClasses.find(c => c.id === item1.classId)?.name || item1.classId;
-          const class2 = mockClasses.find(c => c.id === item2.classId)?.name || item2.classId;
+          const group1 = mockGroups.find(g => g.id === item1.groupId)?.name || item1.groupId;
+          const group2 = mockGroups.find(g => g.id === item2.groupId)?.name || item2.groupId;
           
           item1.conflicts.push('room');
           item2.conflicts.push('room');
           
           newConflicts.push({
             id: `room-${item1.id}-${item2.id}`,
-            description: `Кабинет ${room?.name} используется одновременно для ${item1.subject} (${class1}) и ${item2.subject} (${class2}) (${days.find(d => d.id === item1.day)?.label}, ${item1.lesson} урок)`
+            description: `Кабинет ${room?.name} используется одновременно для ${item1.subject} (${group1}) и ${item2.subject} (${group2}) (${days.find(d => d.id === item1.day)?.label}, ${item1.lesson} урок)`
           });
         }
-
-        // Конфликт класса (один и тот же класс не может быть в двух местах одновременно)
-        if (item1.classId === item2.classId && 
+ 
+        // Конфликт группы (одна и та же группа не может быть в двух местах одновременно)
+        if (item1.groupId === item2.groupId && 
             item1.day === item2.day && 
             item1.lesson === item2.lesson &&
             (!item1.subgroupId || !item2.subgroupId || item1.subgroupId === item2.subgroupId)) {
           
-          const className = mockClasses.find(c => c.id === item1.classId)?.name || item1.classId;
+          const groupName = mockGroups.find(g => g.id === item1.groupId)?.name || item1.groupId;
           
-          item1.conflicts.push('class');
-          item2.conflicts.push('class');
+          item1.conflicts.push('group');
+          item2.conflicts.push('group');
           
           newConflicts.push({
-            id: `class-${item1.id}-${item2.id}`,
-            description: `Класс ${className} не может одновременно посещать ${item1.subject} и ${item2.subject} (${days.find(d => d.id === item1.day)?.label}, ${item1.lesson} урок)`
+            id: `group-${item1.id}-${item2.id}`,
+            description: `Группа ${groupName} не может одновременно посещать ${item1.subject} и ${item2.subject} (${days.find(d => d.id === item1.day)?.label}, ${item1.lesson} урок)`
           });
         }
       }
@@ -870,11 +872,11 @@ const AISchedulePage: React.FC = () => {
     setTimeout(() => {
       const generatedSchedule: ScheduleItem[] = [];
       
-      // Для каждого класса
-      mockClasses.forEach(cls => {
+      // Для каждой группы
+      mockGroups.forEach(group => {
         // Для каждого предмета
         mockSubjects.forEach(subj => {
-          const hoursPerWeek = subj.hoursPerWeek[cls.name] || 0;
+          const hoursPerWeek = subj.hoursPerWeek[group.name] || 0;
           
           if (hoursPerWeek === 0) return;
           
@@ -919,7 +921,7 @@ const AISchedulePage: React.FC = () => {
             
             // Определяем возможные уроки с учетом ограничений
             const maxLesson = Math.min(
-              cls.maxLessonsPerDay,
+              group.maxLessonsPerDay,
               teacher.constraints.morningOnly ? 4 : 7
             );
             
@@ -934,11 +936,11 @@ const AISchedulePage: React.FC = () => {
               lesson = Math.min(lesson, 5); // Только до 5 урока
             }
             
-            // Проверяем, нет ли уже урока в этот день и время у этого класса или у этого учителя
-            const classConflict = generatedSchedule.find(item => 
+            // Проверяем, нет ли уже урока в этот день и время у этой группы или у этого учителя
+            const groupConflict = generatedSchedule.find(item => 
               item.day === day && 
               item.lesson === lesson && 
-              item.classId === cls.id
+              item.groupId === group.id
             );
             
             const teacherConflict = generatedSchedule.find(item => 
@@ -947,8 +949,8 @@ const AISchedulePage: React.FC = () => {
               item.teacherId === teacher.id
             );
             
-            // Если нет конфликтов с классом и учителем, пытаемся найти свободный кабинет
-            if (!classConflict && !teacherConflict || maxAttempts < 10) {
+            // Если нет конфликтов с группой и учителем, пытаемся найти свободный кабинет
+            if (!groupConflict && !teacherConflict || maxAttempts < 10) {
               // Находим свободные кабинеты (те, которые не заняты в это время)
               const freeRooms = availableRooms.filter(room => {
                 return !generatedSchedule.some(item => 
@@ -968,7 +970,7 @@ const AISchedulePage: React.FC = () => {
                 id: Math.random().toString(36).substring(2, 9),
                 day,
                 lesson,
-                classId: cls.id,
+                groupId: group.id,
                 subject: subj.name,
                 teacherId: teacher.id,
                 roomId: room.id,
@@ -1010,7 +1012,7 @@ const AISchedulePage: React.FC = () => {
       <div className="p-6 max-w-[1600px] mx-auto print:p-0">
         <h1 className="text-3xl font-bold text-gray-900 print:text-2xl">Генератор расписания</h1>
         <p className="mt-2 text-gray-700 print:text-sm">
-          Сформируйте автоматическое расписание на неделю для всех классов и учителей с учётом ограничений
+          Сформируйте автоматическое расписание на неделю для всех групп и учителей с учётом ограничений
         </p>
 
         {/* Только для печати - заголовок */}
@@ -1018,7 +1020,7 @@ const AISchedulePage: React.FC = () => {
           <h2 className="text-xl font-bold">РАСПИСАНИЕ ЗАНЯТИЙ</h2>
           {viewMode !== 'all' && viewFilter && (
             <p className="text-lg">
-              {viewMode === 'class' ? `Класс: ${mockClasses.find(c => c.id === viewFilter)?.name}` :
+              {viewMode === 'group' ? `Группа: ${mockGroups.find(g => g.id === viewFilter)?.name}` :
                viewMode === 'teacher' ? `Учитель: ${mockTeachers.find(t => t.id === viewFilter)?.name}` :
                `Кабинет: ${mockRooms.find(r => r.id === viewFilter)?.name}`}
             </p>
@@ -1035,10 +1037,10 @@ const AISchedulePage: React.FC = () => {
               Учителя
             </button>
             <button 
-              onClick={() => setActiveTab('classes')} 
-              className={`px-4 py-2 ${activeTab === 'classes' ? 'border-b-2 border-blue-500 font-medium' : ''}`}
+              onClick={() => setActiveTab('groups')} 
+              className={`px-4 py-2 ${activeTab === 'groups' ? 'border-b-2 border-blue-500 font-medium' : ''}`}
             >
-              Классы
+              Группы
             </button>
             <button 
               onClick={() => setActiveTab('subjects')} 
@@ -1130,10 +1132,10 @@ const AISchedulePage: React.FC = () => {
               Все
             </button>
             <button 
-              className={`px-3 py-1 rounded-md ${viewMode === 'class' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-              onClick={() => { setViewMode('class'); setViewFilter(mockClasses[0].id); }}
+              className={`px-3 py-1 rounded-md ${viewMode === 'group' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              onClick={() => { setViewMode('group'); setViewFilter(mockGroups[0].id); }}
             >
-              По классу
+              По группе
             </button>
             <button 
               className={`px-3 py-1 rounded-md ${viewMode === 'teacher' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
@@ -1156,8 +1158,8 @@ const AISchedulePage: React.FC = () => {
                 onChange={(e) => setViewFilter(e.target.value)}
                 className="px-3 py-1 border border-gray-300 rounded-md"
               >
-                {viewMode === 'class' && mockClasses.map(cls => (
-                  <option key={cls.id} value={cls.id}>{cls.name}</option>
+                {viewMode === 'group' && mockGroups.map(group => (
+                  <option key={group.id} value={group.id}>{group.name}</option>
                 ))}
                 {viewMode === 'teacher' && mockTeachers.map(teacher => (
                   <option key={teacher.id} value={teacher.id}>{teacher.name}</option>
@@ -1237,7 +1239,7 @@ const AISchedulePage: React.FC = () => {
               day={selectedCell.day}
               lesson={selectedCell.lesson}
               teachers={mockTeachers}
-              classes={mockClasses}
+              groups={mockGroups}
               subjects={mockSubjects}
               rooms={mockRooms}
             />

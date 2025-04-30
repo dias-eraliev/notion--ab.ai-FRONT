@@ -46,7 +46,7 @@ interface BudgetItem {
 }
 
 // Константы
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+const COLORS = ['#1E5945', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 const categoryLabels = {
   income: {
@@ -241,7 +241,7 @@ const quarterlyTrends = [
 
 // Демо-данные для структуры доходов
 const incomeData = [
-  { name: 'Оплата за обучение', value: 68, color: '#3B82F6' },
+  { name: 'Оплата за обучение', value: 68, color: '#1E5945' },
   { name: 'Гранты и субсидии', value: 20, color: '#10B981' },
   { name: 'Дополнительные услуги', value: 10, color: '#F59E0B' },
   { name: 'Аренда помещений', value: 2, color: '#EC4899' }
@@ -249,7 +249,7 @@ const incomeData = [
 
 // Демо-данные для структуры расходов
 const expenseData = [
-  { name: 'Зарплаты и компенсации', value: 67, color: '#3B82F6' },
+  { name: 'Зарплаты и компенсации', value: 67, color: '#1E5945' },
   { name: 'Оборудование', value: 12, color: '#F59E0B' },
   { name: 'Коммунальные услуги', value: 9, color: '#10B981' },
   { name: 'Инфраструктура', value: 6, color: '#6366F1' },
@@ -492,7 +492,7 @@ const BudgetPage: React.FC = () => {
             Сбросить
           </button>
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
+            className="px-4 py-2 bg-green-600 text-white rounded-md text-sm"
             onClick={() => setShowFilterModal(false)}
           >
             Применить
@@ -623,17 +623,18 @@ const BudgetPage: React.FC = () => {
             <FaFilter className="mr-2" />
             Фильтры
             {(filters.type || filters.category || filters.status) && (
-              <span className="ml-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="ml-2 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {Object.values(filters).filter(Boolean).length}
               </span>
             )}
           </button>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
             + Добавить статью
           </button>
-          <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+          <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center">
+            <FaChartLine className="mr-2" />
             Экспорт
           </button>
         </div>
@@ -656,7 +657,7 @@ const BudgetPage: React.FC = () => {
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">Факт</div>
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-green-600">
                 {formatCurrency(summaryStats.totalActualIncome)}
               </div>
             </div>
@@ -837,7 +838,7 @@ const BudgetPage: React.FC = () => {
               <Line
                 type="monotone"
                 dataKey="доходы"
-                stroke="#3B82F6"
+                stroke="#1E5945"
                 strokeWidth={2}
                 dot={{ r: 4 }}
                 activeDot={{ r: 8 }}
@@ -860,7 +861,7 @@ const BudgetPage: React.FC = () => {
           <button
             className={`py-2 px-4 text-sm font-medium ${
               activeTab === 'overview' 
-              ? 'border-b-2 border-blue-600 text-blue-600' 
+              ? 'border-b-2 border-green-600 text-green-600' 
               : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => handleTabChange('overview')}
@@ -870,7 +871,7 @@ const BudgetPage: React.FC = () => {
           <button
             className={`py-2 px-4 text-sm font-medium ${
               activeTab === 'income' 
-              ? 'border-b-2 border-blue-600 text-blue-600' 
+              ? 'border-b-2 border-green-600 text-green-600' 
               : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => handleTabChange('income')}
@@ -880,7 +881,7 @@ const BudgetPage: React.FC = () => {
           <button
             className={`py-2 px-4 text-sm font-medium ${
               activeTab === 'expense' 
-              ? 'border-b-2 border-blue-600 text-blue-600' 
+              ? 'border-b-2 border-green-600 text-green-600' 
               : 'text-gray-500 hover:text-gray-700'
             }`}
             onClick={() => handleTabChange('expense')}
@@ -992,4 +993,4 @@ const BudgetPage: React.FC = () => {
   );
 };
 
-export default BudgetPage; 
+export default BudgetPage;

@@ -343,7 +343,7 @@ const PaymentsPage: React.FC = () => {
             Сбросить
           </button>
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
+            className="px-4 py-2 bg-green-600 text-white rounded-md text-sm"
             onClick={() => setShowFilterModal(false)}
           >
             Применить
@@ -430,7 +430,7 @@ const PaymentsPage: React.FC = () => {
               <FaBell className="mr-2" /> Отправить напоминание
             </button>
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm flex items-center"
+              className="px-4 py-2 bg-green-600 text-white rounded-md text-sm flex items-center"
               onClick={() => handleGenerateInvoice(selectedPayment.id)}
             >
               <FaDownload className="mr-2" /> Сформировать квитанцию
@@ -456,14 +456,14 @@ const PaymentsPage: React.FC = () => {
             <FaFilter className="mr-2" />
             Фильтры
             {(filters.grade || filters.serviceType || filters.status) && (
-              <span className="ml-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="ml-2 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {Object.values(filters).filter(Boolean).length}
               </span>
             )}
           </button>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center">
+          <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors flex items-center">
             <FaMoneyBill className="mr-2" />
             Добавить оплату
           </button>
@@ -482,14 +482,14 @@ const PaymentsPage: React.FC = () => {
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Собрано оплат</div>
-          <div className="text-2xl font-bold">{stats.totalPaid.toLocaleString()} KZT</div>
+          <div className="text-2xl font-bold text-green-600">{stats.totalPaid.toLocaleString()} KZT</div>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Процент сбора</div>
           <div className="text-2xl font-bold">{stats.collectionRate}%</div>
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
             <div 
-              className="bg-blue-600 h-2.5 rounded-full" 
+              className="bg-green-600 h-2.5 rounded-full" 
               style={{ width: `${stats.collectionRate}%` }}
             ></div>
           </div>
@@ -561,7 +561,7 @@ const PaymentsPage: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button 
-                      className="text-blue-600 hover:text-blue-900 mr-3"
+                      className="text-green-600 hover:text-green-900 mr-3"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSendReminder(payment.id);
@@ -593,4 +593,4 @@ const PaymentsPage: React.FC = () => {
   );
 };
 
-export default PaymentsPage; 
+export default PaymentsPage;

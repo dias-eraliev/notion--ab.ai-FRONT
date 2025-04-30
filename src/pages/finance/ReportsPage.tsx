@@ -483,7 +483,7 @@ const ReportsPage: React.FC = () => {
           </button>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center">
+          <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors flex items-center">
             <FaFileExport className="mr-2" />
             Экспорт
           </button>
@@ -495,9 +495,9 @@ const ReportsPage: React.FC = () => {
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Общий доход</div>
-            <FaChartLine className="text-blue-600" />
+            <FaChartLine className="text-green-600" />
           </div>
-          <div className="text-2xl font-bold mt-2">{stats.totalIncome} KZT</div>
+          <div className="text-2xl font-bold text-green-600 mt-2">{stats.totalIncome} KZT</div>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <div className="flex items-center justify-between">
@@ -550,7 +550,7 @@ const ReportsPage: React.FC = () => {
               <Bar 
                 dataKey="value" 
                 name="Доходы" 
-                fill="#3B82F6" 
+                fill="#1E5945" 
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
@@ -614,4 +614,4 @@ const ReportsPage: React.FC = () => {
   );
 };
 
-export default ReportsPage; 
+export default ReportsPage;

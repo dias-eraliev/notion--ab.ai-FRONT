@@ -97,7 +97,7 @@ const StudentModal: React.FC<StudentModalProps> = ({ student, onClose, onViewDet
           <div className="mt-8 flex justify-end">
             <button
               onClick={() => onViewDetails(student.id)}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
               Подробнее
             </button>
@@ -243,7 +243,7 @@ const StudentsPage: React.FC = () => {
               <input
                 type="text"
                 placeholder="Поиск по имени..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -253,7 +253,7 @@ const StudentsPage: React.FC = () => {
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="">Все группы</option>
               {classes.slice(1).map(classItem => (
@@ -307,4 +307,4 @@ const StudentsPage: React.FC = () => {
   );
 };
 
-export default StudentsPage; 
+export default StudentsPage;

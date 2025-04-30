@@ -196,7 +196,7 @@ const initialTeachers: TeacherWorkload[] = [
   }
 ];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#1E5945', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 const WorkloadPage: React.FC = () => {
   const [teachers, setTeachers] = useState<TeacherWorkload[]>(initialTeachers);
@@ -338,7 +338,7 @@ const WorkloadPage: React.FC = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center">
+          <button className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center">
             <FaDownload className="mr-2" />
             Загрузить шаблон
           </button>
@@ -385,7 +385,7 @@ const WorkloadPage: React.FC = () => {
                 <Bar 
                   dataKey="standardHours" 
                   name="Норма часов" 
-                  fill="#8884d8"
+                  fill="#1E5945"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar 
@@ -655,7 +655,7 @@ const WorkloadPage: React.FC = () => {
                           return null;
                         }}
                       />
-                      <Bar dataKey="standardHours" name="Норма часов" fill="#8884d8" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="standardHours" name="Норма часов" fill="#1E5945" radius={[4, 4, 0, 0]} />
                       <Bar dataKey="actualHours" name="Фактические часы" fill="#82ca9d" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -690,7 +690,7 @@ const WorkloadPage: React.FC = () => {
                               {subject.classes.map((cls, cIdx) => (
                                 <span 
                                   key={cIdx}
-                                  className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs"
+                                  className="px-2 py-1 bg-green-100 text-green-800 rounded-md text-xs"
                                 >
                                   {cls}
                                 </span>
@@ -749,7 +749,7 @@ const WorkloadPage: React.FC = () => {
                 <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md mr-2">
                   Выгрузить данные
                 </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
+                <button className="px-4 py-2 bg-green-600 text-white rounded-md">
                   Редактировать нагрузку
                 </button>
               </div>
@@ -761,4 +761,4 @@ const WorkloadPage: React.FC = () => {
   );
 };
 
-export default WorkloadPage; 
+export default WorkloadPage;

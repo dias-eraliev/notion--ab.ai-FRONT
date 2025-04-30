@@ -135,7 +135,7 @@ const ClassroomModal: React.FC<ClassroomModalProps> = ({ isOpen, onClose, classr
                 Проверка состояния
               </button>
               <button
-                onClick={() => navigate('/requests/new?room=' + classroom.number)}
+                onClick={() => navigate('/booking')}
                 className="mt-2 text-sm text-blue-600 hover:text-blue-700 flex items-center"
               >
                 <FaCalendar className="mr-1" />
@@ -219,4 +219,4 @@ const ClassroomModal: React.FC<ClassroomModalProps> = ({ isOpen, onClose, classr
   );
 };
 
-export default ClassroomModal; 
+export default ClassroomModal;

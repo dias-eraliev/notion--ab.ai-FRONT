@@ -356,7 +356,7 @@ const EmotionalAnalysisPage: React.FC = () => {
             <button
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 selectedPeriod === 'week'
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-green-600 text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
               onClick={() => setSelectedPeriod('week')}
@@ -366,7 +366,7 @@ const EmotionalAnalysisPage: React.FC = () => {
             <button
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 selectedPeriod === 'month'
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-green-600 text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
               onClick={() => setSelectedPeriod('month')}
@@ -376,7 +376,7 @@ const EmotionalAnalysisPage: React.FC = () => {
             <button
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 selectedPeriod === 'quarter'
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-green-600 text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
               onClick={() => setSelectedPeriod('quarter')}
@@ -446,8 +446,8 @@ const EmotionalAnalysisPage: React.FC = () => {
             <AreaChart data={currentTrends}>
               <defs>
                 <linearGradient id="colorMood" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#1E5945" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="#1E5945" stopOpacity={0}/>
                 </linearGradient>
                 <linearGradient id="colorStress" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#EF4444" stopOpacity={0.1}/>
@@ -472,7 +472,7 @@ const EmotionalAnalysisPage: React.FC = () => {
               <Area 
                 type="monotone" 
                 dataKey="mood" 
-                stroke="#3B82F6" 
+                stroke="#1E5945" 
                 fill="url(#colorMood)" 
                 name="Настроение"
               />
@@ -521,7 +521,7 @@ const EmotionalAnalysisPage: React.FC = () => {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div 
-                        className="bg-blue-500 h-1.5 rounded-full" 
+                        className="bg-green-500 h-1.5 rounded-full" 
                         style={{ width: `${classData.averageMood}%` }}
                       />
                     </div>
@@ -580,7 +580,7 @@ const EmotionalAnalysisPage: React.FC = () => {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1">
                   <div 
-                    className="bg-blue-500 h-1 rounded-full" 
+                    className="bg-green-500 h-1 rounded-full" 
                     style={{ width: `${day.mood}%` }}
                   />
                 </div>
@@ -678,4 +678,4 @@ const EmotionalAnalysisPage: React.FC = () => {
   );
 };
 
-export default EmotionalAnalysisPage; 
+export default EmotionalAnalysisPage;

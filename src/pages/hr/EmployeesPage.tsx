@@ -164,7 +164,7 @@ const EmployeesPage: React.FC = () => {
       case 'active':
         return 'bg-green-100 text-green-800';
       case 'vacation':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-green-100 text-green-800';
       case 'sick':
         return 'bg-red-100 text-red-800';
       case 'business_trip':
@@ -190,7 +190,7 @@ const EmployeesPage: React.FC = () => {
   };
 
   const getEmploymentTypeColor = (type: 'fulltime' | 'parttime') => {
-    return type === 'fulltime' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800';
+    return type === 'fulltime' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
   };
 
   const getEmploymentTypeText = (type: 'fulltime' | 'parttime') => {
@@ -278,8 +278,8 @@ const EmployeesPage: React.FC = () => {
             >
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 font-medium">
+                  <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <span className="text-green-600 font-medium">
                       {employee.name.split(' ').map(n => n[0]).join('')}
                     </span>
                   </div>
@@ -304,7 +304,7 @@ const EmployeesPage: React.FC = () => {
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex justify-end gap-2">
                   <button 
-                    className="text-gray-400 hover:text-blue-500"
+                    className="text-gray-400 hover:text-green-500"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleEmploymentType(employee.id);
@@ -351,7 +351,7 @@ const EmployeesPage: React.FC = () => {
             Экспорт
           </button>
           <button 
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 flex items-center gap-2"
+            className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 flex items-center gap-2"
             onClick={() => setShowAddModal(true)}
           >
             <FaPlus className="w-4 h-4" />
@@ -417,8 +417,8 @@ const EmployeesPage: React.FC = () => {
               {/* Заголовок */}
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center">
-                  <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 text-xl font-medium">
+                  <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
+                    <span className="text-green-600 text-xl font-medium">
                       {selectedEmployee.name.split(' ').map(n => n[0]).join('')}
                     </span>
                   </div>
@@ -508,7 +508,7 @@ const EmployeesPage: React.FC = () => {
                         {selectedEmployee.subjects.general.map((subject, index) => (
                           <span 
                             key={`general-${index}`}
-                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                            className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
                           >
                             {subject}
                           </span>
@@ -583,7 +583,7 @@ const EmployeesPage: React.FC = () => {
               {/* Кнопки действий */}
               <div className="flex justify-between pt-4 border-t">
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                  <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                     Редактировать
                   </button>
                   <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
@@ -628,11 +628,11 @@ const EmployeesPage: React.FC = () => {
               <div className="mb-6">
                 <p className="mb-4 text-gray-700">Выберите тип занятости:</p>
                 <div className="flex gap-4">
-                  <div className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-blue-500 cursor-pointer">
+                  <div className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-green-500 cursor-pointer">
                     <h3 className="font-medium mb-2">Штатный преподаватель</h3>
                     <p className="text-sm text-gray-500">Полная занятость, официальное трудоустройство</p>
                   </div>
-                  <div className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-blue-500 cursor-pointer">
+                  <div className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-green-500 cursor-pointer">
                     <h3 className="font-medium mb-2">Совместитель</h3>
                     <p className="text-sm text-gray-500">Частичная занятость, почасовая оплата</p>
                   </div>
@@ -646,7 +646,7 @@ const EmployeesPage: React.FC = () => {
                 >
                   Отмена
                 </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                   Продолжить
                 </button>
               </div>
@@ -658,4 +658,4 @@ const EmployeesPage: React.FC = () => {
   );
 };
 
-export default EmployeesPage; 
+export default EmployeesPage;

@@ -48,7 +48,7 @@ interface Homework {
   };
   teacherId: string;
   teacherName: string;
-  classId: string;
+  groupId: string;
   createdAt: string;
   priority: 'high' | 'medium' | 'low';
   estimatedTime: string;
@@ -106,7 +106,7 @@ const HomeworkModal: React.FC<{
     description: '',
     dueDate: '',
     subjectId: '',
-    classId: ''
+    groupId: ''
   });
 
   if (!isOpen) return null;
@@ -180,19 +180,20 @@ const HomeworkModal: React.FC<{
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Класс
+                  Группа
                 </label>
                 <select
-                  value={formData.classId}
-                  onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
+                  value={formData.groupId}
+                  onChange={(e) => setFormData({ ...formData, groupId: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 >
-                  <option value="">Выберите класс</option>
-                  <option value="10A">10A</option>
-                  <option value="10B">10B</option>
-                  <option value="11A">11A</option>
-                  <option value="11B">11B</option>
+                  <option value="">Выберите группу</option>
+                  <option value="МК24-1М">МК24-1М (Менеджмент)</option>
+                  <option value="МК24-2М">МК24-2М (Менеджмент)</option>
+                  <option value="ПК24-1П">ПК24-1П (Программирование)</option>
+                  <option value="ПР24-1Ю">ПР24-1Ю (Право)</option>
+                  <option value="ПР24-2Ю">ПР24-2Ю (Право)</option>
                 </select>
               </div>
             </div>
@@ -273,7 +274,7 @@ const mockHomeworks: Homework[] = [
     status: 'pending',
     teacherId: 'ivanova',
     teacherName: 'Иванова Л.М.',
-    classId: '10A',
+    groupId: 'МК24-1М',
     createdAt: '2024-03-10T10:00:00',
     priority: 'high',
     estimatedTime: '45',
@@ -297,7 +298,7 @@ const mockHomeworks: Homework[] = [
     status: 'submitted',
     teacherId: 'petrov',
     teacherName: 'Петров А.С.',
-    classId: '10A',
+    groupId: 'ПК24-1П',
     createdAt: '2024-03-08T11:30:00',
     priority: 'medium',
     estimatedTime: '90',
@@ -341,11 +342,52 @@ const mockHomeworks: Homework[] = [
     feedback: 'Отличная работа! Особенно хорошо раскрыты практические применения элементов.',
     teacherId: 'smirnova',
     teacherName: 'Смирнова Е.В.',
-    classId: '10A',
+    groupId: 'ПР24-1Ю',
     createdAt: '2024-03-05T09:15:00',
     priority: 'medium',
     estimatedTime: '60',
     maxScore: 5
+  },
+  {
+    id: '4',
+    subjectId: 'biology',
+    subject: 'Биология',
+    title: 'Клеточная теория',
+    description: 'Подготовить реферат на тему "Современная клеточная теория и ее значение для медицины".',
+    dueDate: '2024-04-05T23:59:59',
+    attachments: [
+      {
+        id: '5',
+        name: 'Методические_указания.pdf',
+        type: 'application/pdf',
+        size: 1524000
+      }
+    ],
+    status: 'pending',
+    teacherId: 'ivanova',
+    teacherName: 'Иванова Л.М.',
+    groupId: 'МК24-2М',
+    createdAt: '2024-03-20T14:25:00',
+    priority: 'medium',
+    estimatedTime: '120',
+    maxScore: 20
+  },
+  {
+    id: '5',
+    subjectId: 'math',
+    subject: 'Математика',
+    title: 'Интегралы и их применение',
+    description: 'Решить задачи на вычисление интегралов и площадей фигур (упражнения 15-20, страница 87).',
+    dueDate: '2024-03-30T23:59:59',
+    attachments: [],
+    status: 'overdue',
+    teacherId: 'ivanova',
+    teacherName: 'Иванова Л.М.',
+    groupId: 'ПР24-2Ю',
+    createdAt: '2024-03-15T11:00:00',
+    priority: 'low',
+    estimatedTime: '90',
+    maxScore: 15
   }
 ];
 
@@ -398,7 +440,7 @@ const HomeworkDetailsModal: React.FC<{
               </span>
               <span className="flex items-center">
                 <FaUsers className="mr-1" />
-                Класс {homework.classId}
+                Группа {homework.groupId}
               </span>
             </div>
           </div>
@@ -611,11 +653,11 @@ const HomeworkPage: React.FC = () => {
     switch (role) {
       case 'student':
         // Студент видит только свои задания
-        filtered = filtered.filter(hw => hw.classId === '10A'); // В реальном приложении фильтруем по ID студента
+        filtered = filtered.filter(hw => hw.groupId === 'МК24-1М'); // В реальном приложении фильтруем по ID студента
         break;
       case 'parent':
         // Родитель видит задания своего ребенка
-        filtered = filtered.filter(hw => hw.classId === '10A'); // В реальном приложении фильтруем по ID ребенка
+        filtered = filtered.filter(hw => hw.groupId === 'МК24-1М'); // В реальном приложении фильтруем по ID ребенка
         break;
       case 'teacher':
         // Учитель видит задания, которые он создал
@@ -781,4 +823,4 @@ const HomeworkPage: React.FC = () => {
   );
 };
 
-export default HomeworkPage; 
+export default HomeworkPage;

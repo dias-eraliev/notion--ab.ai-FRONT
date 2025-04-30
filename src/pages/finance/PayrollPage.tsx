@@ -183,7 +183,7 @@ const PayrollPage: React.FC = () => {
             Сбросить
           </button>
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
+            className="px-4 py-2 bg-green-600 text-white rounded-md text-sm"
             onClick={() => setShowFilterModal(false)}
           >
             Применить
@@ -215,7 +215,7 @@ const PayrollPage: React.FC = () => {
         <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="relative">
             {/* Шапка */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-xl text-white">
+            <div className="bg-gradient-to-r from-green-600 to-green-800 p-6 rounded-t-xl text-white">
               <button 
                 onClick={() => setSelectedEmployee(null)}
                 className="absolute top-4 right-4 text-white hover:text-gray-200"
@@ -224,11 +224,11 @@ const PayrollPage: React.FC = () => {
               </button>
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
-                  <FaUserTie className="w-12 h-12 text-blue-600" />
+                  <FaUserTie className="w-12 h-12 text-green-600" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold">{selectedEmployee.name}</h2>
-                  <p className="text-blue-100">{selectedEmployee.position}</p>
+                  <p className="text-green-100">{selectedEmployee.position}</p>
                 </div>
               </div>
             </div>
@@ -242,11 +242,11 @@ const PayrollPage: React.FC = () => {
                     <h3 className="text-lg font-semibold mb-4">Контактная информация</h3>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
-                        <FaEnvelope className="text-blue-600" />
+                        <FaEnvelope className="text-green-600" />
                         <span>{selectedEmployee.email}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <FaPhone className="text-blue-600" />
+                        <FaPhone className="text-green-600" />
                         <span>{selectedEmployee.phone}</span>
                       </div>
                     </div>
@@ -256,11 +256,11 @@ const PayrollPage: React.FC = () => {
                     <h3 className="text-lg font-semibold mb-4">Образование и опыт</h3>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
-                        <FaGraduationCap className="text-blue-600" />
+                        <FaGraduationCap className="text-green-600" />
                         <span>{selectedEmployee.education}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <FaCalendar className="text-blue-600" />
+                        <FaCalendar className="text-green-600" />
                         <span>Стаж работы: {selectedEmployee.experience} лет</span>
                       </div>
                     </div>
@@ -274,7 +274,7 @@ const PayrollPage: React.FC = () => {
                     <div className="space-y-2">
                       {selectedEmployee.achievements?.map((achievement, index) => (
                         <div key={index} className="flex items-center gap-3">
-                          <FaMedal className="text-blue-600" />
+                          <FaMedal className="text-green-600" />
                           <span>{achievement}</span>
                         </div>
                       ))}
@@ -285,7 +285,7 @@ const PayrollPage: React.FC = () => {
                     <h3 className="text-lg font-semibold mb-4">Компетенции</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedEmployee.skills?.map((skill, index) => (
-                        <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                        <span key={index} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                           {skill}
                         </span>
                       ))}
@@ -308,7 +308,7 @@ const PayrollPage: React.FC = () => {
                   </div>
                   <div className="p-4 bg-white rounded-lg">
                     <div className="text-sm text-gray-600">Итого</div>
-                    <div className="text-xl font-bold text-blue-600">{formatCurrency(selectedEmployee.total)}</div>
+                    <div className="text-xl font-bold text-green-600">{formatCurrency(selectedEmployee.total)}</div>
                   </div>
                 </div>
               </div>
@@ -324,7 +324,7 @@ const PayrollPage: React.FC = () => {
                 <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50">
                   История выплат
                 </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">
                   Редактировать
                 </button>
               </div>
@@ -348,7 +348,7 @@ const PayrollPage: React.FC = () => {
             <FaFilter className="mr-2" />
             Фильтры
           </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center">
+          <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors flex items-center">
             <FaPlus className="mr-2" />
             Расчет зарплаты
           </button>
@@ -364,10 +364,10 @@ const PayrollPage: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Фонд оплаты труда</div>
-            <FaChartLine className="text-blue-600" />
+            <FaChartLine className="text-green-600" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">{formatCurrency(summaryStats.totalPayroll)}</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(summaryStats.totalPayroll)}</div>
             <div className="text-sm text-green-600 flex items-center mt-1">
               <span>+{summaryStats.payrollGrowth}% к прошлому месяцу</span>
             </div>
@@ -377,10 +377,10 @@ const PayrollPage: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Средняя зарплата</div>
-            <FaUserTie className="text-blue-600" />
+            <FaUserTie className="text-green-600" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">{formatCurrency(summaryStats.avgSalary)}</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(summaryStats.avgSalary)}</div>
             <div className="text-sm text-green-600 flex items-center mt-1">
               <span>+3.8% к прошлому месяцу</span>
             </div>
@@ -390,10 +390,10 @@ const PayrollPage: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Сотрудников</div>
-            <FaUsers className="text-blue-600" />
+            <FaUsers className="text-green-600" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">{summaryStats.employeeCount}</div>
+            <div className="text-2xl font-bold text-green-600">{summaryStats.employeeCount}</div>
             <div className="text-sm text-gray-600 flex items-center mt-1">
               <span>{summaryStats.departments.teaching.count} учителей</span>
             </div>
@@ -403,11 +403,11 @@ const PayrollPage: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Премиальный фонд</div>
-            <FaChartLine className="text-blue-600" />
+            <FaChartLine className="text-green-600" />
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">{formatCurrency(summaryStats.totalPayroll * 0.1)}</div>
-            <div className="text-sm text-blue-600 flex items-center mt-1">
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(summaryStats.totalPayroll * 0.1)}</div>
+            <div className="text-sm text-green-600 flex items-center mt-1">
               <span>10% от ФОТ</span>
             </div>
           </div>
@@ -432,7 +432,7 @@ const PayrollPage: React.FC = () => {
                   formatter={(value: number) => formatCurrency(value)}
                   labelStyle={{ color: '#1F2937' }}
                 />
-                <Bar dataKey="value" fill="#3B82F6" />
+                <Bar dataKey="value" fill="#1E5945" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -456,7 +456,7 @@ const PayrollPage: React.FC = () => {
                   formatter={(value: number) => formatCurrency(value)}
                   labelStyle={{ color: '#1F2937' }}
                 />
-                <Line type="monotone" dataKey="value" stroke="#3B82F6" strokeWidth={2} />
+                <Line type="monotone" dataKey="value" stroke="#1E5945" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -531,4 +531,4 @@ const PayrollPage: React.FC = () => {
   );
 };
 
-export default PayrollPage; 
+export default PayrollPage;
