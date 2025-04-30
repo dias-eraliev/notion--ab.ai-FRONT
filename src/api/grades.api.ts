@@ -55,7 +55,7 @@ export const createLessonGrade = async (data: LessonGrade) => {
 };
 
 export const createHomeworkGrade = async (data: HomeworkGrade) => {
-    const response = await api.post('/grades/homework', data);
+    const response = await api.post('/grades', data);
     return response.data;
 };
 

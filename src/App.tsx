@@ -54,6 +54,7 @@ import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import 'filepond/dist/filepond.min.css'
 import "react-datepicker/dist/react-datepicker.css";
+import HomeworkAbout from "@/pages/HomeworkAbout.tsx"
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
@@ -82,6 +83,7 @@ const App: React.FC = () => {
               <Route path="academic/study-plans/:id" element={<StudyPlanDetailPage />} />
               <Route path="academic/study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
               <Route path="academic/homework" element={<HomeworkPage />} />
+              <Route path="academic/homework/:id" element={<HomeworkAbout />} />
 
               {/* Students routes */}
               <Route path="students" element={<StudentsPage />} />

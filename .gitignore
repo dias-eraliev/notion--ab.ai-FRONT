@@ -8,3 +8,4 @@ pnpm-lock.yaml
 dist
 
 src/types/dto
+/abai-college-backend-main
