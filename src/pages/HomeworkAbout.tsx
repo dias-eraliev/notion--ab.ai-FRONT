@@ -201,9 +201,10 @@ const ResourceCard = ({title, label, onClick}: ResourceCardProps) => (
 
 const HomeworkAbout: React.FC = () => {
 		const [homework] = useState<Homework>(mockHomework)
-		const [userRole] = useState<UserRole>("student") // роль тут менять
+		const [userRole] = useState<UserRole>("teacher") // роль тут менять
 		const [file, setFile] = useState<File | null>(null)
 		const fileInputRef = useRef<HTMLInputElement>(null)
+		const [showSubmissions, setShowSubmissions] = useState<boolean>(false);
 		const [comment, setComment] = useState<string>("")
 		const [loading, setLoading] = useState<boolean>(false)
 		const [success, setSuccess] = useState<boolean>(false)
@@ -353,7 +354,20 @@ const HomeworkAbout: React.FC = () => {
 											</div>
 									</div>
 
-									{userRole === "student" ? renderSubmissionForm() : renderSubmissionsTable()}
+									{userRole === "student" && renderSubmissionForm()}
+									{userRole === "teacher" && (
+										<div>
+												<div className="pl-1">
+														<button
+															className={`btn btn-primary`}
+															onClick={() => setShowSubmissions(prev => !prev)}
+														>
+																{showSubmissions ? "Скрыть решения" : "Просмотр решений"}
+														</button>
+												</div>
+										</div>
+									)}
+									{userRole === "teacher" && showSubmissions && renderSubmissionsTable()}
 							</div>
 
 							<div className="w-full lg:w-1/3">
