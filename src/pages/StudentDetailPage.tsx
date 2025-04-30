@@ -607,7 +607,7 @@ const StudentDetailPage: React.FC = () => {
                         </div>
                         <div className="grid grid-cols-3 gap-4 p-4">
 
-                            {students?.lessonGrades.map((subject, index) => (
+                            {students?.lessonGrades?.map((subject, index) => (
                                 <div
                                     key={index}
                                     className="bg-white border border-gray-100 rounded-lg hover:border-blue-100 transition-all duration-200"
@@ -822,7 +822,7 @@ const StudentDetailPage: React.FC = () => {
                         <p className="text-sm text-gray-500 mb-6">Записи о посещаемости, медицинских визитах и
                             пропусках</p>
                         <div className="grid grid-cols-1 gap-4">
-                            {students?.Attendance.map((record, index) => (
+                            {students?.Attendance?.map((record, index) => (
                                 <div
                                     key={index}
                                     className="border border-gray-200 rounded-lg hover:border-blue-200 transition-all duration-200"
