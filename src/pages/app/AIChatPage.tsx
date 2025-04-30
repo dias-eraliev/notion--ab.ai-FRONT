@@ -498,8 +498,18 @@ const AIChatPage: React.FC = () => {
     );
   };
 
-  // Компонент голосового оверлея с CSS-анимацией
+  // Обновляем компонент VoiceOverlay для увеличения эквалайзера и добавления более плавной анимации
   const VoiceOverlay = () => {
+    const [bars, setBars] = useState<number[]>([10, 20, 15, 25, 10, 30, 20, 15, 25, 35]);
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setBars(bars.map(() => Math.floor(Math.random() * 100) + 20));
+      }, 150);
+
+      return () => clearInterval(interval);
+    }, [bars]);
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex flex-col items-center justify-center">
         {/* Верхняя часть с инструкцией */}
@@ -507,57 +517,15 @@ const AIChatPage: React.FC = () => {
           <p>Говорите, чтобы продолжить диалог</p>
         </div>
 
-        {/* Центральный индикатор речи с CSS-анимацией */}
-        <div className="relative flex items-center justify-center">
-          {/* Фоновая пульсация - используем CSS-анимацию */}
-          <div
-            className="absolute rounded-full bg-white bg-opacity-10 animate-pulse-slow"
-            style={{
-              width: '300px',
-              height: '300px'
-            }}
-          ></div>
-
-          {/* Основное облако */}
-          <div
-            className="relative rounded-full bg-white flex items-center justify-center animate-pulse-medium"
-            style={{
-              width: '240px',
-              height: '240px',
-              boxShadow: '0 0 30px rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            {/* Облако рисуем с помощью SVG для более точного соответствия */}
-            <svg
-              width="100%"
-              height="100%"
-              viewBox="0 0 200 200"
-              fill="none"
-              style={{
-                position: 'absolute',
-                top: '0',
-                left: '0'
-              }}
-            >
-              <path
-                d="M160 100C160 134.738 132.738 162 98 162C85.5639 162 73.9701 158.321 64.3124 152.019C58.6449 148.266 50.6369 150.345 47.9868 156.721C46.1032 161.27 43 175 30 170C39.7212 162.421 40.8337 155.93 38.0638 151.107C24.0791 135.264 16 118.687 16 100C16 65.2617 43.2617 38 78 38C112.738 38 140 65.2617 140 100Z"
-                fill="white"
-              />
-            </svg>
-          </div>
-
-          {/* Маленький индикатор (точка для диалога) с независимой анимацией */}
-          <div
-            className="absolute rounded-full bg-white shadow-lg animate-pulse-fast"
-            style={{
-              width: '56px',
-              height: '56px',
-              bottom: '0',
-              left: '20%',
-              transform: 'translateY(25%)',
-              boxShadow: '0 0 15px rgba(255, 255, 255, 0.3)'
-            }}
-          />
+        {/* Центральный футуристичный эквалайзер */}
+        <div className="relative flex items-center space-x-4">
+          {bars.map((height, index) => (
+            <div
+              key={index}
+              className="bg-green-500 rounded transition-all duration-200 ease-in-out"
+              style={{ width: '30px', height: `${height}px` }}
+            ></div>
+          ))}
         </div>
 
         {/* Сообщение внизу */}
@@ -601,11 +569,11 @@ const AIChatPage: React.FC = () => {
       <div className="w-80 border-r border-gray-200 bg-white flex flex-col">
         <div className="p-4 border-b border-gray-200">
           <h1 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-            <FaRobot className="mr-2 text-blue-500" />
+            <FaRobot className="mr-2 text-[#1E5945]" />
             AI Чат
           </h1>
           <button
-            className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+            className="w-full py-3 px-4 bg-[#1E5945] hover:bg-[#1E5945]/90 text-white rounded-lg font-medium transition-colors"
             onClick={() => setSelectedConversation(null)}
           >
             Новый чат
@@ -617,8 +585,7 @@ const AIChatPage: React.FC = () => {
             <div
               key={conv.id}
               onClick={() => setSelectedConversation(conv.id)}
-              className={`flex items-center p-4 hover:bg-gray-50 cursor-pointer ${selectedConversation === conv.id ? 'bg-blue-50' : ''
-                }`}
+              className={`flex items-center p-4 hover:bg-[#1E5945]/10 cursor-pointer ${selectedConversation === conv.id ? 'bg-[#1E5945]/10' : ''}`}
             >
               <div className="flex-1">
                 <div className="flex justify-between items-center">
@@ -634,7 +601,7 @@ const AIChatPage: React.FC = () => {
         <div className="p-4 border-t border-gray-200">
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="flex items-center text-gray-700 hover:text-blue-500 transition-colors"
+            className="flex items-center text-gray-700 hover:text-[#1E5945] transition-colors"
           >
             <FaCog className="mr-2" />
             Настройки
@@ -661,7 +628,7 @@ const AIChatPage: React.FC = () => {
         {/* Заголовок чата */}
         <div className="p-4 bg-white border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center">
-            <FaRobot className="text-blue-500 mr-2" />
+            <FaRobot className="text-[#1E5945] mr-2" />
             <h2 className="font-semibold text-gray-800">
               {selectedConversation
                 ? conversations.find(c => c.id === selectedConversation)?.title
@@ -670,10 +637,10 @@ const AIChatPage: React.FC = () => {
           </div>
           <div className="flex items-center space-x-4">
             {isRecording && <RecordingIndicator />}
-            <button className="text-gray-500 hover:text-blue-500 transition-colors">
+            <button className="text-gray-500 hover:text-[#1E5945] transition-colors">
               <FaRegBookmark />
             </button>
-            <button className="text-gray-500 hover:text-blue-500 transition-colors">
+            <button className="text-gray-500 hover:text-[#1E5945] transition-colors">
               <FaEraser />
             </button>
           </div>
@@ -689,8 +656,7 @@ const AIChatPage: React.FC = () => {
               <div
                 className={`max-w-[70%] rounded-lg p-4 ${msg.isAI
                   ? 'bg-white border border-gray-200'
-                  : 'bg-blue-500 text-white'
-                  }`}
+                  : 'bg-[#1E5945] text-white'}`}
               >
                 {msg.type === 'text' && <p>{msg.text}</p>}
                 {msg.type === 'code' && (
@@ -732,7 +698,7 @@ const AIChatPage: React.FC = () => {
         <div className="p-4 bg-white border-t border-gray-200">
           <div className="flex items-center space-x-2">
             <button
-              className="p-2 text-gray-500 hover:text-blue-500 transition-colors"
+              className="p-2 text-gray-500 hover:text-green-500 transition-colors"
               disabled={isRealtimeActive}
             >
               <FaImage />
@@ -743,7 +709,7 @@ const AIChatPage: React.FC = () => {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={isRealtimeActive ? "Голосовой режим активен..." : "Введите сообщение..."}
-                className={`w-full px-4 py-2 border ${isRealtimeActive ? 'bg-gray-100' : 'bg-white'} border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 resize-none`}
+                className={`w-full px-4 py-2 border ${isRealtimeActive ? 'bg-gray-100' : 'bg-white'} border-gray-200 rounded-lg focus:outline-none focus:border-green-500 resize-none`}
                 rows={1}
                 disabled={isRealtimeActive}
               />
@@ -752,7 +718,7 @@ const AIChatPage: React.FC = () => {
               onClick={handleMicrophoneClick}
               className={`p-2 rounded-full ${isRecording
                 ? 'text-white bg-red-500 hover:bg-red-600'
-                : 'text-gray-500 hover:text-blue-500'} transition-colors`}
+                : 'text-gray-500 hover:text-green-500'} transition-colors`}
               title={isRecording ? "Остановить запись" : "Начать запись"}
             >
               {isRecording ? <FaStop /> : <FaMicrophone />}
@@ -761,9 +727,8 @@ const AIChatPage: React.FC = () => {
               onClick={handleSendMessage}
               disabled={!message.trim() || isRealtimeActive}
               className={`p-2 ${message.trim() && !isRealtimeActive
-                ? 'text-blue-500 hover:text-blue-600'
-                : 'text-gray-400'
-                } transition-colors`}
+                ? 'text-green-500 hover:text-green-600'
+                : 'text-gray-400'} transition-colors`}
             >
               <FaPaperPlane />
             </button>
@@ -826,4 +791,4 @@ const styleSheet = document.createElement("style");
 styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
 
-export default AIChatPage; 
+export default AIChatPage;

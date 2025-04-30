@@ -15,7 +15,7 @@ const initialSettings: BrandingSettings = {
   schoolName: 'UIB College Ai',
   logo: '/logo.png',
   favicon: '/favicon.ico',
-  primaryColor: '#1C7E66',
+  primaryColor: '#1E5945',
   secondaryColor: '#fff',
   accentColor: '#1C7E66',
   fontFamily: 'Inter'
@@ -230,4 +230,4 @@ const BrandingPage: React.FC = () => {
   );
 };
 
-export default BrandingPage; 
+export default BrandingPage;

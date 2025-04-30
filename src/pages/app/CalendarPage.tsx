@@ -294,7 +294,7 @@ const CalendarPage: React.FC = () => {
       {/* Верхняя панель */}
       <div className="bg-white border-b border-gray-200 p-4">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold text-corporate-primary">Календарь</h1>
+          <h1 className="text-2xl font-semibold text-[#1E5945]">Календарь</h1>
           <div className="flex items-center space-x-4">
             <button
               onClick={() => {
@@ -306,7 +306,7 @@ const CalendarPage: React.FC = () => {
                 });
                 setShowEventModal(true);
               }}
-              className="flex items-center px-4 py-2 bg-corporate-primary text-white rounded-lg hover:bg-corporate-primary/90 transition-colors"
+              className="flex items-center px-4 py-2 bg-[#1E5945] text-white rounded-lg hover:bg-[#1E5945]/90 transition-colors"
             >
               <FaPlus className="mr-2" />
               Добавить событие
@@ -827,4 +827,4 @@ const CalendarPage: React.FC = () => {
   );
 };
 
-export default CalendarPage; 
+export default CalendarPage;

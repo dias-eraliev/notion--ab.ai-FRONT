@@ -47,6 +47,7 @@ import IntegrationsPage from './pages/settings/IntegrationsPage';
 import BrandingPage from './pages/settings/BrandingPage';
 import SystemPage from './pages/settings/SystemPage';
 import HomeworkPage from './pages/HomeworkPage';
+import AISchedulePage from './pages/AISchedulePage';
 
 const App: React.FC = () => {
   return (
@@ -116,6 +117,7 @@ const App: React.FC = () => {
               <Route path="study-plans/:id/lessons/:lessonId" element={<LessonDetailPage />} />
 
               <Route path='/test/realtime-api' element={<TestRealtimeApi />} />
+              <Route path="/ai-schedule" element={<AISchedulePage />} />
             </Route>
           </Routes>
         </AuthProvider>
@@ -124,4 +126,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App; 
+export default App;

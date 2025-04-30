@@ -112,7 +112,7 @@ const EmailPage: React.FC = () => {
         <div className="p-4">
           <button
             onClick={() => setShowCompose(true)}
-            className="w-full flex items-center justify-center px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="w-full flex items-center justify-center px-4 py-3 bg-[#1E5945] text-white rounded-lg hover:bg-[#1E5945]/90 transition-colors"
           >
             <FaPlus className="mr-2" />
             Написать
@@ -148,13 +148,13 @@ const EmailPage: React.FC = () => {
             <FaSearch className="absolute left-3 top-3 text-gray-400" />
           </div>
           <div className="flex items-center justify-between mt-4">
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-[#1E5945]">
               {folders.find((f) => f.id === selectedFolder)?.name}
             </h2>
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`p-2 rounded-lg transition-colors ${
-                showFilters ? 'bg-blue-50 text-blue-500' : 'text-gray-500 hover:bg-gray-50'
+                showFilters ? 'bg-[#1E5945]/10 text-[#1E5945]' : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
               <FaFilter />
@@ -352,4 +352,4 @@ const EmailPage: React.FC = () => {
   );
 };
 
-export default EmailPage; 
+export default EmailPage;

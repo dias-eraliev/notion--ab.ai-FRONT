@@ -7,6 +7,7 @@ import ClassroomModal from '../components/ClassroomModal';
 import * as XLSX from 'xlsx';
 import { useSearchParams } from 'react-router-dom';
 import { useAuthContext, UserRole } from '../providers/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 // Типы данных
 interface Schedule {
@@ -528,6 +529,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onSave, 
 };
 
 const SchedulePage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roomFilter = searchParams.get('room');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -664,12 +666,8 @@ const SchedulePage: React.FC = () => {
     }
   };
 
-  const handleAISchedule = async () => {
-    setIsLoading(true);
-    // Здесь будет логика AI
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+  const handleAISchedule = () => {
+    navigate('/ai-schedule');
   };
 
   const handleRoomClick = (roomId: string) => {
@@ -708,7 +706,6 @@ const SchedulePage: React.FC = () => {
               </button>
               <button
                 onClick={handleAISchedule}
-                disabled={isLoading}
                 className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 flex items-center"
               >
                 <FaRobot className="mr-2" />
@@ -943,4 +940,4 @@ const SchedulePage: React.FC = () => {
   );
 };
 
-export default SchedulePage; 
+export default SchedulePage;

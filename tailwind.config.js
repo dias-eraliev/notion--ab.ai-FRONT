@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'corporate-primary': '#1C7E66',
+        'corporate-primary': '#1E5945',
         'corporate-secondary': '#fff',
         'corporate-bg': '#f8fafc',
         'notion-gray': {
@@ -61,4 +61,4 @@ module.exports = {
   plugins: [
     require('@tailwindcss/typography'),
   ],
-} 
+}

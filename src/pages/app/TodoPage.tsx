@@ -191,7 +191,7 @@ const TodoPage: React.FC = () => {
       {/* Верхняя панель */}
       <div className="bg-white border-b border-gray-200 p-4">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold text-corporate-primary">Список задач</h1>
+          <h1 className="text-2xl font-semibold text-[#1E5945]">Список задач</h1>
           <div className="flex items-center space-x-4">
             <div className="flex items-center bg-gray-100 rounded-lg p-1">
               <button
@@ -217,7 +217,7 @@ const TodoPage: React.FC = () => {
             </div>
             <button
               onClick={() => setShowAddTodo(true)}
-              className="flex items-center px-4 py-2 bg-corporate-primary text-white rounded-lg hover:bg-corporate-primary/90 transition-colors"
+              className="flex items-center px-4 py-2 bg-[#1E5945] text-white rounded-lg hover:bg-[#1E5945]/90 transition-colors"
             >
               <FaPlus className="mr-2" />
               Добавить задачу
@@ -251,7 +251,10 @@ const TodoPage: React.FC = () => {
 
         {/* Панель фильтров */}
         {showFilters && (
-          <div className="bg-white border-t border-gray-200 p-4">
+          <div className="bg-[#1E5945]/10 p-4 rounded-lg">
+            <label className="block text-sm font-medium text-[#1E5945] mb-3">
+              Фильтры
+            </label>
             <div className="flex flex-wrap gap-2">
               {allTags.map((tag) => (
                 <button
@@ -888,4 +891,4 @@ const TodoPage: React.FC = () => {
   );
 };
 
-export default TodoPage; 
+export default TodoPage;

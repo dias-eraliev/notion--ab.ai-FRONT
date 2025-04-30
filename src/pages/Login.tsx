@@ -37,7 +37,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const letters = "UIB College Ai".split("");
+  const letters = "UIB.AI".split("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +55,34 @@ const Login: React.FC = () => {
   const handleGoogleLogin = () => {
     // Здесь будет логика входа через Google
     window.location.href = '/api/auth/google';
+  };
+
+  const handleFaceIDAuthentication = () => {
+    const video = document.createElement('video');
+    video.style.position = 'fixed';
+    video.style.top = '50%';
+    video.style.left = '50%';
+    video.style.transform = 'translate(-50%, -50%)';
+    video.style.zIndex = '1000';
+    video.style.border = '2px solid #1E5945';
+    video.style.borderRadius = '8px';
+    document.body.appendChild(video);
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+        video.play();
+
+        setTimeout(() => {
+          stream.getTracks().forEach(track => track.stop());
+          video.remove();
+          alert('Face ID authentication successful!');
+        }, 3000); // Эмуляция успешного прохождения через 3 секунды
+      })
+      .catch((err) => {
+        console.error('Error accessing camera:', err);
+        alert('Failed to access camera for Face ID authentication.');
+      });
   };
 
   return (
@@ -111,11 +139,11 @@ const Login: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleGoogleLogin}
+            onClick={handleFaceIDAuthentication}
             className="w-full flex items-center justify-center py-2 px-4 mb-6 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-corporate-primary"
           >
-            <FaGoogle className="w-5 h-5 mr-2 text-corporate-primary" />
-            Войти через Google
+            <FaEye className="w-5 h-5 mr-2 text-corporate-primary" />
+            Войти через Face ID
           </motion.button>
 
           <div className="relative mb-6">
@@ -222,9 +250,17 @@ const Login: React.FC = () => {
         >
           Copyright © 2024 - UIB College Ai
         </motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4 }}
+          className="mt-2 text-center text-sm text-corporate-primary/70"
+        >
+          Powered by AB.AI
+        </motion.p>
       </div>
     </div>
   );
 };
 
-export default Login; 
+export default Login;

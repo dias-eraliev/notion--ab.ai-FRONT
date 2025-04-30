@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaFilter, FaPlus, FaEllipsisH, FaCalendar, FaCaretDown, FaTimes } from 'react-icons/fa';
 import { useLanguage } from '../hooks/useLanguage';
@@ -60,7 +60,8 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
   
   const [classworkEnabled, setClassworkEnabled] = useState<boolean>(!!initialData?.classwork);
   const [homeworkEnabled, setHomeworkEnabled] = useState<boolean>(!!initialData?.homework);
-  
+  const [attendanceTag, setAttendanceTag] = useState<string>('');
+
   const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,7 +70,24 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
       classworkEnabled ? classworkGrade : null,
       homeworkEnabled ? homeworkGrade : null
     );
+    console.log('Selected Attendance Tag:', attendanceTag); // Логируем выбранный тег
     onClose();
+  };
+
+  const getTagClass = (tag: string) => {
+    if (attendanceTag === tag) {
+      switch (tag) {
+        case 'Б':
+          return 'bg-yellow-300';
+        case 'Н':
+          return 'bg-red-300';
+        case 'П':
+          return 'bg-green-300';
+        default:
+          return '';
+      }
+    }
+    return 'hover:bg-gray-100';
   };
 
   if (!isOpen) return null;
@@ -89,6 +107,52 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
           </button>
         </div>
         <form onSubmit={handleSubmit}>
+          {/* Секция выбора тега посещаемости */}
+          <div className="mb-6 p-4 border border-gray-200 rounded-lg">
+            <h4 className="text-md font-medium mb-3">Тег посещаемости</h4>
+            <div className="flex space-x-4">
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="attendanceTag"
+                  value="Б"
+                  checked={attendanceTag === 'Б'}
+                  onChange={(e) => setAttendanceTag(e.target.value)}
+                  className="sr-only"
+                />
+                <div className={`px-4 py-2 border border-gray-300 rounded-md cursor-pointer ${getTagClass('Б')}`}>
+                  Б (Болеет)
+                </div>
+              </label>
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="attendanceTag"
+                  value="Н"
+                  checked={attendanceTag === 'Н'}
+                  onChange={(e) => setAttendanceTag(e.target.value)}
+                  className="sr-only"
+                />
+                <div className={`px-4 py-2 border border-gray-300 rounded-md cursor-pointer ${getTagClass('Н')}`}>
+                  Н (Не был)
+                </div>
+              </label>
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="attendanceTag"
+                  value="П"
+                  checked={attendanceTag === 'П'}
+                  onChange={(e) => setAttendanceTag(e.target.value)}
+                  className="sr-only"
+                />
+                <div className={`px-4 py-2 border border-gray-300 rounded-md cursor-pointer ${getTagClass('П')}`}>
+                  П (Причина)
+                </div>
+              </label>
+            </div>
+          </div>
+
           {/* Секция классной работы */}
           <div className="mb-6 p-4 border border-gray-200 rounded-lg">
             <div className="flex items-center justify-between mb-3">
@@ -307,6 +371,7 @@ const GradeInfoModal: React.FC<{
   );
 };
 
+// Добавлена логика для фильтрации таблицы на основе выбранных фильтров
 const AcademicJournalPage: React.FC = () => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -326,7 +391,7 @@ const AcademicJournalPage: React.FC = () => {
   // Даты для колонок (в реальном приложении это должно быть динамическим)
   const dates = ['27.02', '28.02', '01.03', '02.03', '05.03', '06.03'];
 
-  // Обновленные тестовые данные с 100-балльной системой
+  // Заполнены пустые места оценками для всех студентов, кроме 28 февраля у Абдуллаева Армана
   const students: Student[] = [
     {
       id: 1,
@@ -337,6 +402,7 @@ const AcademicJournalPage: React.FC = () => {
           homework: { value: 78, type: 'homework', createdAt: '27.02.2024 18:45', comment: 'Небольшие неточности в решении' },
           average: 82
         },
+        '28.02': null, // Оставляем пустым для демонстрации
         '01.03': {
           classwork: { value: 92, type: 'classwork', createdAt: '01.03.2024 09:15' },
           average: 92
@@ -346,6 +412,10 @@ const AcademicJournalPage: React.FC = () => {
           homework: { value: 94, type: 'homework', createdAt: '05.03.2024 15:30', comment: 'Все задачи решены верно' },
           average: 91
         },
+        '06.03': {
+          classwork: { value: 80, type: 'classwork', comment: 'Болеет' },
+          average: 'Б'
+        }
       }
     },
     {
@@ -357,6 +427,10 @@ const AcademicJournalPage: React.FC = () => {
           homework: { value: 68, type: 'homework' },
           average: 72
         },
+        '28.02': {
+          classwork: { value: 0, type: 'classwork', comment: 'Болеет' },
+          average: 'Б'
+        },
         '01.03': {
           classwork: { value: 65, type: 'classwork' },
           average: 65
@@ -365,6 +439,10 @@ const AcademicJournalPage: React.FC = () => {
           classwork: { value: 82, type: 'classwork' },
           average: 82
         },
+        '06.03': {
+          classwork: { value: 70, type: 'classwork', comment: 'Причина' },
+          average: 'П'
+        }
       }
     },
     {
@@ -376,13 +454,17 @@ const AcademicJournalPage: React.FC = () => {
           average: 90
         },
         '02.03': { 
-          homework: { value: 85, type: 'homework' },
-          average: 85
+          homework: { value: 60, type: 'homework', comment: 'Не был' },
+          average: 'Н'
         },
         '06.03': { 
           classwork: { value: 95, type: 'classwork' },
           average: 95
         },
+        '05.03': {
+          classwork: { value: 85, type: 'classwork', comment: 'Болеет' },
+          average: 'Б'
+        }
       }
     },
     {
@@ -398,9 +480,13 @@ const AcademicJournalPage: React.FC = () => {
           average: 88
         },
         '05.03': { 
-          classwork: { value: 82, type: 'classwork' },
-          average: 82
+          classwork: { value: 70, type: 'classwork', comment: 'Причина' },
+          average: 'П'
         },
+        '06.03': {
+          classwork: { value: 75, type: 'classwork', comment: 'Не был' },
+          average: 'Н'
+        }
       }
     },
     {
@@ -419,6 +505,10 @@ const AcademicJournalPage: React.FC = () => {
           classwork: { value: 80, type: 'classwork' },
           average: 80
         },
+        '05.03': {
+          classwork: { value: 70, type: 'classwork', comment: 'Болеет' },
+          average: 'Б'
+        }
       }
     },
     {
@@ -438,6 +528,10 @@ const AcademicJournalPage: React.FC = () => {
           homework: { value: 90, type: 'homework' },
           average: 89
         },
+        '06.03': {
+          classwork: { value: 85, type: 'classwork', comment: 'Не был' },
+          average: 'Н'
+        }
       }
     },
     {
@@ -456,6 +550,10 @@ const AcademicJournalPage: React.FC = () => {
           classwork: { value: 94, type: 'classwork' },
           average: 94
         },
+        '05.03': {
+          classwork: { value: 80, type: 'classwork', comment: 'Причина' },
+          average: 'П'
+        }
       }
     },
     {
@@ -474,13 +572,352 @@ const AcademicJournalPage: React.FC = () => {
           classwork: { value: 80, type: 'classwork' },
           average: 80
         },
+        '06.03': {
+          classwork: { value: 70, type: 'classwork', comment: 'Болеет' },
+          average: 'Б'
+        }
       }
-    }
+    },
+    {
+      id: 9,
+      name: 'Кайратов Нурлан',
+      grades: {
+        '27.02': { 
+          classwork: { value: 88, type: 'classwork' },
+          average: 88
+        },
+        '01.03': { 
+          homework: { value: 75, type: 'homework' },
+          average: 75
+        },
+        '05.03': { 
+          classwork: { value: 90, type: 'classwork' },
+          average: 90
+        },
+        '06.03': {
+          classwork: { value: 80, type: 'classwork', comment: 'Причина' },
+          average: 'П'
+        }
+      }
+    },
+    {
+      id: 10,
+      name: 'Лесбекова Асем',
+      grades: {
+        '27.02': { 
+          classwork: { value: 78, type: 'classwork' },
+          average: 78
+        },
+        '01.03': { 
+          homework: { value: 85, type: 'homework' },
+          average: 85
+        },
+        '05.03': { 
+          classwork: { value: 88, type: 'classwork' },
+          average: 88
+        },
+        '06.03': {
+          classwork: { value: 75, type: 'classwork', comment: 'Не был' },
+          average: 'Н'
+        }
+      }
+    },
+    {
+      id: 11,
+      name: 'Мухамедьярова Алия',
+      grades: {
+        '27.02': {
+          classwork: { value: 85, type: 'classwork' },
+          average: 85
+        },
+        '28.02': {
+          classwork: { value: 90, type: 'classwork' },
+          average: 90
+        },
+        '01.03': {
+          classwork: { value: 88, type: 'classwork' },
+          average: 88
+        },
+      }
+    },
+    {
+      id: 12,
+      name: 'Нурмагамбетов Азамат',
+      grades: {
+        '27.02': {
+          classwork: { value: 70, type: 'classwork' },
+          average: 70
+        },
+        '28.02': {
+          classwork: { value: 75, type: 'classwork' },
+          average: 75
+        },
+        '01.03': {
+          classwork: { value: 80, type: 'classwork' },
+          average: 80
+        },
+      }
+    },
+    {
+      id: 13,
+      name: 'Омарова Айнур',
+      grades: {
+        '27.02': {
+          classwork: { value: 95, type: 'classwork' },
+          average: 95
+        },
+        '28.02': {
+          classwork: { value: 85, type: 'classwork' },
+          average: 85
+        },
+        '01.03': {
+          classwork: { value: 90, type: 'classwork' },
+          average: 90
+        },
+      }
+    },
+    {
+      id: 14,
+      name: 'Павлов Тимур',
+      grades: {
+        '27.02': {
+          classwork: { value: 60, type: 'classwork' },
+          average: 60
+        },
+        '28.02': {
+          classwork: { value: 65, type: 'classwork' },
+          average: 65
+        },
+        '01.03': {
+          classwork: { value: 70, type: 'classwork' },
+          average: 70
+        },
+      }
+    },
+    {
+      id: 15,
+      name: 'Рахимов Аскар',
+      grades: {
+        '27.02': {
+          classwork: { value: 75, type: 'classwork' },
+          average: 75
+        },
+        '28.02': {
+          classwork: { value: 80, type: 'classwork' },
+          average: 80
+        },
+        '01.03': {
+          classwork: { value: 85, type: 'classwork' },
+          average: 85
+        },
+      }
+    },
+    {
+      id: 16,
+      name: 'Сулейменов Ержан',
+      grades: {
+        '27.02': {
+          classwork: { value: 90, type: 'classwork' },
+          average: 90
+        },
+        '28.02': {
+          classwork: { value: 95, type: 'classwork' },
+          average: 95
+        },
+        '01.03': {
+          classwork: { value: 88, type: 'classwork' },
+          average: 88
+        },
+      }
+    },
+    {
+      id: 17,
+      name: 'Тлеубаев Нурсултан',
+      grades: {
+        '27.02': {
+          classwork: { value: 65, type: 'classwork' },
+          average: 65
+        },
+        '28.02': {
+          classwork: { value: 70, type: 'classwork' },
+          average: 70
+        },
+        '01.03': {
+          classwork: { value: 75, type: 'classwork' },
+          average: 75
+        },
+      }
+    },
+    {
+      id: 18,
+      name: 'Уразова Алия',
+      grades: {
+        '27.02': {
+          classwork: { value: 80, type: 'classwork' },
+          average: 80
+        },
+        '28.02': {
+          classwork: { value: 85, type: 'classwork' },
+          average: 85
+        },
+        '01.03': {
+          classwork: { value: 90, type: 'classwork' },
+          average: 90
+        },
+      }
+    },
+    {
+      id: 19,
+      name: 'Фазылов Ермек',
+      grades: {
+        '27.02': {
+          classwork: { value: 88, type: 'classwork' },
+          average: 88
+        },
+        '28.02': {
+          classwork: { value: 92, type: 'classwork' },
+          average: 92
+        },
+        '01.03': {
+          classwork: { value: 85, type: 'classwork' },
+          average: 85
+        },
+      }
+    },
+    {
+      id: 20,
+      name: 'Хасенова Асем',
+      grades: {
+        '27.02': {
+          classwork: { value: 78, type: 'classwork' },
+          average: 78
+        },
+        '28.02': {
+          classwork: { value: 80, type: 'classwork' },
+          average: 80
+        },
+        '01.03': {
+          classwork: { value: 82, type: 'classwork' },
+          average: 82
+        },
+      }
+    },
   ];
+
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>(students);
+
+  // Добавлены моковые данные для демонстрации изменения таблицы при выборе фильтров
+  const mockData = {
+    math: {
+      'МК24-1М': [
+        { id: 1, name: 'Абдуллаев Арман', grades: { '27.02': { classwork: { value: 85, type: 'classwork' }, average: 85 }, '28.02': { classwork: { value: 90, type: 'classwork' }, average: 90 }, '01.03': { classwork: { value: 88, type: 'classwork' }, average: 88 } } },
+        { id: 2, name: 'Бекенов Дамир', grades: { '27.02': { classwork: { value: 70, type: 'classwork' }, average: 70 }, '28.02': { classwork: { value: 75, type: 'classwork' }, average: 75 }, '01.03': { classwork: { value: 80, type: 'classwork' }, average: 80 } } },
+        { id: 3, name: 'Васильев Александр', grades: { '27.02': { classwork: { value: 95, type: 'classwork' }, average: 95 }, '28.02': { classwork: { value: 85, type: 'classwork' }, average: 85 }, '01.03': { classwork: { value: 90, type: 'classwork' }, average: 90 } } },
+        { id: 4, name: 'Галимова Алия', grades: { '27.02': { classwork: { value: 60, type: 'classwork' }, average: 60 }, '28.02': { classwork: { value: 65, type: 'classwork' }, average: 65 }, '01.03': { classwork: { value: 70, type: 'classwork' }, average: 70 } } },
+        { id: 5, name: 'Дмитриев Кирилл', grades: { '27.02': { classwork: { value: 75, type: 'classwork' }, average: 75 }, '28.02': { classwork: { value: 80, type: 'classwork' }, average: 80 }, '01.03': { classwork: { value: 85, type: 'classwork' }, average: 85 } } },
+        { id: 6, name: 'Ержанов Тимур', grades: { '27.02': { classwork: { value: 90, type: 'classwork' }, average: 90 }, '28.02': { classwork: { value: 95, type: 'classwork' }, average: 95 }, '01.03': { classwork: { value: 88, type: 'classwork' }, average: 88 } } },
+        { id: 7, name: 'Жумабаева Айгерим', grades: { '27.02': { classwork: { value: 65, type: 'classwork' }, average: 65 }, '28.02': { classwork: { value: 70, type: 'classwork' }, average: 70 }, '01.03': { classwork: { value: 75, type: 'classwork' }, average: 75 } } },
+        { id: 8, name: 'Иванов Максим', grades: { '27.02': { classwork: { value: 80, type: 'classwork' }, average: 80 }, '28.02': { classwork: { value: 85, type: 'classwork' }, average: 85 }, '01.03': { classwork: { value: 90, type: 'classwork' }, average: 90 } } },
+        { id: 9, name: 'Кайратов Нурлан', grades: { '27.02': { classwork: { value: 88, type: 'classwork' }, average: 88 }, '28.02': { classwork: { value: 92, type: 'classwork' }, average: 92 }, '01.03': { classwork: { value: 85, type: 'classwork' }, average: 85 } } },
+        { id: 10, name: 'Лесбекова Асем', grades: { '27.02': { classwork: { value: 78, type: 'classwork' }, average: 78 }, '28.02': { classwork: { value: 80, type: 'classwork' }, average: 80 }, '01.03': { classwork: { value: 82, type: 'classwork' }, average: 82 } } },
+      ],
+      'МК24-2М': [
+        { id: 11, name: 'Мухамедьярова Алия', grades: { '27.02': { classwork: { value: 85, type: 'classwork' }, average: 85 }, '28.02': { classwork: { value: 90, type: 'classwork' }, average: 90 }, '01.03': { classwork: { value: 88, type: 'classwork' }, average: 88 } } },
+        { id: 12, name: 'Нурмагамбетов Азамат', grades: { '27.02': { classwork: { value: 70, type: 'classwork' }, average: 70 }, '28.02': { classwork: { value: 75, type: 'classwork' }, average: 75 }, '01.03': { classwork: { value: 80, type: 'classwork' }, average: 80 } } },
+        { id: 13, name: 'Омарова Айнур', grades: { '27.02': { classwork: { value: 95, type: 'classwork' }, average: 95 }, '28.02': { classwork: { value: 85, type: 'classwork' }, average: 85 }, '01.03': { classwork: { value: 90, type: 'classwork' }, average: 90 } } },
+        { id: 14, name: 'Павлов Тимур', grades: { '27.02': { classwork: { value: 60, type: 'classwork' }, average: 60 }, '28.02': { classwork: { value: 65, type: 'classwork' }, average: 65 }, '01.03': { classwork: { value: 70, type: 'classwork' }, average: 70 } } },
+        { id: 15, name: 'Рахимов Аскар', grades: { '27.02': { classwork: { value: 75, type: 'classwork' }, average: 75 }, '28.02': { classwork: { value: 80, type: 'classwork' }, average: 80 }, '01.03': { classwork: { value: 85, type: 'classwork' }, average: 85 } } },
+        { id: 16, name: 'Сулейменов Ержан', grades: { '27.02': { classwork: { value: 90, type: 'classwork' }, average: 90 }, '28.02': { classwork: { value: 95, type: 'classwork' }, average: 95 }, '01.03': { classwork: { value: 88, type: 'classwork' }, average: 88 } } },
+        { id: 17, name: 'Тлеубаев Нурсултан', grades: { '27.02': { classwork: { value: 65, type: 'classwork' }, average: 65 }, '28.02': { classwork: { value: 70, type: 'classwork' }, average: 70 }, '01.03': { classwork: { value: 75, type: 'classwork' }, average: 75 } } },
+        { id: 18, name: 'Уразова Алия', grades: { '27.02': { classwork: { value: 80, type: 'classwork' }, average: 80 }, '28.02': { classwork: { value: 85, type: 'classwork' }, average: 85 }, '01.03': { classwork: { value: 90, type: 'classwork' }, average: 90 } } },
+        { id: 19, name: 'Фазылов Ермек', grades: { '27.02': { classwork: { value: 88, type: 'classwork' }, average: 88 }, '28.02': { classwork: { value: 92, type: 'classwork' }, average: 92 }, '01.03': { classwork: { value: 85, type: 'classwork' }, average: 85 } } },
+        { id: 20, name: 'Хасенова Асем', grades: { '27.02': { classwork: { value: 78, type: 'classwork' }, average: 78 }, '28.02': { classwork: { value: 80, type: 'classwork' }, average: 80 }, '01.03': { classwork: { value: 82, type: 'classwork' }, average: 82 } } },
+      ],
+    },
+    physics: {
+      'МК24-1М': [
+        {
+          id: 5,
+          name: 'Дмитриев Кирилл',
+          grades: {
+            '27.02': { classwork: { value: 75, type: 'classwork' }, average: 75 },
+            '28.02': { classwork: { value: 80, type: 'classwork' }, average: 80 },
+            '01.03': { classwork: { value: 85, type: 'classwork' }, average: 85 },
+          },
+        },
+        {
+          id: 6,
+          name: 'Ержанов Тимур',
+          grades: {
+            '27.02': { classwork: { value: 90, type: 'classwork' }, average: 90 },
+            '28.02': { classwork: { value: 95, type: 'classwork' }, average: 95 },
+            '01.03': { classwork: { value: 88, type: 'classwork' }, average: 88 },
+          },
+        },
+      ],
+      'МК24-2М': [
+        {
+          id: 7,
+          name: 'Жумабаева Айгерим',
+          grades: {
+            '27.02': { classwork: { value: 65, type: 'classwork' }, average: 65 },
+            '28.02': { classwork: { value: 70, type: 'classwork' }, average: 70 },
+            '01.03': { classwork: { value: 75, type: 'classwork' }, average: 75 },
+          },
+        },
+        {
+          id: 8,
+          name: 'Иванов Максим',
+          grades: {
+            '27.02': { classwork: { value: 80, type: 'classwork' }, average: 80 },
+            '28.02': { classwork: { value: 85, type: 'classwork' }, average: 85 },
+            '01.03': { classwork: { value: 90, type: 'classwork' }, average: 90 },
+          },
+        },
+      ],
+    },
+  };
+
+  const handleFilterChange = () => {
+    if (selectedSubject && selectedClass) {
+      setFilteredStudents(mockData[selectedSubject]?.[selectedClass] || []);
+    } else {
+      setFilteredStudents([]); // Пустая таблица, если фильтры не выбраны
+    }
+  };
+
+  // Добавлена возможность фильтрации по датам и календарю
+  const handleDateFilter = () => {
+    if (startDate && endDate) {
+      const filtered = students.map(student => {
+        const filteredGrades = Object.keys(student.grades)
+          .filter(date => {
+            const [day, month] = date.split('.').map(Number);
+            const gradeDate = new Date(startDate.getFullYear(), month - 1, day);
+            return gradeDate >= startDate && gradeDate <= endDate;
+          })
+          .reduce((acc, date) => {
+            acc[date] = student.grades[date];
+            return acc;
+          }, {});
+
+        return { ...student, grades: filteredGrades };
+      });
+
+      setFilteredStudents(filtered);
+    } else {
+      setFilteredStudents(students);
+    }
+  };
+
+  useEffect(() => {
+    handleFilterChange();
+    handleDateFilter();
+  }, [selectedSubject, selectedClass, selectedSemester, startDate, endDate]);
 
   // Функция фильтрации студентов в зависимости от роли
   const getFilteredStudents = () => {
-    let filtered = [...students];
+    let filtered = [...filteredStudents];
 
     // Базовая фильтрация по поиску
     if (searchQuery) {
@@ -562,11 +999,28 @@ const AcademicJournalPage: React.FC = () => {
   };
 
   // Функция для определения цвета оценки в 100-балльной системе
-  const getGradeColor = (value: number) => {
-    if (value >= 85) return 'bg-green-500'; // Отлично
-    if (value >= 70) return 'bg-blue-500';  // Хорошо
-    if (value >= 50) return 'bg-yellow-500'; // Удовлетворительно
-    return 'bg-red-500'; // Неудовлетворительно
+  const getGradeColor = (value: number | string) => {
+    if (typeof value === 'string') {
+      switch (value) {
+        case 'Б':
+          return 'bg-yellow-500'; // Желтый для "Б"
+        case 'Н':
+          return 'bg-red-500'; // Красный для "Н"
+        case 'П':
+          return 'bg-green-500'; // Зеленый для "П"
+        default:
+          return 'bg-gray-500';
+      }
+    }
+
+    if (typeof value === 'number') {
+      if (value >= 85) return 'bg-green-500'; // Отлично
+      if (value >= 70) return 'bg-blue-500';  // Хорошо
+      if (value >= 50) return 'bg-yellow-500'; // Удовлетворительно
+      return 'bg-red-500'; // Неудовлетворительно
+    }
+
+    return 'bg-gray-500';
   };
 
   const handleDateChange = (start: Date | null, end: Date | null) => {
@@ -798,4 +1252,4 @@ const AcademicJournalPage: React.FC = () => {
   );
 };
 
-export default AcademicJournalPage; 
+export default AcademicJournalPage;

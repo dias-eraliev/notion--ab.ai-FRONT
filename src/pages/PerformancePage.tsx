@@ -198,15 +198,15 @@ const PerformancePage: React.FC = () => {
               <AreaChart data={filteredData.monthlyData}>
                 <defs>
                   <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2E69FF" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#2E69FF" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#1C7E66" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#1C7E66" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} />
                 <YAxis domain={[2, 5]} axisLine={false} tickLine={false} />
                 <Tooltip />
-                <Area type="monotone" dataKey="value" stroke="#2E69FF" fillOpacity={1} fill="url(#colorValue)" />
+                <Area type="monotone" dataKey="value" stroke="#1C7E66" fillOpacity={1} fill="url(#colorValue)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -246,7 +246,7 @@ const PerformancePage: React.FC = () => {
                 <XAxis type="number" domain={[0, 5]} />
                 <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} />
                 <Tooltip />
-                <Bar dataKey="grade" fill="#2E69FF" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="grade" fill="#1C7E66" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -260,7 +260,7 @@ const PerformancePage: React.FC = () => {
                 <PolarGrid />
                 <PolarAngleAxis dataKey="subject" />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar name="Показатели" dataKey="value" data={filteredData.performanceMetrics} fill="#2E69FF" fillOpacity={0.6} />
+                <Radar name="Показатели" dataKey="value" data={filteredData.performanceMetrics} fill="#1C7E66" fillOpacity={0.6} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -303,4 +303,4 @@ const PerformancePage: React.FC = () => {
   );
 };
 
-export default PerformancePage; 
+export default PerformancePage;

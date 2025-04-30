@@ -37,18 +37,24 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      sender: 'Буробай Диас',
-      content: 'Привет @Рахмат! Как прошла презентация?',
-      timestamp: '8:16 PM',
+      sender: 'Команда учителей',
+      content: 'Добрый день! Напоминаем, что завтра состоится собрание.',
+      timestamp: '10:00 AM',
       isMe: false
     },
     {
       id: '2',
-      sender: 'Рахмат Кенжибаев',
-      content: 'Привет! Все прошло отлично, спасибо за помощь!',
-      timestamp: '8:18 PM',
-      isMe: true,
-      status: 'read'
+      sender: 'Вы',
+      content: 'Спасибо за напоминание! Обязательно буду.',
+      timestamp: '10:05 AM',
+      isMe: true
+    },
+    {
+      id: '3',
+      sender: 'Команда учителей',
+      content: 'Если есть вопросы, пишите.',
+      timestamp: '10:10 AM',
+      isMe: false
     }
   ]);
 
@@ -80,8 +86,90 @@ const ChatPage: React.FC = () => {
       unread: 0,
       online: true,
       avatar: 'https://placekitten.com/42/42'
+    },
+    {
+      id: '4',
+      name: 'Учебный план',
+      lastMessage: 'Обсудим изменения в расписании?',
+      timestamp: 'Сегодня',
+      unread: 2,
+      online: true,
+      avatar: 'https://placekitten.com/43/43'
+    },
+    {
+      id: '5',
+      name: 'Кураторская группа',
+      lastMessage: 'Не забудьте про собрание в пятницу.',
+      timestamp: 'Сегодня',
+      unread: 1,
+      online: false,
+      avatar: 'https://placekitten.com/44/44'
+    },
+    {
+      id: '6',
+      name: 'Методический совет',
+      lastMessage: 'Нужно утвердить новый учебный план.',
+      timestamp: 'Вчера',
+      unread: 0,
+      online: true,
+      avatar: 'https://placekitten.com/45/45'
     }
   ];
+
+  // Добавлены моковые сообщения для новых чатов
+  const mockMessages: { [key: string]: ChatMessage[] } = {
+    '4': [
+      {
+        id: '1',
+        sender: 'Учебный план',
+        content: 'Привет! Обсудим изменения в расписании?',
+        timestamp: '10:00 AM',
+        isMe: false
+      },
+      {
+        id: '2',
+        sender: 'Рахмат Кенжибаев',
+        content: 'Да, конечно. Какие изменения предлагаете?',
+        timestamp: '10:05 AM',
+        isMe: true,
+        status: 'read'
+      }
+    ],
+    '5': [
+      {
+        id: '1',
+        sender: 'Кураторская группа',
+        content: 'Не забудьте про собрание в пятницу.',
+        timestamp: '9:00 AM',
+        isMe: false
+      },
+      {
+        id: '2',
+        sender: 'Рахмат Кенжибаев',
+        content: 'Спасибо за напоминание!',
+        timestamp: '9:10 AM',
+        isMe: true,
+        status: 'read'
+      }
+    ],
+    '6': [
+      {
+        id: '1',
+        sender: 'Методический совет',
+        content: 'Нужно утвердить новый учебный план.',
+        timestamp: '8:00 AM',
+        isMe: false
+      },
+      {
+        id: '2',
+        sender: 'Рахмат Кенжибаев',
+        content: 'Хорошо, я подготовлю документы.',
+        timestamp: '8:15 AM',
+        isMe: true,
+        status: 'read'
+      }
+    ]
+  };
 
   useEffect(() => {
     if (recipientId) {
@@ -155,8 +243,34 @@ const ChatPage: React.FC = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  useEffect(() => {
+    setMessages([
+      {
+        id: '1',
+        sender: 'Команда учителей',
+        content: 'Добрый день! Напоминаем, что завтра состоится собрание.',
+        timestamp: '10:00 AM',
+        isMe: false
+      },
+      {
+        id: '2',
+        sender: 'Вы',
+        content: 'Спасибо за напоминание! Обязательно буду.',
+        timestamp: '10:05 AM',
+        isMe: true
+      },
+      {
+        id: '3',
+        sender: 'Команда учителей',
+        content: 'Если есть вопросы, пишите.',
+        timestamp: '10:10 AM',
+        isMe: false
+      }
+    ]);
+  }, []);
+
   return (
-    <div className="h-screen flex bg-[#FFFFFF]">
+    <div className="h-screen flex bg-[#1E5945]">
       {/* Левая панель со списком чатов */}
       <div className="w-[300px] border-r border-[#E5E5E5] bg-[#FAFAFA]">
         <div className="p-5">
@@ -241,7 +355,7 @@ const ChatPage: React.FC = () => {
                 <div
                   className={`max-w-[70%] rounded-lg p-3 ${
                     message.isMe
-                      ? 'bg-[#2E69FF] text-white'
+                      ? 'bg-[#1C7E66] text-white'
                       : 'bg-[#F7F7F7] text-[#37352F]'
                   }`}
                 >
@@ -255,7 +369,7 @@ const ChatPage: React.FC = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`text-sm ${
-                              message.isMe ? 'text-white hover:underline' : 'text-[#2E69FF] hover:underline'
+                              message.isMe ? 'text-white hover:underline' : 'text-[#1C7E66] hover:underline'
                             }`}
                           >
                             {attachment.name}
@@ -335,7 +449,7 @@ const ChatPage: React.FC = () => {
                 <FaMicrophone className="w-4 h-4" />
               </button>
               <button
-                className="text-[#2E69FF] hover:text-[#1E4BB8] transition-colors disabled:opacity-50"
+                className="text-[#1C7E66] hover:text-[#145A4D] transition-colors disabled:opacity-50"
                 onClick={handleSendMessage}
                 disabled={isRecording}
               >
@@ -353,4 +467,4 @@ const ChatPage: React.FC = () => {
   );
 };
 
-export default ChatPage; 
+export default ChatPage;

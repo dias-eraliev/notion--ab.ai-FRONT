@@ -25,6 +25,12 @@
   .grid-auto-fill {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
+  .bg-corporate-primary {
+    background-color: #1E5945;
+  }
+  .text-corporate-primary {
+    color: #1E5945;
+  }
 }
 
 /* Анимации для drag-and-drop */
@@ -37,4 +43,4 @@
 
 .widget-dragging {
   animation: wiggle 0.3s ease-in-out infinite;
-} 
+}
