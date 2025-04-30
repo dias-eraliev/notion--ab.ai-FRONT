@@ -228,7 +228,7 @@ const StudyPlansPage: React.FC = () => {
             </div>
           </div>
         )}
-        <CreateStudyPlanModal isOpen={createStudyPlanModal} onClose={() => setCreateStudyPlanModal(false)} />
+        <CreateStudyPlanModal isOpen={createStudyPlanModal} onClose={() => setCreateStudyPlanModal(false)} mutate={mutate} />
       </div>
     </div>
   );

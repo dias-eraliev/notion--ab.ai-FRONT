@@ -1,16 +1,10 @@
-export const TextField: React.FC<React.HTMLAttributes<HTMLInputElement>> = () => <input className="input w-full max-w-xs" />
-export const SubmitButton: React.FC<React.HtmlHTMLAttributes<HTMLButtonElement>> = () => <button className="btn btn-primary">Submit</button>
-export const SelectField: React.FC<React.SelectHTMLAttributes<HTMLSelectElement> & { options: { value: string | number; label: string }[] }> = ({ options, ...props }) => {
-    return (
-        <select {...props}>
-            <option disabled value="">
-                Выберите группу
-            </option>
-            {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                    {option.label}
-                </option>
-            ))}
-        </select>
-    );
-};
+interface SubmitButtonProps extends React.HtmlHTMLAttributes<HTMLButtonElement> {
+    content: string;
+}
+
+export const TextField: React.FC<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>> = (props) => <input {...props} />
+export const SubmitButton: React.FC<React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>> = ({ children, ...props }) => (
+    <button className="btn btn-primary" {...props}>
+        {children}
+    </button>
+);

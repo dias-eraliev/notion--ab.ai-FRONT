@@ -5,5 +5,6 @@
 
 
 export interface ConnectScheduleDto {
-  id: number ;
+  id?: number ;
+lessonId?: number ;
 }
