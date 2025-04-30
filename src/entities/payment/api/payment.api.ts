@@ -7,3 +7,4 @@ export const getPayments = async (params: any): Promise<Payment[]> => {
   const res = await axios.get(`${API_BASE}/payments`, { params });
   return res.data;
 };
+    

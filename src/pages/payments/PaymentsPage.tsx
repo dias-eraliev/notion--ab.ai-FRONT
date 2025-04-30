@@ -5,7 +5,7 @@ import { PaymentTable } from "../../entities/payment/ui/PaymentTable";
 import { PaymentFilter } from "../../features/payment-filter/ui/PaymentFilter";
 import { PaymentStats } from "../../features/payment-stats/ui/PaymentStats";
 
-export const PaymentsPage = () => {
+const PaymentsPage = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [filters, setFilters] = useState<any>({});
 
@@ -23,3 +23,5 @@ export const PaymentsPage = () => {
     </div>
   );
 };
+
+export default PaymentsPage;
