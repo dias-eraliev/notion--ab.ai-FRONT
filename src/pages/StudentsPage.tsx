@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {FaSearch} from 'react-icons/fa';
+import {FaEnvelope, FaPhone, FaSearch} from 'react-icons/fa';
 import api from "@/api";
 import {Group} from "@/types/group.entity.ts";
 import {IStudent} from "@/Interfeces/Student.interface.ts";
@@ -99,7 +99,7 @@ const StudentsPage: React.FC = () => {
                         <select
                             value={selectedClass}
                             onChange={(e) => setSelectedClass(e.target.value)}
-                            className="..."
+                            className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Все группы</option>
                             {Array.isArray(groups) && groups.map(group => (
@@ -122,7 +122,7 @@ const StudentsPage: React.FC = () => {
                         >
                             <div className="aspect-w-4 aspect-h-3">
                                 <img
-                                    src={"https://media.istockphoto.com/id/588348500/nl/vector/male-avatar-profile-picture-vector.jpg?s=612x612&w=0&k=20&c=5IcAtIJUOTcrRDxQd5Q6Yi8C83ptgrOgXTCP-GaDrRY="}
+                                    src={""}
                                     alt={student.name}
                                     className="w-full h-full object-cover"
                                 />
@@ -130,14 +130,14 @@ const StudentsPage: React.FC = () => {
                             <div className="p-4">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-1">{student.name + " " + student.surname}</h3>
                                 <p className="text-sm text-gray-600">Группа: {student.group.name}</p>
-                                {/*<div className="mt-2 flex items-center text-sm text-gray-500">*/}
-                                {/*    <FaPhone className="w-4 h-4 mr-2"/>*/}
-                                {/*    <span>{student.phone}</span>*/}
-                                {/*</div>*/}
-                                {/*<div className="mt-1 flex items-center text-sm text-gray-500">*/}
-                                {/*    <FaEnvelope className="w-4 h-4 mr-2"/>*/}
-                                {/*    <span>{student.email}</span>*/}
-                                {/*</div>*/}
+                                <div className="mt-2 flex items-center text-sm text-gray-500">
+                                    <FaPhone className="w-4 h-4 mr-2"/>
+                                    <span>+7 (701) 123-4567</span>
+                                </div>
+                                <div className="mt-1 flex items-center text-sm text-gray-500">
+                                    <FaEnvelope className="w-4 h-4 mr-2"/>
+                                    <span>alikhan@example.com</span>
+                                </div>
                             </div>
                         </div>
                     ))}

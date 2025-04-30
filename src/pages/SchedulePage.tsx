@@ -37,23 +37,24 @@ const SchedulePage: React.FC = () => {
 
     const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-
+    const firstGroupId: number | undefined = groups?.[0]?.id;
 
     useEffect(() => {
         let isMounted = true;
 
         const fetchSchedule = async () => {
+            if (!firstGroupId) return;
+
             try {
-                const GetSchedule = await ScheduleReq.getScheduleAll();
+                const GetSchedule = await ScheduleReq.getScheduleAll(Number(firstGroupId));
                 if (GetSchedule?.data) {
-                    // Группируем расписание по дням недели
                     const groupedByDay = daysOfWeek.reduce((acc, day) => {
                         acc[day] = GetSchedule.data.filter((item: ScheduleDto) => item.day === day);
                         return acc;
                     }, {} as Record<string, ScheduleDto[]>);
 
-                    console.log(groupedByDay);  // Выводим сгруппированное расписание
-                    setSchedule(groupedByDay);  // Устанавливаем сгруппированное расписание
+                    console.log(groupedByDay);
+                    if (isMounted) setSchedule(groupedByDay);
                 } else {
                     console.error("No schedule data received.");
                 }
@@ -65,9 +66,10 @@ const SchedulePage: React.FC = () => {
         fetchSchedule();
 
         return () => {
-            isMounted = false; // предотвращает setState после размонтирования
+            isMounted = false;
         };
-    }, []);
+    }, [firstGroupId]);
+
 
 
     // Group schedules by day
@@ -129,6 +131,7 @@ const SchedulePage: React.FC = () => {
             setIsLoading(false);
         }
     };
+
 
     return (
         <div className="p-6 max-w-[1600px] mx-auto">
@@ -293,4 +296,4 @@ const SchedulePage: React.FC = () => {
     );
 };
 
-export default SchedulePage; 
+export default SchedulePage;

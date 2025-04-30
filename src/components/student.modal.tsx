@@ -1,6 +1,6 @@
 import {IStudent} from "@/Interfeces/Student.interface.ts";
 import React from "react";
-import {FaIdCard, FaUserGraduate} from "react-icons/fa";
+import {FaEnvelope, FaIdCard, FaPhone, FaUserGraduate} from "react-icons/fa";
 
 interface StudentModalProps {
     student: IStudent | null;
@@ -19,7 +19,7 @@ export const StudentModal: React.FC<StudentModalProps> = ({student, onClose, onV
                         <div className="flex items-center">
                             <div className="w-20 h-20 rounded-full overflow-hidden mr-4">
                                 <img
-                                    src={"https://media.istockphoto.com/id/588348500/nl/vector/male-avatar-profile-picture-vector.jpg?s=612x612&w=0&k=20&c=5IcAtIJUOTcrRDxQd5Q6Yi8C83ptgrOgXTCP-GaDrRY="}
+                                    src={""}
                                     alt={student.name} className="w-32 h-32 object-cover"/>
                             </div>
                             <div>
@@ -44,38 +44,39 @@ export const StudentModal: React.FC<StudentModalProps> = ({student, onClose, onV
                                 {student.user.role && (
                                     <div className="flex items-center">
                                         <FaIdCard className="w-5 h-5 text-gray-500 mr-3"/>
-                                        <span>Дата рождения: {student.user.role}</span>
+                                        {/*Доделать*/}
+                                        <span>Дата рождения: 15.05.2006</span>
                                     </div>
                                 )}
-                                {/*{student.phone && (*/}
-                                {/*    <div className="flex items-center">*/}
-                                {/*        <FaPhone className="w-5 h-5 text-gray-500 mr-3"/>*/}
-                                {/*        <span>{student.phone}</span>*/}
-                                {/*    </div>*/}
-                                {/*)}*/}
-                                {/*{student.email && (*/}
-                                {/*    <div className="flex items-center">*/}
-                                {/*        <FaEnvelope className="w-5 h-5 text-gray-500 mr-3"/>*/}
-                                {/*        <span>{student.email}</span>*/}
-                                {/*    </div>*/}
-                                {/*)}*/}
+                                {student && (
+                                    <div className="flex items-center">
+                                        <FaPhone className="w-5 h-5 text-gray-500 mr-3"/>
+                                        <span>+7 (701) 123-4567</span>
+                                    </div>
+                                )}
+                                {student && (
+                                    <div className="flex items-center">
+                                        <FaEnvelope className="w-5 h-5 text-gray-500 mr-3"/>
+                                        <span>alikhan@example.com</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div>
                             <h3 className="text-lg font-semibold mb-4">Контакты родителей</h3>
                             <div className="space-y-3">
-                                {student?.Parent?.user?.username && (
+                                {student?.Parent && (
                                     <div className="flex items-center">
                                         <FaUserGraduate className="w-5 h-5 text-gray-500 mr-3"/>
                                         <span>{student?.Parent?.user?.username}</span>
                                     </div>
                                 )}
-                                {/*{student.parentPhone && (*/}
-                                {/*    <div className="flex items-center">*/}
-                                {/*        <FaPhone className="w-5 h-5 text-gray-500 mr-3"/>*/}
-                                {/*        <span>{student.parentPhone}</span>*/}
-                                {/*    </div>*/}
-                                {/*)}*/}
+                                {student && (
+                                    <div className="flex items-center">
+                                        <FaPhone className="w-5 h-5 text-gray-500 mr-3"/>
+                                        <span>+7 (701) 765-4321</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
