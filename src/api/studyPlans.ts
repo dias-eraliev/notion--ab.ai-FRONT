@@ -1,4 +1,6 @@
 import api, { fetcher } from './index';
+import { Lesson } from '@/Types/lesson.entity';
+import { CreateLessonDto } from '@/Types/create-lesson.dto';
 import useSWR from 'swr';
 
 interface StudyPlan {
@@ -17,33 +19,6 @@ interface StudyPlan {
 interface GroupStudyPlan {
     id: number;
     name: string;
-}
-
-interface Lesson {
-    id: number;
-    name: string;
-    description: string;
-    scheduledDate?: string;
-    hasVideo: boolean;
-    hasPresentation: boolean;
-    hasTest: boolean;
-    homework?: {
-        id: number;
-        name: string;
-    }[];
-}
-
-interface CreateLessonDto {
-    title: string;
-    description: string;
-    scheduledDate?: string;
-    hasVideo: boolean;
-    hasPresentation: boolean;
-    hasTest: boolean;
-    videoFile?: File;
-    videoLink?: string;
-    presentationFile?: File;
-    testQuestions?: any[];
 }
 
 interface PaginatedResponse<T> {
@@ -77,7 +52,7 @@ export const useStudyPlans = (page = 1, limit = 10) => {
         studyPlansKey(page, limit),
         fetcher
     );
-    
+
     return {
         studyPlans: data?.data,
         isLoading: !error && !data,
@@ -95,7 +70,7 @@ export const useStudyPlansByGroup = (groupId?: number) => {
         groupId ? studyPlanByGroupKey(groupId) : null,
         fetcher
     );
-    
+
     return {
         studyPlans: data,
         isLoading: !error && !data,
@@ -112,7 +87,7 @@ export const useStudyPlan = (id?: number) => {
         id ? studyPlanKey(id.toString()) : null,
         fetcher
     );
-    
+
     return {
         studyPlan: data,
         isLoading: !error && !data,
@@ -129,7 +104,7 @@ export const useStudyPlanLessons = (id?: number) => {
         id ? studyPlanLessonsKey(id) : null,
         fetcher
     );
-    
+
     return {
         lessons: data,
         isLoading: !error && !data,
@@ -180,46 +155,9 @@ export const getLessonsByStudyPlanId = async (id: number) => {
  */
 export const createLesson = async (studyPlanId: string, lessonData: CreateLessonDto) => {
     // Create FormData if files are included
-    if (lessonData.videoFile || lessonData.presentationFile) {
-        const formData = new FormData();
-
-        // Add JSON data
-        formData.append('title', lessonData.title);
-        formData.append('description', lessonData.description);
-        if (lessonData.scheduledDate) {
-            formData.append('scheduledDate', lessonData.scheduledDate);
-        }
-        formData.append('hasVideo', String(lessonData.hasVideo));
-        formData.append('hasPresentation', String(lessonData.hasPresentation));
-        formData.append('hasTest', String(lessonData.hasTest));
-
-        if (lessonData.videoLink) {
-            formData.append('videoLink', lessonData.videoLink);
-        }
-
-        if (lessonData.videoFile) {
-            formData.append('videoFile', lessonData.videoFile);
-        }
-
-        if (lessonData.presentationFile) {
-            formData.append('presentationFile', lessonData.presentationFile);
-        }
-
-        if (lessonData.testQuestions && lessonData.testQuestions.length > 0) {
-            formData.append('testQuestions', JSON.stringify(lessonData.testQuestions));
-        }
-
-        const response = await api.post<Lesson>(`/study-plans/${studyPlanId}/lessons`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        return response.data;
-    } else {
-        // Regular JSON request
-        const response = await api.post<Lesson>(`/study-plans/${studyPlanId}/lessons`, lessonData);
-        return response.data;
-    }
+    // Regular JSON request
+    const response = await api.post<Lesson>(`/study-plans/${studyPlanId}/lessons`, lessonData);
+    return response.data;
 };
 
 /**

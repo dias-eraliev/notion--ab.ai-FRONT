@@ -1,5 +1,7 @@
 
+import {Lesson} from './lesson.entity'
 import {Classroom} from './classroom.entity'
+import {Group} from './group.entity'
 
 
 export interface Schedule {
@@ -7,14 +9,15 @@ export interface Schedule {
 day: string ;
 startTime: string ;
 endTime: string ;
-classId: string ;
-subject: string ;
-teacherId: string ;
-roomId: number ;
 type: string ;
 repeat: string ;
 comment: string  | null;
 createdAt: Date ;
 updatedAt: Date ;
-classroom?: Classroom ;
+lesson?: Lesson  | null;
+lessonId: number  | null;
+classroom: Classroom ;
+classroomId: number ;
+Group?: Group ;
+groupId: number ;
 }

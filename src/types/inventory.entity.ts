@@ -1,12 +1,12 @@
 
-import {Object} from './object.entity'
+import {InventoryObject} from './inventoryObject.entity'
 
 
 export interface Inventory {
   id: number ;
 name: string ;
 description: string ;
-objects?: Object[] ;
+objects?: InventoryObject[] ;
 createdAt: Date ;
 updatedAt: Date ;
 }
