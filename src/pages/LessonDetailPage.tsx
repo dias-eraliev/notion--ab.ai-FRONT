@@ -4,27 +4,6 @@ import useSWR from 'swr';
 import { FaArrowLeft, FaVideo, FaFile, FaClipboardCheck, FaSpinner } from 'react-icons/fa';
 import { fetcher } from '@/api/index';
 
-interface LessonMaterial {
-  id: number;
-  type: string; // 'video' | 'presentation' | 'text'
-  url?: string;
-  content?: string;
-  Quiz?: {
-    id: number;
-    name: string;
-    description: string;
-    questions: Array<{
-      id: number;
-      question: string;
-      answers: Array<{
-        id: number;
-        answer: string;
-        isCorrect: boolean;
-      }>;
-    }>;
-  };
-}
-
 interface Lesson {
   id: number;
   name: string;
@@ -89,10 +68,10 @@ const LessonDetailPage: React.FC = () => {
   }
 
   // Определяем материалы
-  const textMaterial = data.materials.lecture;
-  const videoMaterial = data.materials.videoUrl;
-  const presentationMaterial = data.materials.presentationUrl;
-  const quizMaterial = data.materials.Quiz;
+  const textMaterial = data.materials?.lecture || '<p>Нет текстового материала</p>';
+  const videoMaterial = data.materials?.videoUrl || '';
+  const presentationMaterial = data.materials?.presentationUrl || '';
+  const quizMaterial = data.materials?.Quiz ?? [];
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
@@ -113,7 +92,11 @@ const LessonDetailPage: React.FC = () => {
               <h1 className="text-2xl font-bold mb-2">{data.name}</h1>
               <p className="text-gray-600">{data.description}</p>
               <div className="text-sm text-gray-500 mt-2">
-                {new Date(data.date).toLocaleString('ru-RU')}
+                {new Date(data.date).toLocaleDateString('ru-RU', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
               </div>
             </div>
             <div className="flex space-x-4">
