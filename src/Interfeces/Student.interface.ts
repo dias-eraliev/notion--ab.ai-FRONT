@@ -38,7 +38,7 @@ export interface ISyllabus {
 
 export interface ILesson {
     id: number;
-    name: string;
+    name: string | null;
     description: string;
     syllabusId: number;
     date: string | null;
@@ -110,6 +110,6 @@ export interface IStudent {
     Syllabus: ISyllabus;
     payments: any[]; // Пока нет данных о структуре платежей
     Attendance: IAttendance[];
-    lessonGrades: ILessonGrade[];
+    grades: ILessonGrade[];
     homeworkGrades: IHomeworkGrade[];
 }

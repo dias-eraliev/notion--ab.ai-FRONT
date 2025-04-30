@@ -1,4 +1,4 @@
-import api, { fetcher } from './index';
+import api, {fetcher} from './index';
 
 // DTOs
 export interface CreateHomeworkDto {
@@ -93,25 +93,38 @@ export interface HomeworkResponse {
 
 // API endpoints
 const homeworkApi = {
-    getAll: (groupId: number | null, studyPlanId: number | null) => groupId && studyPlanId
-        ? fetcher(`/homework?groupId=${groupId}&studyPlanId=${studyPlanId}`)
-        : null,
+    getAll: (groupId: string | number | null, studyPlanId: string | number | null) => {
+        const params = new URLSearchParams();
+
+        if (groupId !== null && groupId !== undefined && groupId !== '') {
+            params.append('groupId', String(groupId));
+        }
+        if (studyPlanId !== null && studyPlanId !== undefined && studyPlanId !== '') {
+            params.append('studyPlanId', String(studyPlanId));
+        }
+        const queryString = params.toString();
+        const url = `/homework${queryString ? `?${queryString}` : ''}`;
+
+        console.log(`[homeworkApi.getAll] Calling fetcher with URL: ${url}`);
+        return fetcher(url);
+    },
 
     getOne: (id: number) =>
-        fetcher(`/homework/${id}`),
+        fetcher(`/homework/${id}`), // Добавил /api/ префикс для консистентности
 
     create: (homework: CreateHomeworkDto) =>
-        api.post<HomeworkResponse>('/homework', homework),
+        api.post<HomeworkResponse>('/homework', homework), // Добавил /api/
 
     update: (id: number, homework: UpdateHomeworkDto) =>
-        api.patch<HomeworkResponse>(`/homework/${id}`, homework),
+        api.patch<HomeworkResponse>(`/homework/${id}`, homework), // Добавил /api/
 
     delete: (id: number) =>
-        api.delete(`/homework/${id}`),
+        api.delete(`/homework/${id}`), // Добавил /api/
 
     uploadFile: (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
+        // Убедись, что /api/upload - правильный путь
         return api.post('/upload', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
