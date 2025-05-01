@@ -5,7 +5,6 @@ export class HrRequests {
         return api.get(`/hr`)
     }
 
-
     async addHr(body: any) {
         try {
             // Передаем оба поля в один объект
