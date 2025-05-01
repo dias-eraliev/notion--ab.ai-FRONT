@@ -288,12 +288,12 @@ export const ViewRequestModal: React.FC<ViewModalProps> = ({ isOpen, onClose, re
                   <div className="space-y-2">
                     <div>
                       <span className="text-gray-500">Предполагаемая стоимость:</span>
-                      <span className="ml-2">{request.estimatedCost} ₽</span>
+                      <span className="ml-2">{request.estimatedCost} ₸</span>
                     </div>
                     {request.actualCost && (
                       <div>
                         <span className="text-gray-500">Фактическая стоимость:</span>
-                        <span className="ml-2">{request.actualCost} ₽</span>
+                        <span className="ml-2">{request.actualCost} ₸</span>
                       </div>
                     )}
                   </div>
@@ -378,4 +378,4 @@ export const ViewRequestModal: React.FC<ViewModalProps> = ({ isOpen, onClose, re
       </div>
     </div>
   );
-}; 
+};

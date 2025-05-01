@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   FaBarcode,
   FaQrcode,
@@ -114,7 +114,6 @@ const InventoryPage: React.FC = () => {
 
   // Обработчики
   const handleScan = (result: string) => {
-    // Здесь будет логика обработки результатов сканирования
     console.log('Scan result:', result);
     setShowScannerModal(false);
   };
@@ -151,6 +150,47 @@ const InventoryPage: React.FC = () => {
   const handleRowClick = (item: InventoryItem) => {
     setSelectedItem(item);
     setShowViewModal(true);
+  };
+
+  const CameraScanner: React.FC<{ onClose: () => void; onScan: (result: string) => void }> = ({ onClose, onScan }) => {
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+
+    useEffect(() => {
+      const startCamera = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          onClose();
+        }
+      };
+
+      startCamera();
+
+      return () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+          const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+          tracks.forEach((track) => track.stop());
+        }
+      };
+    }, [onClose]);
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div className="relative">
+          <video ref={videoRef} autoPlay className="w-full h-auto rounded-lg" />
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 bg-red-600 text-white px-4 py-2 rounded-lg"
+          >
+            Закрыть
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -332,8 +372,15 @@ const InventoryPage: React.FC = () => {
           item={selectedItem}
         />
       )}
+
+      {showScanner && (
+        <CameraScanner
+          onClose={() => setShowScanner(false)}
+          onScan={handleScan}
+        />
+      )}
     </div>
   );
 };
 
-export default InventoryPage; 
+export default InventoryPage;

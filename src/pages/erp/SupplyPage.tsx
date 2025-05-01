@@ -233,7 +233,7 @@ const SupplyPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-2">{request.requestDate.toLocaleDateString()}</td>
-                    <td className="py-2">{request.estimatedCost.toLocaleString()} ₽</td>
+                    <td className="py-2">{request.estimatedCost.toLocaleString()} ₸</td>
                     <td className="py-2">
                       <div className="flex gap-2">
                         <button
@@ -307,4 +307,4 @@ const SupplyPage: React.FC = () => {
   );
 };
 
-export default SupplyPage; 
+export default SupplyPage;

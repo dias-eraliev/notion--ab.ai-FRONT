@@ -672,7 +672,7 @@ const WorkloadPage: React.FC = () => {
                           Предмет
                         </th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Классы
+                          Группы
                         </th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Часы
@@ -692,7 +692,7 @@ const WorkloadPage: React.FC = () => {
                                   key={cIdx}
                                   className="px-2 py-1 bg-green-100 text-green-800 rounded-md text-xs"
                                 >
-                                  {cls}
+                                  {cls.replace('10A', 'МК24-1М').replace('10Б', 'МК24-2М').replace('11A', 'ПК24-1П').replace('11Б', 'ПР24-1Ю').replace('11Б', 'ПР24-2Ю')}
                                 </span>
                               ))}
                             </div>
