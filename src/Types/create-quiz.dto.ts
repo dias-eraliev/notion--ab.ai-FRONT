@@ -9,5 +9,7 @@ export interface CreateQuizQuestionsRelationInputDto {
 export interface CreateQuizDto {
   name: string ;
 description: string ;
+startTime?: Date  | null;
+endTime?: Date  | null;
 questions?: CreateQuizQuestionsRelationInputDto ;
 }

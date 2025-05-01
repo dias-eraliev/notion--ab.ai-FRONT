@@ -6,6 +6,7 @@ import {Attendance} from './attendance.entity'
 import {Syllabus} from './syllabus.entity'
 import {Payment} from './payment.entity'
 import {Grade} from './grade.entity'
+import {QuizResult} from './quizResult.entity'
 
 
 export interface Student {
@@ -24,4 +25,5 @@ Syllabus?: Syllabus[] ;
 courseNumber: number  | null;
 payments?: Payment[] ;
 grades?: Grade[] ;
+QuizResult?: QuizResult[] ;
 }

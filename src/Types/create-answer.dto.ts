@@ -1,12 +1,14 @@
 
+import {CreateQuestionDto} from './create-question.dto'
 import {ConnectQuestionDto} from './connect-question.dto'
 
 export interface CreateAnswerQuestionRelationInputDto {
-    connect: ConnectQuestionDto ;
+    create?: CreateQuestionDto ;
+connect?: ConnectQuestionDto ;
   }
 
 
 export interface CreateAnswerDto {
   answer: string ;
-Question: CreateAnswerQuestionRelationInputDto ;
+Question?: CreateAnswerQuestionRelationInputDto ;
 }

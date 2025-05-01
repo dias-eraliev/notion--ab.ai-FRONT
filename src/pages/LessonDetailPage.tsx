@@ -15,6 +15,7 @@ interface Lesson {
     videoUrl: string;
     presentationUrl: string;
     Quiz: {
+      id: number;
       questions: {
         id: number;
         question: string;
@@ -33,13 +34,73 @@ const LessonDetailPage: React.FC = () => {
   const { id, lessonId } = useParams();
   const [activeTab, setActiveTab] = useState<'text' | 'video' | 'presentation' | 'quiz'>('text');
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number[]>>({});
 
   // Получаем урок с бэкенда
   const { data, error, isLoading } = useSWR<Lesson>(
     id && lessonId ? `/study-plans/${id}/lessons/${lessonId}` : null,
     fetcher
   );
+
+  // Функция для обработки выбора ответа
+  const toggleAnswer = (questionIndex: number, answerIndex: number) => {
+    setSelectedAnswers(prev => {
+      const currentAnswers = prev[questionIndex] || [];
+
+      if (currentAnswers.includes(answerIndex)) {
+        return {
+          ...prev,
+          [questionIndex]: currentAnswers.filter(idx => idx !== answerIndex)
+        };
+      } else {
+        return {
+          ...prev,
+          [questionIndex]: [...currentAnswers, answerIndex]
+        };
+      }
+    });
+  };
+
+  // Функция для проверки, выбран ли ответ
+  const isAnswerSelected = (questionIndex: number, answerIndex: number) => {
+    return (selectedAnswers[questionIndex] || []).includes(answerIndex);
+  };
+
+  // Функция для подготовки данных к отправке на сервер
+  const prepareQuizSubmission = () => {
+    if (!data?.materials?.Quiz) return null;
+
+    const quizId = data.materials.Quiz.id;
+    const questions = Object.keys(selectedAnswers).map(qIndex => {
+      const questionIndex = parseInt(qIndex);
+      const question = data.materials.Quiz.questions[questionIndex];
+
+      return {
+        questionId: question.id,
+        answerIds: selectedAnswers[questionIndex].map(
+          answerIndex => question.answers[answerIndex].id
+        )
+      };
+    });
+
+    return {
+      quizId,
+      questions
+    };
+  };
+
+  // Функция для отправки результатов теста
+  const submitQuiz = async () => {
+    const quizData = prepareQuizSubmission();
+    if (!quizData) return;
+
+    try {
+      alert('Функция отправки теста будет реализована в ближайшее время');
+    } catch (error) {
+      console.error('Ошибка при отправке теста:', error);
+      alert('Произошла ошибка при отправке теста');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -160,32 +221,40 @@ const LessonDetailPage: React.FC = () => {
             )
           )}
 
-          {activeTab === 'quiz' && quizMaterial ? (
+          {activeTab === 'quiz' && quizMaterial && quizMaterial.questions && quizMaterial.questions.length > 0 ? (
             <div className="space-y-6">
               <div className="bg-gray-50 p-6 rounded-lg">
-                {quizMaterial && (
-                  <>
-                    <h3 className="text-xl font-semibold mb-4">
-                      Вопрос {currentQuestion + 1} из {quizMaterial.questions.length}
-                    </h3>
-                    <p className="text-lg mb-4">{quizMaterial.questions[currentQuestion].question}</p>
-                    <div className="space-y-2">
-                      {quizMaterial.questions[currentQuestion].answers.map((option, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setAnswers({ ...answers, [currentQuestion]: index })}
-                          className={`w-full text-left p-4 rounded-lg border ${answers[currentQuestion] === index
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-blue-500'
-                            }`}
-                        >
-                          {option.answer}
-                        </button>
-                      ))}
+                <h3 className="text-xl font-semibold mb-4">
+                  Вопрос {currentQuestion + 1} из {quizMaterial.questions.length}
+                </h3>
+                <p className="text-lg mb-4">{quizMaterial.questions[currentQuestion].question}</p>
+
+                <div className="mb-4 text-sm text-blue-600 italic">
+                  Можно выбрать несколько правильных ответов
+                </div>
+
+                <div className="space-y-2">
+                  {quizMaterial.questions[currentQuestion].answers.map((option, index) => (
+                    <div
+                      key={index}
+                      onClick={() => toggleAnswer(currentQuestion, index)}
+                      className={`w-full text-left p-4 rounded-lg border flex items-center cursor-pointer ${isAnswerSelected(currentQuestion, index)
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-200'
+                        }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isAnswerSelected(currentQuestion, index)}
+                        onChange={() => {}} // Обработка происходит в onClick контейнера
+                        className="form-checkbox h-5 w-5 text-blue-600 mr-3"
+                      />
+                      <span>{option.answer}</span>
                     </div>
-                  </>
-                )}
+                  ))}
+                </div>
               </div>
+
               <div className="flex justify-between">
                 <button
                   onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
@@ -194,13 +263,22 @@ const LessonDetailPage: React.FC = () => {
                 >
                   Предыдущий вопрос
                 </button>
-                <button
-                  onClick={() => setCurrentQuestion(Math.min(quizMaterial.questions.length - 1, currentQuestion + 1))}
-                  disabled={currentQuestion === quizMaterial.questions.length - 1}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50"
-                >
-                  Следующий вопрос
-                </button>
+
+                {currentQuestion === quizMaterial.questions.length - 1 ? (
+                  <button
+                    onClick={submitQuiz}
+                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                  >
+                    Завершить тест
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setCurrentQuestion(Math.min(quizMaterial.questions.length - 1, currentQuestion + 1))}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50"
+                  >
+                    Следующий вопрос
+                  </button>
+                )}
               </div>
             </div>
           ) : activeTab === 'quiz' ? (
@@ -212,4 +290,4 @@ const LessonDetailPage: React.FC = () => {
   );
 };
 
-export default LessonDetailPage; 
+export default LessonDetailPage;

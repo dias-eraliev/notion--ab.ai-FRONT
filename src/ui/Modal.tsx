@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import React from 'react';
 
 interface ModalProps {
@@ -18,12 +19,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title, size = 
     }[size] || 'max-w-lg';
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className={`bg-white rounded-lg shadow-xl w-full ${sizeClass} p-6 relative`}>
+            <div className={`bg-white rounded-lg shadow-xl w-full ${sizeClass} p-6 relative max-h-[90vh] overflow-y-scroll`}>
                 <button
                     onClick={onClose}
-                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                    className="absolute top-2 right-4 text-gray-400 hover:text-gray-600"
                 >
-                    ×
+                    <X className="w-6 h-6" />
                 </button>
                 {title && (
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">{title}</h2>
