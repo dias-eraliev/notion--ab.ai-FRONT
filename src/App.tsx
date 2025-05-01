@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -51,6 +51,11 @@ import AISchedulePage from './pages/AISchedulePage';
 import BookingPage from './pages/BookingPage';
 
 const App: React.FC = () => {
+  useEffect(() => {
+    const randomHash = Math.random().toString(36).substring(2, 15);
+    sessionStorage.setItem('randomHash', randomHash);
+  }, []);
+
   return (
 
     <LanguageProvider>
