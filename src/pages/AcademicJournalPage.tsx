@@ -371,6 +371,20 @@ const GradeInfoModal: React.FC<{
   );
 };
 
+// Компонент анимации загрузки
+const LoadingAnimation: React.FC = () => {
+  return (
+    <div className="flex flex-col items-center justify-center py-16">
+      <div className="flex space-x-3 items-center">
+        <div className="h-5 w-5 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-200"></div>
+        <div className="h-6 w-6 bg-green-600 rounded-full animate-bounce shadow-lg shadow-green-300"></div>
+        <div className="h-5 w-5 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-200"></div>
+      </div>
+      <p className="mt-5 text-green-700 font-medium">Загрузка данных журнала...</p>
+    </div>
+  );
+};
+
 // Добавлена логика для фильтрации таблицы на основе выбранных фильтров
 const AcademicJournalPage: React.FC = () => {
   const { t } = useLanguage();
@@ -387,11 +401,45 @@ const AcademicJournalPage: React.FC = () => {
   } | null>(null);
   const [selectedGrade, setSelectedGrade] = useState<GradeInfo | null>(null);
   const { role } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFiltersApplied, setIsFiltersApplied] = useState(false);
+
+  // Функция для проверки заполненности фильтров
+  const areFiltersComplete = () => {
+    if (role === 'admin' || role === 'teacher') {
+      return !!selectedSubject && !!selectedClass && !!selectedSemester && !!startDate && !!endDate;
+    } else {
+      return !!selectedSubject && !!selectedSemester && !!startDate && !!endDate;
+    }
+  };
+
+  // Функция для применения фильтров и загрузки данных
+  const applyFilters = () => {
+    if (!areFiltersComplete()) {
+      return;
+    }
+
+    setIsLoading(true);
+    
+    // Имитация загрузки данных с сервера с задержкой в 1 секунду
+    setTimeout(() => {
+      handleFilterChange();
+      handleDateFilter();
+      setIsFiltersApplied(true);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000); // Задержка перед отображением таблицы
+    }, 1500); // Задержка для демонстрации анимации загрузки
+  };
+
+  useEffect(() => {
+    // Убираем автоматическое применение фильтров при изменении
+    // для того чтобы пользователь явно нажимал кнопку "Применить"
+  }, [selectedSubject, selectedClass, selectedSemester, startDate, endDate]);
 
   // Даты для колонок (в реальном приложении это должно быть динамическим)
   const dates = ['27.02', '28.02', '01.03', '02.03', '05.03', '06.03'];
 
-  // Заполнены пустые места оценками для всех студентов, кроме 28 февраля у Абдуллаева Армана
   const students: Student[] = [
     {
       id: 1,
@@ -910,11 +958,6 @@ const AcademicJournalPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    handleFilterChange();
-    handleDateFilter();
-  }, [selectedSubject, selectedClass, selectedSemester, startDate, endDate]);
-
   // Функция фильтрации студентов в зависимости от роли
   const getFilteredStudents = () => {
     let filtered = [...filteredStudents];
@@ -1028,6 +1071,10 @@ const AcademicJournalPage: React.FC = () => {
     setEndDate(end);
   };
 
+  const handleApplyFilters = () => {
+    applyFilters();
+  };
+
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
       <div className="mb-6">
@@ -1041,194 +1088,240 @@ const AcademicJournalPage: React.FC = () => {
 
       {/* Показываем панель фильтров только для учителей и администраторов */}
       {(role === 'admin' || role === 'teacher') && (
-        <div className="grid grid-cols-5 gap-4 mb-6">
-          <div className="relative">
-            <select
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-            >
-              <option value="">{t('selectSubject')}</option>
-              <option value="math">{t('math')}</option>
-              <option value="physics">{t('physics')}</option>
-              <option value="chemistry">{t('chemistry')}</option>
-              <option value="biology">{t('biology')}</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <FaCaretDown className="text-gray-400" />
+        <div>
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <div className="relative">
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+              >
+                <option value="">{t('selectSubject')}</option>
+                <option value="math">{t('math')}</option>
+                <option value="physics">{t('physics')}</option>
+                <option value="chemistry">{t('chemistry')}</option>
+                <option value="biology">{t('biology')}</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <FaCaretDown className="text-gray-400" />
+              </div>
+            </div>
+
+            <div className="relative">
+              <select
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+              >
+                <option value="">{t('selectGroup')}</option>
+                <option value="МК24-1М">МК24-1М (Менеджмент)</option>
+                <option value="МК24-2М">МК24-2М (Менеджмент)</option>
+                <option value="ПК24-1П">ПК24-1П (Программирование)</option>
+                <option value="ПР24-1Ю">ПР24-1Ю (Право)</option>
+                <option value="ПР24-2Ю">ПР24-2Ю (Право)</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <FaCaretDown className="text-gray-400" />
+              </div>
+            </div>
+
+            <div className="relative">
+              <select
+                value={selectedSemester}
+                onChange={(e) => setSelectedSemester(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+              >
+                <option value="">{t('selectSemester')}</option>
+                <option value="1">{t('semester1')}</option>
+                <option value="2">{t('semester2')}</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <FaCaretDown className="text-gray-400" />
+              </div>
+            </div>
+
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleDateChange}
+            />
+
+            <div className="relative">
+              <div className="flex items-center w-full">
+                <input
+                  type="text"
+                  placeholder={t('searchByName')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button className="px-4 py-2 bg-white border border-l-0 border-gray-200 rounded-r-md hover:bg-gray-50">
+                  <FaSearch className="text-gray-400" />
+                </button>
+              </div>
             </div>
           </div>
-
-          <div className="relative">
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+          
+          <div className="flex justify-end mb-6">
+            <button
+              onClick={handleApplyFilters}
+              disabled={!areFiltersComplete()}
+              className={`px-6 py-2 rounded-md text-white transition-colors ${
+                areFiltersComplete()
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-gray-400 cursor-not-allowed'
+              }`}
             >
-              <option value="">{t('selectGroup')}</option>
-              <option value="МК24-1М">МК24-1М (Менеджмент)</option>
-              <option value="МК24-2М">МК24-2М (Менеджмент)</option>
-              <option value="ПК24-1П">ПК24-1П (Программирование)</option>
-              <option value="ПР24-1Ю">ПР24-1Ю (Право)</option>
-              <option value="ПР24-2Ю">ПР24-2Ю (Право)</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <FaCaretDown className="text-gray-400" />
-            </div>
-          </div>
-
-          <div className="relative">
-            <select
-              value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-            >
-              <option value="">{t('selectSemester')}</option>
-              <option value="1">{t('semester1')}</option>
-              <option value="2">{t('semester2')}</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <FaCaretDown className="text-gray-400" />
-            </div>
-          </div>
-
-          <DateRangePicker
-            startDate={startDate}
-            endDate={endDate}
-            onChange={handleDateChange}
-          />
-
-          <div className="relative">
-            <div className="flex items-center w-full">
-              <input
-                type="text"
-                placeholder={t('searchByName')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <button className="px-4 py-2 bg-white border border-l-0 border-gray-200 rounded-r-md hover:bg-gray-50">
-                <FaSearch className="text-gray-400" />
-              </button>
-            </div>
+              Применить фильтры
+            </button>
           </div>
         </div>
       )}
 
       {/* Для студентов и родителей показываем упрощенные фильтры */}
       {(role === 'student' || role === 'parent') && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="relative">
-            <select
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-            >
-              <option value="">{t('selectSubject')}</option>
-              <option value="math">{t('math')}</option>
-              <option value="physics">{t('physics')}</option>
-              <option value="chemistry">{t('chemistry')}</option>
-              <option value="biology">{t('biology')}</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <FaCaretDown className="text-gray-400" />
+        <div>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="relative">
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+              >
+                <option value="">{t('selectSubject')}</option>
+                <option value="math">{t('math')}</option>
+                <option value="physics">{t('physics')}</option>
+                <option value="chemistry">{t('chemistry')}</option>
+                <option value="biology">{t('biology')}</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <FaCaretDown className="text-gray-400" />
+              </div>
             </div>
-          </div>
 
-          <div className="relative">
-            <select
-              value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-            >
-              <option value="">{t('selectSemester')}</option>
-              <option value="1">{t('semester1')}</option>
-              <option value="2">{t('semester2')}</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <FaCaretDown className="text-gray-400" />
+            <div className="relative">
+              <select
+                value={selectedSemester}
+                onChange={(e) => setSelectedSemester(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+              >
+                <option value="">{t('selectSemester')}</option>
+                <option value="1">{t('semester1')}</option>
+                <option value="2">{t('semester2')}</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <FaCaretDown className="text-gray-400" />
+              </div>
             </div>
-          </div>
 
-          <DateRangePicker
-            startDate={startDate}
-            endDate={endDate}
-            onChange={handleDateChange}
-          />
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleDateChange}
+            />
+          </div>
+          
+          <div className="flex justify-end mb-6">
+            <button
+              onClick={handleApplyFilters}
+              disabled={!areFiltersComplete()}
+              className={`px-6 py-2 rounded-md text-white transition-colors ${
+                areFiltersComplete()
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-gray-400 cursor-not-allowed'
+              }`}
+            >
+              Применить фильтры
+            </button>
+          </div>
         </div>
       )}
       
-      {/* Таблица журнала */}
-      <div className="mt-6 bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 border-b border-r border-gray-200 min-w-[200px]">
-                  {role === 'student' ? 'Предмет' : 'Студент'}
-                </th>
-                {dates.map((date) => (
-                  <th key={date} className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px] border-b border-r border-gray-200 bg-gray-50">
-                    {date}
+      {/* Таблица журнала или сообщение о необходимости выбрать фильтры */}
+      {!isFiltersApplied ? (
+        <div className="mt-8 text-center p-12 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="text-6xl mb-4 text-gray-300">
+            <FaFilter className="mx-auto" />
+          </div>
+          <h3 className="text-xl font-medium text-gray-700 mb-2">Данные журнала не загружены</h3>
+          <p className="text-gray-500 mb-4">
+            Пожалуйста, выберите предмет, группу, семестр и даты, затем нажмите "Применить фильтры"
+          </p>
+        </div>
+      ) : isLoading ? (
+        <LoadingAnimation />
+      ) : (
+        <div className="mt-6 bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 border-b border-r border-gray-200 min-w-[200px]">
+                    {role === 'student' ? 'Предмет' : 'Студент'}
                   </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {getFilteredStudents().map((student, index) => (
-                <tr key={student.id} className="hover:bg-gray-50">
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white border-r border-gray-200 ${index !== students.length - 1 ? 'border-b' : ''}`}>
-                    {student.name}
-                  </td>
                   {dates.map((date) => (
-                    <td key={date} className={`px-6 py-4 border-r border-gray-200 ${index !== students.length - 1 ? 'border-b' : ''}`}>
-                      <div className="flex items-center justify-center">
-                        {student.grades[date] ? (
-                          <div className="relative group">
-                            <button
-                              onClick={() => handleGradeClick(student.id, date)}
-                              className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-white font-medium ${
-                                getGradeColor(student.grades[date]!.average || 0)
-                              } hover:opacity-90 transition-opacity`}
-                            >
-                              {student.grades[date]!.average}
-                            </button>
-                            
-                            {/* Тултип при наведении показывает обе оценки */}
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-                              <div className="bg-gray-900 text-white text-sm rounded-lg py-2 px-3 whitespace-nowrap shadow-lg">
-                                {student.grades[date]!.classwork && (
-                                  <div>Классная работа: {student.grades[date]!.classwork.value}</div>
-                                )}
-                                {student.grades[date]!.homework && (
-                                  <div>Домашняя работа: {student.grades[date]!.homework.value}</div>
-                                )}
-                                <div className="text-xs text-gray-300 mt-1">
-                                  Средний: {student.grades[date]!.average}
-                                </div>
-                              </div>
-                              <div className="border-8 border-transparent border-t-gray-900 absolute left-1/2 transform -translate-x-1/2 -bottom-2"></div>
-                            </div>
-                          </div>
-                        ) : (
-                          canEditGrades() && (
-                            <button
-                              onClick={() => handleGradeClick(student.id, date)}
-                              className="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 text-gray-400 flex items-center justify-center hover:border-blue-500 hover:text-blue-600 transition-colors"
-                            >
-                              <span className="text-xl leading-none">+</span>
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </td>
+                    <th key={date} className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px] border-b border-r border-gray-200 bg-gray-50">
+                      {date}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {getFilteredStudents().map((student, index) => (
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white border-r border-gray-200 ${index !== students.length - 1 ? 'border-b' : ''}`}>
+                      {student.name}
+                    </td>
+                    {dates.map((date) => (
+                      <td key={date} className={`px-6 py-4 border-r border-gray-200 ${index !== students.length - 1 ? 'border-b' : ''}`}>
+                        <div className="flex items-center justify-center">
+                          {student.grades[date] ? (
+                            <div className="relative group">
+                              <button
+                                onClick={() => handleGradeClick(student.id, date)}
+                                className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-white font-medium ${
+                                  getGradeColor(student.grades[date]!.average || 0)
+                                } hover:opacity-90 transition-opacity`}
+                              >
+                                {student.grades[date]!.average}
+                              </button>
+                              
+                              {/* Тултип при наведении показывает обе оценки */}
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+                                <div className="bg-gray-900 text-white text-sm rounded-lg py-2 px-3 whitespace-nowrap shadow-lg">
+                                  {student.grades[date]!.classwork && (
+                                    <div>Классная работа: {student.grades[date]!.classwork.value}</div>
+                                  )}
+                                  {student.grades[date]!.homework && (
+                                    <div>Домашняя работа: {student.grades[date]!.homework.value}</div>
+                                  )}
+                                  <div className="text-xs text-gray-300 mt-1">
+                                    Средний: {student.grades[date]!.average}
+                                  </div>
+                                </div>
+                                <div className="border-8 border-transparent border-t-gray-900 absolute left-1/2 transform -translate-x-1/2 -bottom-2"></div>
+                              </div>
+                            </div>
+                          ) : (
+                            canEditGrades() && (
+                              <button
+                                onClick={() => handleGradeClick(student.id, date)}
+                                className="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 text-gray-400 flex items-center justify-center hover:border-blue-500 hover:text-blue-600 transition-colors"
+                              >
+                                <span className="text-xl leading-none">+</span>
+                              </button>
+                            )
+                          )}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       <AnimatePresence>
         {isModalOpen && (
