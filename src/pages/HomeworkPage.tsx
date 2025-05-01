@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaBook, 
@@ -15,9 +15,16 @@ import {
   FaSearch,
   FaUser,
   FaUsers,
-  FaStar
+  FaStar,
+  FaMicrophone,
+  FaRobot,
+  FaStop,
+  FaVolumeUp,
+  FaSquare
 } from 'react-icons/fa';
 import { useAuthContext, UserRole } from '../providers/AuthProvider';
+// Импортируем API для голосового чата
+import { spsChatApi } from '../api/sps-chat';
 
 interface Homework {
   id: string;
@@ -53,6 +60,57 @@ interface Homework {
   priority: 'high' | 'medium' | 'low';
   estimatedTime: string;
   maxScore: number;
+}
+
+// Интерфейсы для WebRTC и Realtime API
+interface RealtimeSession {
+  pc: RTCPeerConnection | null;
+  dc: RTCDataChannel | null;
+  audioElement: HTMLAudioElement | null;
+  mediaStream: MediaStream | null;
+}
+
+// Интерфейс для ответа транскрипции от Realtime API
+interface TranscriptResponse {
+  type: string;
+  event_id: string;
+  response_id: string;
+  item_id: string;
+  output_index: number;
+  content_index: number;
+  transcript: string;
+}
+
+// Интерфейс для транскрипции ввода пользователя
+interface UserInputTranscription {
+  type: string;
+  event_id: string;
+  item_id: string;
+  content_index: number;
+  transcript: string;
+  logprobs?: any[] | null;
+}
+
+// Интерфейс для завершенного ответа модели
+interface ModelResponse {
+  type: string;
+  event_id: string;
+  response: {
+    id: string;
+    object: string;
+    status: string;
+    output: Array<{
+      id: string;
+      object: string;
+      type: string;
+      status: string;
+      role: string;
+      content: Array<{
+        type: string;
+        transcript: string;
+      }>
+    }>
+  }
 }
 
 // Компонент для отображения статуса задания
@@ -175,6 +233,7 @@ const HomeworkModal: React.FC<{
                   <option value="physics">Физика</option>
                   <option value="chemistry">Химия</option>
                   <option value="biology">Биология</option>
+                  <option value="politics">Политология</option>
                 </select>
               </div>
 
@@ -256,6 +315,36 @@ const HomeworkModal: React.FC<{
 
 // Добавим больше тестовых данных
 const mockHomeworks: Homework[] = [
+  {
+    id: '6',
+    subjectId: 'politics',
+    subject: 'Политология',
+    title: 'Влияние СССР на развитие промышленности в РК',
+    description: 'Подготовить аналитическое эссе о влиянии Советского Союза на развитие промышленности в Казахстане. Обязательно рассмотреть следующие аспекты: 1) Индустриализация в период СССР; 2) Ключевые промышленные объекты, построенные в советский период; 3) Положительные и отрицательные последствия советской индустриальной политики для современного Казахстана. Объем работы: 5-7 страниц.',
+    dueDate: '2025-05-20T23:59:59',
+    attachments: [
+      {
+        id: '6',
+        name: 'Методические_рекомендации.pdf',
+        type: 'application/pdf',
+        size: 1845000
+      },
+      {
+        id: '7',
+        name: 'Список_литературы.docx',
+        type: 'application/docx',
+        size: 345000
+      }
+    ],
+    status: 'pending',
+    teacherId: 'kozlov',
+    teacherName: 'Козлов В.И.',
+    groupId: 'ПР24-1Ю',
+    createdAt: '2025-05-01T09:30:00',
+    priority: 'high',
+    estimatedTime: '180',
+    maxScore: 25
+  },
   {
     id: '1',
     subjectId: 'math',
@@ -401,6 +490,247 @@ const HomeworkDetailsModal: React.FC<{
   const { role } = useAuthContext();
   const [comment, setComment] = useState('');
   const [files, setFiles] = useState<File[]>([]);
+  
+  // Состояние для голосового чата
+  const [isVoiceChatActive, setIsVoiceChatActive] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [realtimeSession, setRealtimeSession] = useState<RealtimeSession>({
+    pc: null,
+    dc: null,
+    audioElement: null,
+    mediaStream: null
+  });
+  const [realtimeText, setRealtimeText] = useState<string>('');
+  const [recordingAnimation, setRecordingAnimation] = useState<number>(0);
+  
+  // Состояние для анимации записи
+  const [bars, setBars] = useState<number[]>([10, 20, 15, 25, 10, 30, 20, 15, 25, 35]);
+  
+  // Эффект для анимации эквалайзера
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
+    if (isVoiceChatActive) {
+      interval = setInterval(() => {
+        setBars(bars.map(() => Math.floor(Math.random() * 100) + 20));
+      }, 150);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isVoiceChatActive, bars]);
+  
+  // Эффект для анимации индикатора записи
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingAnimation(prev => (prev + 1) % 3);
+      }, 500);
+    } else if (interval) {
+      clearInterval(interval);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRecording]);
+  
+  // Инициализация Realtime API сессии
+  const initRealtimeSession = async () => {
+    try {
+      // Получение эфемерного токена с сервера
+      const tokenResponse = await spsChatApi.initSession();
+      const EPHEMERAL_KEY = tokenResponse.client_secret.value;
+
+      // Создание peer connection
+      const pc = new RTCPeerConnection();
+
+      // Настройка для воспроизведения аудио от модели
+      const audioEl = document.createElement("audio");
+      audioEl.autoplay = true;
+
+      pc.ontrack = (e) => {
+        audioEl.srcObject = e.streams[0];
+      };
+
+      // Получение доступа к микрофону и добавление аудиотрека
+      const ms = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      });
+
+      pc.addTrack(ms.getTracks()[0]);
+
+      // Настройка канала данных для отправки и получения событий
+      const dc = pc.createDataChannel("oai-events");
+
+      dc.addEventListener("message", (e) => {
+        // Обработка событий от Realtime API
+        try {
+          const eventData = JSON.parse(e.data);
+          console.log("Realtime event:", eventData);
+
+          // Обработка различных типов событий
+          if (eventData.type === 'text.delta') {
+            // Перезаписываем текст вместо добавления
+            setRealtimeText(eventData.delta?.text || '');
+          }
+        } catch (error) {
+          console.error("Ошибка при обработке события:", error);
+        }
+      });
+
+      // Инициализация сессии с использованием SDP
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      const baseUrl = "https://api.openai.com/v1/realtime";
+      const model = "gpt-4o-realtime-preview-2024-12-17";
+
+      const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
+        method: "POST",
+        body: offer.sdp,
+        headers: {
+          Authorization: `Bearer ${EPHEMERAL_KEY}`,
+          "Content-Type": "application/sdp"
+        },
+      });
+
+      const answerSdp = await sdpResponse.text();
+      const answer: RTCSessionDescriptionInit = {
+        type: 'answer' as RTCSdpType,
+        sdp: answerSdp
+      };
+
+      await pc.setRemoteDescription(answer);
+
+      // Сохраняем сессию в состоянии
+      setRealtimeSession({
+        pc,
+        dc,
+        audioElement: audioEl,
+        mediaStream: ms
+      });
+
+      // После установки соединения активируем голосовой чат
+      setIsVoiceChatActive(true);
+      setIsRecording(true);
+
+      // Инициализация чата с моделью
+      setTimeout(() => {
+        sendRealtimeEvent({
+          type: "response.create",
+          response: {
+            modalities: ["text", "audio"],
+            instructions: "Ты AI-учитель по политологии, который принимает и оценивает работы студентов. Твоя задача - проверить знания студента о влиянии СССР на развитие промышленности в Казахстане. Задавай уточняющие вопросы по теме, оценивай знания студента критически и в конце беседы выставь предварительную оценку от 1 до 25 баллов с комментарием. Обсуди следующие аспекты: 1) Ключевые промышленные проекты в Казахстане в период СССР; 2) Влияние индустриализации на экономику региона; 3) Последствия советской промышленной политики для современного Казахстана. Отвечай на русском языке как строгий, но справедливый преподаватель."
+          }
+        });
+      }, 1000);
+
+    } catch (error) {
+      console.error("Ошибка при инициализации Realtime сессии:", error);
+      setIsRecording(false);
+      setIsVoiceChatActive(false);
+    }
+  };
+
+  // Закрытие Realtime сессии
+  const closeRealtimeSession = () => {
+    try {
+      if (realtimeSession.mediaStream) {
+        realtimeSession.mediaStream.getTracks().forEach(track => track.stop());
+      }
+
+      if (realtimeSession.dc) {
+        realtimeSession.dc.close();
+      }
+
+      if (realtimeSession.pc) {
+        realtimeSession.pc.close();
+      }
+
+      // Сбрасываем состояние
+      setRealtimeSession({
+        pc: null,
+        dc: null,
+        audioElement: null,
+        mediaStream: null
+      });
+
+      setRealtimeText('');
+      setIsVoiceChatActive(false);
+      setIsRecording(false);
+    } catch (error) {
+      console.error("Ошибка при закрытии Realtime сессии:", error);
+      setIsVoiceChatActive(false);
+      setIsRecording(false);
+    }
+  };
+
+  // Отправка события в Realtime API
+  const sendRealtimeEvent = (event: any) => {
+    try {
+      if (realtimeSession.dc && realtimeSession.dc.readyState === 'open') {
+        realtimeSession.dc.send(JSON.stringify(event));
+      }
+    } catch (error) {
+      console.error("Ошибка при отправке события:", error);
+    }
+  };
+  
+  // Компонент для голосового чата с эквалайзером
+  const VoiceOverlay = () => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex flex-col items-center justify-center">
+        {/* Верхняя часть с инструкцией */}
+        <div className="absolute top-8 left-0 right-0 text-center text-white text-xl">
+          <p>Говорите, чтобы обсудить вопросы по заданию</p>
+        </div>
+
+        {/* Центральный футуристичный эквалайзер */}
+        <div className="relative flex items-center space-x-4">
+          {bars.map((height, index) => (
+            <div
+              key={index}
+              className="bg-green-500 rounded transition-all duration-200 ease-in-out"
+              style={{ width: '30px', height: `${height}px` }}
+            ></div>
+          ))}
+        </div>
+
+        {/* Сообщение внизу */}
+        <div className="absolute bottom-32 left-0 right-0 text-center text-white text-lg">
+          <p>Завершите фразу, чтобы отправить</p>
+        </div>
+
+        {/* Кнопки управления */}
+        <div className="absolute bottom-16 left-0 right-0 flex justify-center space-x-24">
+          <button
+            className="bg-gray-600 w-16 h-16 rounded-full flex items-center justify-center text-white"
+            onClick={() => closeRealtimeSession()}
+          >
+            <FaSquare className="text-xl" />
+          </button>
+
+          <button
+            className="bg-red-500 w-16 h-16 rounded-full flex items-center justify-center text-white"
+            onClick={() => closeRealtimeSession()}
+          >
+            <FaTimes className="text-xl" />
+          </button>
+        </div>
+
+        {/* Отображение текущего ответа */}
+        {realtimeText && (
+          <div className="absolute top-24 left-8 right-8 max-h-64 overflow-y-auto bg-gray-800 bg-opacity-80 p-4 rounded-lg text-white">
+            <p>{realtimeText}</p>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const getTimeRemaining = () => {
     const now = new Date();
@@ -418,8 +748,15 @@ const HomeworkDetailsModal: React.FC<{
 
   if (!isOpen) return null;
 
+  // Проверяем, является ли текущее задание заданием по политологии о СССР
+  const isPoliticsHomework = homework.subjectId === 'politics' && 
+                             homework.title.toLowerCase().includes('влияние ссср');
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      {/* Голосовой оверлей */}
+      {isVoiceChatActive && <VoiceOverlay />}
+      
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -444,9 +781,23 @@ const HomeworkDetailsModal: React.FC<{
               </span>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <FaTimes className="w-6 h-6" />
-          </button>
+          <div className="flex items-center space-x-3">
+            {/* Добавляем кнопку для голосового чата, если это задание по политологии */}
+            {isPoliticsHomework && (
+              <button
+                onClick={() => initRealtimeSession()}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center shadow-md"
+                disabled={isVoiceChatActive}
+                title="Обсудить задание с ИИ"
+              >
+                <FaMicrophone className="mr-2" />
+                Голосовой чат
+              </button>
+            )}
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              <FaTimes className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
@@ -479,6 +830,26 @@ const HomeworkDetailsModal: React.FC<{
             </div>
           </div>
         </div>
+
+        {/* Большая заметная кнопка для запуска голосового чата в секции описания */}
+        {isPoliticsHomework && (
+          <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-lg p-4 flex items-center justify-between">
+            <div>
+              <h4 className="text-lg font-medium text-green-700 mb-1">AI-учитель для защиты работы</h4>
+              <p className="text-sm text-green-600">
+                Защитите свою работу перед AI-учителем и получите предварительную оценку вашего эссе по влиянию СССР на промышленность Казахстана
+              </p>
+            </div>
+            <button
+              onClick={() => initRealtimeSession()}
+              className="px-6 py-3 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center shadow-lg transition-transform transform hover:scale-105"
+              disabled={isVoiceChatActive}
+            >
+              <FaMicrophone className="mr-2 text-lg" />
+              <span className="font-bold">Сдать работу</span>
+            </button>
+          </div>
+        )}
 
         <div className="prose max-w-none mb-6">
           <h4 className="text-lg font-medium mb-2">Описание задания</h4>
@@ -557,7 +928,7 @@ const HomeworkDetailsModal: React.FC<{
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => onSubmit?.(files, comment)}
                   className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
@@ -719,6 +1090,7 @@ const HomeworkPage: React.FC = () => {
           <option value="physics">Физика</option>
           <option value="chemistry">Химия</option>
           <option value="biology">Биология</option>
+          <option value="politics">Политология</option>
         </select>
 
         <select

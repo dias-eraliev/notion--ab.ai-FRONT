@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaCheck } from 'react-icons/fa';
 import AnimatedBackground from '../components/AnimatedBackground';
+import { useNavigate } from 'react-router-dom';
+import FaceIDScanner from '../components/auth/FaceIDScanner';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showFaceID, setShowFaceID] = useState(false);
+  const navigate = useNavigate();
   
   // Анимация для букв логотипа
   const letterVariants = {
@@ -47,7 +51,8 @@ const Login: React.FC = () => {
       setIsLoading(false);
       setIsSuccess(true);
       setTimeout(() => {
-        // Здесь будет редирект на главную страницу
+        // Перенаправление на главную страницу
+        navigate('/');
       }, 1500);
     }, 2000);
   };
@@ -58,31 +63,22 @@ const Login: React.FC = () => {
   };
 
   const handleFaceIDAuthentication = () => {
-    const video = document.createElement('video');
-    video.style.position = 'fixed';
-    video.style.top = '50%';
-    video.style.left = '50%';
-    video.style.transform = 'translate(-50%, -50%)';
-    video.style.zIndex = '1000';
-    video.style.border = '2px solid #1E5945';
-    video.style.borderRadius = '8px';
-    document.body.appendChild(video);
+    // Показываем компонент сканирования лица вместо старой реализации
+    setShowFaceID(true);
+  };
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then((stream) => {
-        video.srcObject = stream;
-        video.play();
+  const handleFaceIDSuccess = () => {
+    // Закрываем сканер и показываем анимацию успеха
+    setShowFaceID(false);
+    setIsSuccess(true);
+    setTimeout(() => {
+      navigate('/');
+    }, 1500);
+  };
 
-        setTimeout(() => {
-          stream.getTracks().forEach(track => track.stop());
-          video.remove();
-          alert('Face ID authentication successful!');
-        }, 3000); // Эмуляция успешного прохождения через 3 секунды
-      })
-      .catch((err) => {
-        console.error('Error accessing camera:', err);
-        alert('Failed to access camera for Face ID authentication.');
-      });
+  const handleFaceIDCancel = () => {
+    // Просто закрываем сканер Face ID
+    setShowFaceID(false);
   };
 
   return (
@@ -135,7 +131,7 @@ const Login: React.FC = () => {
           <h2 className="text-2xl font-semibold text-center mb-2 text-corporate-primary">Добро пожаловать</h2>
           <p className="text-gray-600 text-center mb-8">Войдите в свою учетную запись, чтобы продолжить</p>
           
-          {/* Кнопка входа через Google */}
+          {/* Кнопка входа через Face ID */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -259,6 +255,16 @@ const Login: React.FC = () => {
           Powered by AB.AI
         </motion.p>
       </div>
+      
+      {/* Компонент Face ID Сканера */}
+      <AnimatePresence>
+        {showFaceID && (
+          <FaceIDScanner 
+            onSuccess={handleFaceIDSuccess} 
+            onCancel={handleFaceIDCancel} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
