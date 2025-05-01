@@ -11,7 +11,7 @@ const Login: React.FC = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [showFaceID, setShowFaceID] = useState(false);
   const navigate = useNavigate();
-  
+
   // Анимация для букв логотипа
   const letterVariants = {
     hidden: { y: -100, opacity: 0 },
@@ -46,11 +46,13 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
     // Имитация запроса
     setTimeout(() => {
       setIsLoading(false);
       setIsSuccess(true);
       setTimeout(() => {
+        sessionStorage.setItem("loggedIn", "true");
         // Перенаправление на главную страницу
         navigate('/');
       }, 1500);
@@ -72,6 +74,7 @@ const Login: React.FC = () => {
     setShowFaceID(false);
     setIsSuccess(true);
     setTimeout(() => {
+      sessionStorage.setItem("loggedIn", "true");
       navigate('/');
     }, 1500);
   };
@@ -84,7 +87,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen bg-corporate-bg flex items-center justify-center p-4 relative overflow-hidden">
       <AnimatedBackground />
-      
+
       <div className="w-full max-w-md relative z-10">
         {/* Анимированный логотип */}
         <div className="flex justify-center mb-8 space-x-1">
@@ -101,7 +104,7 @@ const Login: React.FC = () => {
             </motion.span>
           ))}
         </div>
-        
+
         <motion.div
           variants={formVariants}
           initial="hidden"
@@ -130,7 +133,7 @@ const Login: React.FC = () => {
 
           <h2 className="text-2xl font-semibold text-center mb-2 text-corporate-primary">Добро пожаловать</h2>
           <p className="text-gray-600 text-center mb-8">Войдите в свою учетную запись, чтобы продолжить</p>
-          
+
           {/* Кнопка входа через Face ID */}
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -150,7 +153,7 @@ const Login: React.FC = () => {
               <span className="px-2 bg-white/80 text-gray-500">или</span>
             </div>
           </div>
-          
+
           {/* Форма входа */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
@@ -237,7 +240,7 @@ const Login: React.FC = () => {
             </motion.button>
           </form>
         </motion.div>
-        
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -255,13 +258,13 @@ const Login: React.FC = () => {
           Powered by AB.AI
         </motion.p>
       </div>
-      
+
       {/* Компонент Face ID Сканера */}
       <AnimatePresence>
         {showFaceID && (
-          <FaceIDScanner 
-            onSuccess={handleFaceIDSuccess} 
-            onCancel={handleFaceIDCancel} 
+          <FaceIDScanner
+            onSuccess={handleFaceIDSuccess}
+            onCancel={handleFaceIDCancel}
           />
         )}
       </AnimatePresence>

@@ -118,6 +118,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    const loggedIn = sessionStorage.getItem("loggedIn");
+    loggedIn === null ? sessionStorage.setItem("loggedIn", "false") : sessionStorage.setItem("loggedIn", "true");
+    if (!loggedIn) {
+      navigate('/login');
+    }
+  }, []);
+
   // Проверяем доступ к текущему маршруту при изменении роли или маршрута
   useEffect(() => {
     if (user) {
@@ -158,11 +166,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <authContext.Provider 
-      value={{ 
-        user, 
-        role, 
-        setRole, 
+    <authContext.Provider
+      value={{
+        user,
+        role,
+        setRole,
         isAuthenticated: !!user,
         login,
         logout,
@@ -175,7 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 // Компонент для защиты маршрутов
-export const ProtectedRoute: React.FC<{ 
+export const ProtectedRoute: React.FC<{
   children: React.ReactNode;
   allowedRoles: UserRole[];
 }> = ({ children, allowedRoles }) => {
