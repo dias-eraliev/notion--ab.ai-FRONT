@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 import {HrRequests} from "@/api/Requests/Hr.requests.ts";
 import {Employee, EmploymentTypeEnum} from '@/Interfeces/Hr.interface';
+import {useForm} from "react-hook-form";
 
 const HrReq = new HrRequests()
 
@@ -25,6 +26,16 @@ const EmployeesPage: React.FC = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [statusFilter, setStatusFilter] = useState<Employee['status'] | 'all'>('all');
     const [employeesList, setEmployeesList] = useState<Employee[]>([]);
+
+    const [addStep, setAddStep] = useState(1);
+    const [selectedType, setSelectedType] = useState<'FULL_TIME' | 'PART_TIME' | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: {errors},
+    } = useForm()
 
 
     useEffect(() => {
@@ -42,9 +53,24 @@ const EmployeesPage: React.FC = () => {
                 console.error("Error fetching hr:", error);
             }
         }
-
         fetchHr()
     }, []);
+
+    const CreateHr = async (data: any) => {
+        try {
+            console.log(data)
+            const payload = {
+                ...data,
+                employmentType: selectedType
+            }
+
+            console.log(selectedType)
+            return await HrReq.addHr(payload).catch(errors => console.log(errors));
+        } catch (error) {
+            console.error("Error add hr:", error);
+        }
+    };
+
 
     const getStatusColor = (status: Employee['status']) => {
         switch (status) {
@@ -133,98 +159,100 @@ const EmployeesPage: React.FC = () => {
 
     // Компонент таблицы сотрудников
     const EmployeeTable = ({employees, title}: { employees: Employee[], title: string }) => (
-        <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">{title} ({employees.length})</h2>
-                <p className="text-sm text-gray-500">Всего: {employees.length} человек</p>
-            </div>
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                <tr>
-                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Сотрудник
-                    </th>
-                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Должность
-                    </th>
-                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Стаж
-                    </th>
-                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Статус
-                    </th>
-                    <th className="px-6 py-3 bg-gray-50"></th>
-                </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                {employees.map((employee) => (
-                    <tr
-                        key={employee.id}
-                        className="hover:bg-gray-50 cursor-pointer"
-                        onClick={() => setSelectedEmployee(employee)}
-                    >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+
+            <div className="bg-white rounded-lg shadow">
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                    <h2 className="text-lg font-medium text-gray-900">{title} ({employees.length})</h2>
+                    <p className="text-sm text-gray-500">Всего: {employees.length} человек</p>
+                </div>
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead>
+                    <tr>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Сотрудник
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Должность
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Стаж
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Статус
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50"></th>
+                    </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                    {employees.map((employee) => (
+                        <tr
+                            key={employee.id}
+                            className="hover:bg-gray-50 cursor-pointer"
+                            onClick={() => setSelectedEmployee(employee)}
+                        >
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                     <span className="text-blue-600 font-medium">
                       {employee.fullName.split(' ').map(n => n[0]).join('')}
                     </span>
+                                    </div>
+                                    <div className="ml-4">
+                                        <div className="text-sm font-medium text-gray-900">{employee.fullName}</div>
+                                        <div className="text-sm text-gray-500">{employee.email}</div>
+                                    </div>
                                 </div>
-                                <div className="ml-4">
-                                    <div className="text-sm font-medium text-gray-900">{employee.fullName}</div>
-                                    <div className="text-sm text-gray-500">{employee.email}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{employee.position}</div>
-                            <div className="text-sm text-gray-500">{employee.category}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {employee.workExperience}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{employee.position}</div>
+                                <div className="text-sm text-gray-500">{employee.category}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {employee.workExperience}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
                 <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status)}`}>
                   {getStatusText(employee.status)}
                 </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div className="flex justify-end gap-2">
-                                <button
-                                    className="text-gray-400 hover:text-blue-500"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        // toggleEmploymentType(employee.id);
-                                    }}
-                                    title={employee.employmentType === 'FULL_TIME' ? 'Перевести в совместители' : 'Перевести в штатные'}
-                                >
-                                    <FaExchangeAlt className="w-4 h-4"/>
-                                </button>
-                                <button
-                                    className="text-gray-400 hover:text-gray-500"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedEmployee(employee);
-                                    }}
-                                >
-                                    <FaEllipsisV className="w-4 h-4"/>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-                {employees.length === 0 && (
-                    <tr>
-                        <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
-                            В этой категории нет сотрудников
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
-        </div>
-    );
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        className="text-gray-400 hover:text-blue-500"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            // toggleEmploymentType(employee.id);
+                                        }}
+                                        title={employee.employmentType === 'FULL_TIME' ? 'Перевести в совместители' : 'Перевести в штатные'}
+                                    >
+                                        <FaExchangeAlt className="w-4 h-4"/>
+                                    </button>
+                                    <button
+                                        className="text-gray-400 hover:text-gray-500"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedEmployee(employee);
+                                        }}
+                                    >
+                                        <FaEllipsisV className="w-4 h-4"/>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    {employees.length === 0 && (
+                        <tr>
+                            <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
+                                В этой категории нет сотрудников
+                            </td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+            </div>
+        )
+    ;
 
     return (
         <div className="p-6">
@@ -392,7 +420,8 @@ const EmployeesPage: React.FC = () => {
                             {selectedEmployee.generalSubjects && (
                                 <div className="mb-6">
                                     <h3 className="text-lg font-semibold mb-4 pb-2 border-b">Преподаваемые предметы</h3>
-
+                                    ф
+                                    ф
                                     {/* Общепрофессиональные дисциплины */}
                                     {selectedEmployee.generalSubjects.length > 0 && (
                                         <div className="mb-4">
@@ -515,40 +544,139 @@ const EmployeesPage: React.FC = () => {
                                 <h2 className="text-xl font-bold">Добавить сотрудника</h2>
                                 <button
                                     className="text-gray-400 hover:text-gray-500"
-                                    onClick={() => setShowAddModal(false)}
+                                    onClick={() => {
+                                        setShowAddModal(false);
+                                        setAddStep(1);
+                                        setSelectedType(null);
+                                    }}
                                 >
                                     <FaTimes className="w-5 h-5"/>
                                 </button>
                             </div>
 
-                            <div className="mb-6">
-                                <p className="mb-4 text-gray-700">Выберите тип занятости:</p>
-                                <div className="flex gap-4">
-                                    <div
-                                        className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-blue-500 cursor-pointer">
-                                        <h3 className="font-medium mb-2">Штатный преподаватель</h3>
-                                        <p className="text-sm text-gray-500">Полная занятость, официальное
-                                            трудоустройство</p>
+                            {addStep === 1 && (
+                                <>
+                                    <p className="mb-4 text-gray-700">Выберите тип занятости:</p>
+                                    <div className="flex gap-4 mb-6">
+                                        <div
+                                            onClick={() => setSelectedType('FULL_TIME')}
+                                            className={`flex-1 p-4 border rounded-lg cursor-pointer ${
+                                                selectedType === 'FULL_TIME' ? 'border-blue-500' : 'border-gray-200 hover:border-blue-300'
+                                            }`}
+                                        >
+                                            <h3 className="font-medium mb-2">Штатный преподаватель</h3>
+                                            <p className="text-sm text-gray-500">Полная занятость, официальное
+                                                трудоустройство</p>
+                                        </div>
+                                        <div
+                                            onClick={() => setSelectedType('PART_TIME')}
+                                            className={`flex-1 p-4 border rounded-lg cursor-pointer ${
+                                                selectedType === 'PART_TIME' ? 'border-blue-500' : 'border-gray-200 hover:border-blue-300'
+                                            }`}
+                                        >
+                                            <h3 className="font-medium mb-2">Совместитель</h3>
+                                            <p className="text-sm text-gray-500">Частичная занятость, почасовая
+                                                оплата</p>
+                                        </div>
                                     </div>
-                                    <div
-                                        className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-blue-500 cursor-pointer">
-                                        <h3 className="font-medium mb-2">Совместитель</h3>
-                                        <p className="text-sm text-gray-500">Частичная занятость, почасовая оплата</p>
+                                    <div className="flex justify-end gap-3">
+                                        <button
+                                            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                                            onClick={() => setShowAddModal(false)}
+                                        >
+                                            Отмена
+                                        </button>
+                                        <button
+                                            disabled={!selectedType}
+                                            className={`px-4 py-2 text-white rounded-md ${
+                                                selectedType ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'
+                                            }`}
+                                            onClick={() => setAddStep(2)}
+                                        >
+                                            Продолжить
+                                        </button>
                                     </div>
-                                </div>
-                            </div>
+                                </>
+                            )}
 
-                            <div className="flex justify-end gap-3">
-                                <button
-                                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
-                                    onClick={() => setShowAddModal(false)}
-                                >
-                                    Отмена
-                                </button>
-                                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                                    Продолжить
-                                </button>
-                            </div>
+                            {addStep === 2 && (
+                                <form onSubmit={handleSubmit(CreateHr)}
+                                      className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                                    <div>
+                                        <label className="block text-sm font-medium">ФИО</label>
+                                        <input {...register('fullName', {required: "Это поле обязательно"})}
+                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        {errors.fullName &&
+                                            <span className="text-red-500 text-xs">{errors.fullName.message}</span>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">ИИН</label>
+                                        <input {...register('iin', {required: "Это поле обязательно"})}
+                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        {errors.iin &&
+                                            <span className="text-red-500 text-xs">{errors.iin.message}</span>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Должность</label>
+                                        <input {...register('position', {required: "Это поле обязательно"})}
+                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        {errors.position &&
+                                            <span className="text-red-500 text-xs">{errors.position.message}</span>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Email</label>
+                                        <input type="email" {...register('email', {required: "Это поле обязательно"})}
+                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        {errors.email &&
+                                            <span className="text-red-500 text-xs">{errors.email.message}</span>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Телефон</label>
+                                        <input {...register('phone', {required: "Это поле обязательно"})}
+                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        {errors.phone &&
+                                            <span className="text-red-500 text-xs">{errors.phone.message}</span>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Адрес</label>
+                                        <input {...register('address')} className="w-full border px-3 py-2 rounded-md"/>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Образование</label>
+                                        <input {...register('education')}
+                                               className="w-full border px-3 py-2 rounded-md"/>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Дата найма</label>
+                                        <input type="date" {...register('hireDate')}
+                                               className="w-full border px-3 py-2 rounded-md"/>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Стаж работы</label>
+                                        <input {...register('workExperience')}
+                                               className="w-full border px-3 py-2 rounded-md"/>
+                                    </div>
+
+                                    <div className="flex justify-end gap-3 pt-4">
+                                        <button type="button" onClick={() => setAddStep(1)}
+                                                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+                                            Назад
+                                        </button>
+                                        <button type="submit"
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                            Сохранить
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
                         </div>
                     </div>
                 </div>
