@@ -9,7 +9,7 @@ import openai from 'openai';
 dotenv.config();
 
 const openaiClient = new openai({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: "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",
 });
 
 const app = express();
