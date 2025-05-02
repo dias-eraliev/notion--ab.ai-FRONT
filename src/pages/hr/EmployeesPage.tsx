@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 import {HrRequests} from "@/api/Requests/Hr.requests.ts";
 import {Employee, EmploymentTypeEnum} from '@/Interfeces/Hr.interface';
+import {useForm} from "react-hook-form";
 
 const HrReq = new HrRequests()
 
@@ -25,6 +26,16 @@ const EmployeesPage: React.FC = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [statusFilter, setStatusFilter] = useState<Employee['status'] | 'all'>('all');
     const [employeesList, setEmployeesList] = useState<Employee[]>([]);
+
+    const [addStep, setAddStep] = useState(1);
+    const [selectedType, setSelectedType] = useState<'FULL_TIME' | 'PART_TIME' | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: {errors},
+    } = useForm()
 
 
     useEffect(() => {
@@ -42,9 +53,24 @@ const EmployeesPage: React.FC = () => {
                 console.error("Error fetching hr:", error);
             }
         }
-
         fetchHr()
     }, []);
+
+    const CreateHr = async (data: any) => {
+        try {
+            console.log(data)
+            const payload = {
+                ...data,
+                employmentType: selectedType
+            }
+
+            console.log(selectedType)
+            return await HrReq.addHr(payload).catch(errors => console.log(errors));
+        } catch (error) {
+            console.error("Error add hr:", error);
+        }
+    };
+
 
     const getStatusColor = (status: Employee['status']) => {
         switch (status) {
@@ -169,62 +195,63 @@ const EmployeesPage: React.FC = () => {
                     <span className="text-blue-600 font-medium">
                       {employee.fullName.split(' ').map(n => n[0]).join('')}
                     </span>
+                                    </div>
+                                    <div className="ml-4">
+                                        <div className="text-sm font-medium text-gray-900">{employee.fullName}</div>
+                                        <div className="text-sm text-gray-500">{employee.email}</div>
+                                    </div>
                                 </div>
-                                <div className="ml-4">
-                                    <div className="text-sm font-medium text-gray-900">{employee.fullName}</div>
-                                    <div className="text-sm text-gray-500">{employee.email}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{employee.position}</div>
-                            <div className="text-sm text-gray-500">{employee.category}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {employee.workExperience}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{employee.position}</div>
+                                <div className="text-sm text-gray-500">{employee.category}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {employee.workExperience}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
                 <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status)}`}>
                   {getStatusText(employee.status)}
                 </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div className="flex justify-end gap-2">
-                                <button
-                                    className="text-gray-400 hover:text-blue-500"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        // toggleEmploymentType(employee.id);
-                                    }}
-                                    title={employee.employmentType === 'FULL_TIME' ? 'Перевести в совместители' : 'Перевести в штатные'}
-                                >
-                                    <FaExchangeAlt className="w-4 h-4"/>
-                                </button>
-                                <button
-                                    className="text-gray-400 hover:text-gray-500"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedEmployee(employee);
-                                    }}
-                                >
-                                    <FaEllipsisV className="w-4 h-4"/>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-                {employees.length === 0 && (
-                    <tr>
-                        <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
-                            В этой категории нет сотрудников
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
-        </div>
-    );
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        className="text-gray-400 hover:text-blue-500"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            // toggleEmploymentType(employee.id);
+                                        }}
+                                        title={employee.employmentType === 'FULL_TIME' ? 'Перевести в совместители' : 'Перевести в штатные'}
+                                    >
+                                        <FaExchangeAlt className="w-4 h-4"/>
+                                    </button>
+                                    <button
+                                        className="text-gray-400 hover:text-gray-500"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedEmployee(employee);
+                                        }}
+                                    >
+                                        <FaEllipsisV className="w-4 h-4"/>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    {employees.length === 0 && (
+                        <tr>
+                            <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
+                                В этой категории нет сотрудников
+                            </td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+            </div>
+        )
+    ;
 
     return (
         <div className="p-6">
@@ -391,7 +418,8 @@ const EmployeesPage: React.FC = () => {
                             {selectedEmployee.generalSubjects && (
                                 <div className="mb-6">
                                     <h3 className="text-lg font-semibold mb-4 pb-2 border-b">Преподаваемые предметы</h3>
-
+                                    ф
+                                    ф
                                     {/* Общепрофессиональные дисциплины */}
                                     {selectedEmployee.generalSubjects.length > 0 && (
                                         <div className="mb-4">
