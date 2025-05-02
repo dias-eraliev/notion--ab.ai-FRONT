@@ -16,7 +16,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: ["https://abai.live", "https://backend.ab-ai.kz", "http://localhost:3000", "https://uib-ai.kz"],
+  origin: ["https://abai.live", "https://backend.ab-ai.kz", "http://localhost:3000", "https://uib-ai.kz", "https://www.uib-ai.kz"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
