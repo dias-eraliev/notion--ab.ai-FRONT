@@ -25,6 +25,8 @@ import {
 import { useAuthContext, UserRole } from '../providers/AuthProvider';
 // Импортируем API для голосового чата
 import { spsChatApi } from '../api/sps-chat';
+// @ts-ignore
+const faceapi = (window as any).faceapi;
 
 interface Homework {
   id: string;
@@ -506,23 +508,6 @@ const HomeworkDetailsModal: React.FC<{
   const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
   const webcamVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Эффект для анимации индикатора записи
-  const [recordingAnimation, setRecordingAnimation] = useState<number>(0);
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    if (isRecording) {
-      interval = setInterval(() => {
-        setRecordingAnimation(prev => (prev + 1) % 3);
-      }, 500);
-    } else if (interval) {
-      clearInterval(interval);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isRecording]);
 
   // Запуск видеопрокторинга при старте голосового чата
   useEffect(() => {
@@ -551,11 +536,114 @@ const HomeworkDetailsModal: React.FC<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRealtimeActive]);
 
+  // Для анализа лица
+  const [showFaceAnalysis, setShowFaceAnalysis] = useState(true);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
+
+  // Загрузка моделей face-api.js и запуск анализа
+  useEffect(() => {
+    if (!showFaceAnalysis) return;
+    const loadModelsAndStart = async () => {
+      try {
+        const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
+        ]);
+        setModelsLoaded(true);
+      } catch (e) {
+        setModelsLoaded(false);
+      }
+    };
+    loadModelsAndStart();
+  }, [showFaceAnalysis]);
+
+  useEffect(() => {
+    if (!modelsLoaded) return;
+    const video = webcamVideoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    let recognitionInterval: number | null = null;
+    const setupRecognition = () => {
+      canvas.width = video.videoWidth || 320;
+      canvas.height = video.videoHeight || 240;
+      const displaySize = { width: canvas.width, height: canvas.height };
+      faceapi.matchDimensions(canvas, displaySize);
+      recognitionInterval = window.setInterval(async () => {
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+          .withFaceLandmarks()
+          .withFaceExpressions();
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          faceapi.draw.drawDetections(canvas, resizedDetections);
+          faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+          faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+          if (resizedDetections && resizedDetections.length > 0) {
+            const landmarks = resizedDetections[0].landmarks;
+            // Глаза
+            const eyePositions = landmarks.getLeftEye();
+            ctx.strokeStyle = '#00FF00';
+            ctx.lineWidth = 2;
+            if (eyePositions.length > 0) {
+              const leftMostPoint = Math.min(...eyePositions.map(p => p.x));
+              const rightMostPoint = Math.max(...eyePositions.map(p => p.x));
+              const topMostPoint = Math.min(...eyePositions.map(p => p.y));
+              const bottomMostPoint = Math.max(...eyePositions.map(p => p.y));
+              ctx.strokeRect(
+                leftMostPoint - 10,
+                topMostPoint - 10,
+                rightMostPoint - leftMostPoint + 20,
+                bottomMostPoint - topMostPoint + 20
+              );
+              ctx.font = '16px Arial';
+              ctx.fillStyle = '#00FF00';
+              ctx.fillText('Сканирование глаз', leftMostPoint - 10, topMostPoint - 15);
+            }
+            // Рот
+            const mouthPositions = landmarks.getMouth();
+            if (mouthPositions.length > 0) {
+              const leftMostPoint = Math.min(...mouthPositions.map(p => p.x));
+              const rightMostPoint = Math.max(...mouthPositions.map(p => p.x));
+              const topMostPoint = Math.min(...mouthPositions.map(p => p.y));
+              const bottomMostPoint = Math.max(...mouthPositions.map(p => p.y));
+              ctx.strokeStyle = '#FFD600';
+              ctx.strokeRect(
+                leftMostPoint - 10,
+                topMostPoint - 10,
+                rightMostPoint - leftMostPoint + 20,
+                bottomMostPoint - topMostPoint + 20
+              );
+              ctx.font = '16px Arial';
+              ctx.fillStyle = '#FFD600';
+              ctx.fillText('Анализ улыбки', leftMostPoint - 10, bottomMostPoint + 25);
+            }
+          }
+        }
+      }, 100);
+    };
+    video.addEventListener('play', setupRecognition);
+    if (video.readyState >= 2) setupRecognition();
+    return () => {
+      if (recognitionInterval) clearInterval(recognitionInterval);
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    };
+  }, [modelsLoaded]);
+
   // Инициализация Realtime API сессии
   const initRealtimeSession = async () => {
     try {
-      // Получение эфемерного токена с сервера
-      const tokenResponse = await spsChatApi.initSession();
+      // Инструкция для AI-учителя по предмету
+      const instructions = `Ты AI-учитель по предмету: ${homework.subject}. Тема домашнего задания: ${homework.title}. Сначала спроси, изучал ли он тему "${homework.title}" и что он запомнил. Затем задай не менее 3 вопросов по теме, чтобы проверить знания. Если ученик затрудняется ответить, дай короткую подсказку и снова задай три вопроса по теме. Не переходи к оценке, пока не получишь ответы. В конце оцени ответы и дай краткий комментарий. Всегда веди диалог на русском языке как строгий, но справедливый преподаватель-мужчина.`;
+
+      // Получение эфемерного токена с сервера с передачей инструкции
+      const tokenResponse = await spsChatApi.initSession({ instructions });
       const EPHEMERAL_KEY = tokenResponse.client_secret.value;
 
       // Создание peer connection
@@ -633,11 +721,12 @@ const HomeworkDetailsModal: React.FC<{
 
       // Инициализация чата с моделью
       setTimeout(() => {
+        console.log(homework.subject, homework.title);
         sendRealtimeEvent({
           type: "response.create",
           response: {
             modalities: ["text", "audio"],
-            instructions: `Ты AI-учитель по предмету: ${homework.subject}. Тема домашнего задания: ${homework.title}. Сначала обязательно спроси ученика, изучал ли он тему домашнего задания \"${homework.title}\" и что он запомнил. Затем обязательно задай не менее 3 вопросов по этой теме, чтобы проверить его знания. Не переходи к оценке, пока не задашь вопросы и не получишь ответы. В конце оцени ответы ученика и дай краткий комментарий. Всегда веди диалог на русском языке как строгий, но справедливый преподаватель.`
+            instructions: `Ты AI-учитель по предмету: ${homework.subject}. Тема домашнего задания: ${homework.title}. Сначала спроси, изучал ли он тему "${homework.title}" и что он запомнил. Затем задай не менее 3 вопросов по теме, чтобы проверить знания. Если ученик затрудняется ответить, дай короткую подсказку и снова задай три вопроса по теме. Не переходи к оценке, пока не получишь ответы. В конце оцени ответы и дай краткий комментарий. Всегда веди диалог на русском языке как строгий, но справедливый преподаватель-мужчина.`
           }
         });
       }, 1000);
@@ -694,12 +783,120 @@ const HomeworkDetailsModal: React.FC<{
   };
 
   // Компонент для голосового чата с эквалайзером и видеопрокторингом
-  const VoiceOverlay = React.memo(() => {
+  const VoiceOverlay = React.memo(({ webcamStream }: { webcamStream: MediaStream | null }) => {
     const [bars, setBars] = useState<number[]>([10, 20, 15, 25, 10, 30, 20, 15, 25, 35]);
     const frame = useRef<number | null>(null);
     const lastUpdate = useRef<number>(0);
-    const UPDATE_INTERVAL = 280; // миллисекунд между обновлениями
+    const UPDATE_INTERVAL = 280;
+    const webcamVideoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [modelsLoaded, setModelsLoaded] = useState(false);
+    const [showFaceAnalysis, setShowFaceAnalysis] = useState(true);
 
+    // Подключение видеопотока
+    useEffect(() => {
+      if (webcamVideoRef.current && webcamStream) {
+        webcamVideoRef.current.srcObject = webcamStream;
+      }
+    }, [webcamStream]);
+
+    // Загрузка моделей face-api.js
+    useEffect(() => {
+      if (!showFaceAnalysis) return;
+      const loadModels = async () => {
+        try {
+          const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+          await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+            faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
+          ]);
+          setModelsLoaded(true);
+        } catch (e) {
+          setModelsLoaded(false);
+        }
+      };
+      loadModels();
+    }, [showFaceAnalysis]);
+
+    // Анализ лица и отрисовка маски (canvas всегда активен, просто скрывается визуально)
+    useEffect(() => {
+      if (!modelsLoaded) return;
+      const video = webcamVideoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas) return;
+      let recognitionInterval: number | null = null;
+      const setupRecognition = () => {
+        canvas.width = video.videoWidth || 320;
+        canvas.height = video.videoHeight || 240;
+        const displaySize = { width: canvas.width, height: canvas.height };
+        faceapi.matchDimensions(canvas, displaySize);
+        recognitionInterval = window.setInterval(async () => {
+          const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceExpressions();
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+            faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+            if (resizedDetections && resizedDetections.length > 0) {
+              const landmarks = resizedDetections[0].landmarks;
+              // Глаза
+              const eyePositions = landmarks.getLeftEye();
+              ctx.strokeStyle = '#00FF00';
+              ctx.lineWidth = 2;
+              if (eyePositions.length > 0) {
+                const leftMostPoint = Math.min(...eyePositions.map(p => p.x));
+                const rightMostPoint = Math.max(...eyePositions.map(p => p.x));
+                const topMostPoint = Math.min(...eyePositions.map(p => p.y));
+                const bottomMostPoint = Math.max(...eyePositions.map(p => p.y));
+                ctx.strokeRect(
+                  leftMostPoint - 10,
+                  topMostPoint - 10,
+                  rightMostPoint - leftMostPoint + 20,
+                  bottomMostPoint - topMostPoint + 20
+                );
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#00FF00';
+                ctx.fillText('Сканирование глаз', leftMostPoint - 10, topMostPoint - 15);
+              }
+              // Рот
+              const mouthPositions = landmarks.getMouth();
+              if (mouthPositions.length > 0) {
+                const leftMostPoint = Math.min(...mouthPositions.map(p => p.x));
+                const rightMostPoint = Math.max(...mouthPositions.map(p => p.x));
+                const topMostPoint = Math.min(...mouthPositions.map(p => p.y));
+                const bottomMostPoint = Math.max(...mouthPositions.map(p => p.y));
+                ctx.strokeStyle = '#FFD600';
+                ctx.strokeRect(
+                  leftMostPoint - 10,
+                  topMostPoint - 10,
+                  rightMostPoint - leftMostPoint + 20,
+                  bottomMostPoint - topMostPoint + 20
+                );
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#FFD600';
+                ctx.fillText('Анализ улыбки', leftMostPoint - 10, bottomMostPoint + 25);
+              }
+            }
+          }
+        }, 100);
+      };
+      video.addEventListener('play', setupRecognition);
+      if (video.readyState >= 2) setupRecognition();
+      return () => {
+        if (recognitionInterval) clearInterval(recognitionInterval);
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      };
+    }, [modelsLoaded]);
+
+    // Эквалайзер
     useEffect(() => {
       let mounted = true;
       function animate(now: number) {
@@ -723,15 +920,17 @@ const HomeworkDetailsModal: React.FC<{
         <div className="absolute top-8 left-0 right-0 text-center text-white text-xl">
           <p>Говорите, чтобы обсудить вопросы по заданию</p>
         </div>
-        {/* Видеопоток с веб-камеры */}
-        <div className="absolute top-8 right-8 bg-black bg-opacity-60 rounded-lg shadow-lg overflow-hidden border-2 border-green-400" style={{ width: 320, height: 240 }}>
+        {/* Видеопоток с веб-камеры + анализ лица */}
+        <div className="absolute top-8 right-8 bg-black bg-opacity-60 rounded-lg shadow-lg overflow-hidden border-2 border-green-400 flex flex-col items-center justify-center" style={{ width: 320, height: 260 }}>
           <video
             ref={webcamVideoRef}
             autoPlay
             muted
             playsInline
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ width: '100%', height: 240, objectFit: 'cover' }}
           />
+          {/* Маска анализа лица (глаза и улыбка) через face-api.js, canvas всегда есть, просто скрывается визуально */}
+          <canvas ref={canvasRef} className={`absolute top-0 left-0 w-full h-full z-10 pointer-events-none transition-opacity duration-300 ${showFaceAnalysis ? 'opacity-100' : 'opacity-0'}`} />
           <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs text-center py-1">Видеопрокторинг</div>
         </div>
         {/* Центральный футуристичный эквалайзер */}
@@ -795,7 +994,7 @@ const HomeworkDetailsModal: React.FC<{
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       {/* Голосовой оверлей */}
-      {isRealtimeActive && <VoiceOverlay />}
+      {isRealtimeActive && <VoiceOverlay webcamStream={webcamStream} />}
 
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
@@ -822,18 +1021,6 @@ const HomeworkDetailsModal: React.FC<{
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            {/* Кнопка голосового чата теперь всегда доступна
-            {isVoiceChatAvailable && (
-              <button
-                onClick={() => initRealtimeSession()}
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center shadow-md"
-                disabled={isRealtimeActive}
-                title="Обсудить задание с ИИ"
-              >
-                <FaMicrophone className="mr-2" />
-                Голосовой чат
-              </button>
-            )} */}
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <FaTimes className="w-6 h-6" />
             </button>
@@ -875,18 +1062,17 @@ const HomeworkDetailsModal: React.FC<{
         {isVoiceChatAvailable && (
           <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-lg p-4 flex items-center justify-between">
             <div>
-              <h4 className="text-lg font-medium text-green-700 mb-1">AI-учитель для обсуждения задания</h4>
+              <h4 className="text-lg font-medium text-green-700 mb-1">AI-учитель для защиты работы</h4>
               <p className="text-sm text-green-600">
-                Обсудите выполнение задания с AI-учителем и получите обратную связь или подсказки по вашей работе
+                Защитите свою работу перед AI-учителем и получите предварительную оценку вашего эссе по теме "{homework.title}".
               </p>
             </div>
             <button
               onClick={() => initRealtimeSession()}
               className="px-6 py-3 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center shadow-lg transition-transform transform hover:scale-105"
-              disabled={isRealtimeActive}
             >
               <FaMicrophone className="mr-2 text-lg" />
-              <span className="font-bold">Голосовой чат</span>
+              <span className="font-bold">Сдать работу</span>
             </button>
           </div>
         )}
