@@ -114,7 +114,7 @@ const StudentsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-  // Обновляем классы на группы
+  // Обновляем группы на группы
   const classes = [
     'Все группы',
     'МК24-1М',

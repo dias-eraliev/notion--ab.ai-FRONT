@@ -172,7 +172,7 @@ export const CreateRequestModal: React.FC<CreateModalProps> = ({ isOpen, onClose
                   </div>
                   <div>
                     <div className="font-semibold">Стоимость</div>
-                    <div>{formData.estimatedCost} ₽</div>
+                    <div>{formData.estimatedCost} ₸</div>
                   </div>
                 </div>
                 <div className="mt-4">

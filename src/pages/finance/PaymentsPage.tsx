@@ -292,7 +292,7 @@ const PaymentsPage: React.FC = () => {
             value={filters.grade}
             onChange={(e) => handleFilterChange('grade', e.target.value)}
           >
-            <option value="">Все классы</option>
+            <option value="">Все группы</option>
             <option value="5В">5В</option>
             <option value="6А">6А</option>
             <option value="7Б">7Б</option>

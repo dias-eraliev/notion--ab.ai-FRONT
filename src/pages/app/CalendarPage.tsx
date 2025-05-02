@@ -400,7 +400,7 @@ const CalendarPage: React.FC = () => {
 
             <div className="bg-gray-50 p-4 rounded-lg">
               <label className="block text-sm font-medium text-corporate-primary mb-3">
-                Классы
+                группы
               </label>
               <div className="space-y-2">
                 {['8А', '8Б', '9А', '9Б', '10А', '10Б', '11А', '11Б'].map((group) => (

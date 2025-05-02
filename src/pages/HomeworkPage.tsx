@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FaBook, 
-  FaUpload, 
-  FaDownload, 
-  FaCheck, 
-  FaTimes, 
-  FaClock, 
+import {
+  FaBook,
+  FaUpload,
+  FaDownload,
+  FaCheck,
+  FaTimes,
+  FaClock,
   FaComment,
   FaPaperclip,
   FaPlus,
@@ -185,7 +185,7 @@ const HomeworkModal: React.FC<{
             <FaTimes />
           </button>
         </div>
-        
+
         <form onSubmit={(e) => {
           e.preventDefault();
           onSubmit(formData);
@@ -490,10 +490,9 @@ const HomeworkDetailsModal: React.FC<{
   const { role } = useAuthContext();
   const [comment, setComment] = useState('');
   const [files, setFiles] = useState<File[]>([]);
-  
+
   // Состояние для голосового чата
-  const [isVoiceChatActive, setIsVoiceChatActive] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRealtimeActive, setIsRealtimeActive] = useState(false);
   const [realtimeSession, setRealtimeSession] = useState<RealtimeSession>({
     pc: null,
     dc: null,
@@ -501,27 +500,14 @@ const HomeworkDetailsModal: React.FC<{
     mediaStream: null
   });
   const [realtimeText, setRealtimeText] = useState<string>('');
-  const [recordingAnimation, setRecordingAnimation] = useState<number>(0);
-  
-  // Состояние для анимации записи
-  const [bars, setBars] = useState<number[]>([10, 20, 15, 25, 10, 30, 20, 15, 25, 35]);
-  
-  // Эффект для анимации эквалайзера
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    
-    if (isVoiceChatActive) {
-      interval = setInterval(() => {
-        setBars(bars.map(() => Math.floor(Math.random() * 100) + 20));
-      }, 150);
-    }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isVoiceChatActive, bars]);
-  
+  const [isRecording, setIsRecording] = useState(false);
+
+  // Состояние для видеопотока с веб-камеры
+  const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
+  const webcamVideoRef = useRef<HTMLVideoElement>(null);
+
   // Эффект для анимации индикатора записи
+  const [recordingAnimation, setRecordingAnimation] = useState<number>(0);
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -537,7 +523,34 @@ const HomeworkDetailsModal: React.FC<{
       if (interval) clearInterval(interval);
     };
   }, [isRecording]);
-  
+
+  // Запуск видеопрокторинга при старте голосового чата
+  useEffect(() => {
+    if (isRealtimeActive) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          setWebcamStream(stream);
+          if (webcamVideoRef.current) {
+            webcamVideoRef.current.srcObject = stream;
+          }
+        })
+        .catch(() => setWebcamStream(null));
+    } else {
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        setWebcamStream(null);
+      }
+    }
+    // Очищаем при размонтировании
+    return () => {
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        setWebcamStream(null);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRealtimeActive]);
+
   // Инициализация Realtime API сессии
   const initRealtimeSession = async () => {
     try {
@@ -615,7 +628,7 @@ const HomeworkDetailsModal: React.FC<{
       });
 
       // После установки соединения активируем голосовой чат
-      setIsVoiceChatActive(true);
+      setIsRealtimeActive(true);
       setIsRecording(true);
 
       // Инициализация чата с моделью
@@ -624,7 +637,7 @@ const HomeworkDetailsModal: React.FC<{
           type: "response.create",
           response: {
             modalities: ["text", "audio"],
-            instructions: "Ты AI-учитель по политологии, который принимает и оценивает работы студентов. Твоя задача - проверить знания студента о влиянии СССР на развитие промышленности в Казахстане. Задавай уточняющие вопросы по теме, оценивай знания студента критически и в конце беседы выставь предварительную оценку от 1 до 25 баллов с комментарием. Обсуди следующие аспекты: 1) Ключевые промышленные проекты в Казахстане в период СССР; 2) Влияние индустриализации на экономику региона; 3) Последствия советской промышленной политики для современного Казахстана. Отвечай на русском языке как строгий, но справедливый преподаватель."
+            instructions: `Ты AI-учитель по предмету: ${homework.subject}. Тема домашнего задания: ${homework.title}. Сначала обязательно спроси ученика, изучал ли он тему домашнего задания \"${homework.title}\" и что он запомнил. Затем обязательно задай не менее 3 вопросов по этой теме, чтобы проверить его знания. Не переходи к оценке, пока не задашь вопросы и не получишь ответы. В конце оцени ответы ученика и дай краткий комментарий. Всегда веди диалог на русском языке как строгий, но справедливый преподаватель.`
           }
         });
       }, 1000);
@@ -632,7 +645,7 @@ const HomeworkDetailsModal: React.FC<{
     } catch (error) {
       console.error("Ошибка при инициализации Realtime сессии:", error);
       setIsRecording(false);
-      setIsVoiceChatActive(false);
+      setIsRealtimeActive(false);
     }
   };
 
@@ -660,11 +673,11 @@ const HomeworkDetailsModal: React.FC<{
       });
 
       setRealtimeText('');
-      setIsVoiceChatActive(false);
+      setIsRealtimeActive(false);
       setIsRecording(false);
     } catch (error) {
       console.error("Ошибка при закрытии Realtime сессии:", error);
-      setIsVoiceChatActive(false);
+      setIsRealtimeActive(false);
       setIsRecording(false);
     }
   };
@@ -679,16 +692,48 @@ const HomeworkDetailsModal: React.FC<{
       console.error("Ошибка при отправке события:", error);
     }
   };
-  
-  // Компонент для голосового чата с эквалайзером
-  const VoiceOverlay = () => {
+
+  // Компонент для голосового чата с эквалайзером и видеопрокторингом
+  const VoiceOverlay = React.memo(() => {
+    const [bars, setBars] = useState<number[]>([10, 20, 15, 25, 10, 30, 20, 15, 25, 35]);
+    const frame = useRef<number | null>(null);
+    const lastUpdate = useRef<number>(0);
+    const UPDATE_INTERVAL = 280; // миллисекунд между обновлениями
+
+    useEffect(() => {
+      let mounted = true;
+      function animate(now: number) {
+        if (!mounted) return;
+        if (now - lastUpdate.current > UPDATE_INTERVAL) {
+          setBars(prevBars => prevBars.map(() => Math.floor(Math.random() * 100) + 20));
+          lastUpdate.current = now;
+        }
+        frame.current = requestAnimationFrame(animate);
+      }
+      frame.current = requestAnimationFrame(animate);
+      return () => {
+        mounted = false;
+        if (frame.current) cancelAnimationFrame(frame.current);
+      };
+    }, []);
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex flex-col items-center justify-center">
         {/* Верхняя часть с инструкцией */}
         <div className="absolute top-8 left-0 right-0 text-center text-white text-xl">
           <p>Говорите, чтобы обсудить вопросы по заданию</p>
         </div>
-
+        {/* Видеопоток с веб-камеры */}
+        <div className="absolute top-8 right-8 bg-black bg-opacity-60 rounded-lg shadow-lg overflow-hidden border-2 border-green-400" style={{ width: 320, height: 240 }}>
+          <video
+            ref={webcamVideoRef}
+            autoPlay
+            muted
+            playsInline
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs text-center py-1">Видеопрокторинг</div>
+        </div>
         {/* Центральный футуристичный эквалайзер */}
         <div className="relative flex items-center space-x-4">
           {bars.map((height, index) => (
@@ -699,12 +744,10 @@ const HomeworkDetailsModal: React.FC<{
             ></div>
           ))}
         </div>
-
         {/* Сообщение внизу */}
         <div className="absolute bottom-32 left-0 right-0 text-center text-white text-lg">
           <p>Завершите фразу, чтобы отправить</p>
         </div>
-
         {/* Кнопки управления */}
         <div className="absolute bottom-16 left-0 right-0 flex justify-center space-x-24">
           <button
@@ -713,7 +756,6 @@ const HomeworkDetailsModal: React.FC<{
           >
             <FaSquare className="text-xl" />
           </button>
-
           <button
             className="bg-red-500 w-16 h-16 rounded-full flex items-center justify-center text-white"
             onClick={() => closeRealtimeSession()}
@@ -721,7 +763,6 @@ const HomeworkDetailsModal: React.FC<{
             <FaTimes className="text-xl" />
           </button>
         </div>
-
         {/* Отображение текущего ответа */}
         {realtimeText && (
           <div className="absolute top-24 left-8 right-8 max-h-64 overflow-y-auto bg-gray-800 bg-opacity-80 p-4 rounded-lg text-white">
@@ -730,33 +771,32 @@ const HomeworkDetailsModal: React.FC<{
         )}
       </div>
     );
-  };
+  });
 
   const getTimeRemaining = () => {
     const now = new Date();
     const due = new Date(homework.dueDate);
     const diff = due.getTime() - now.getTime();
-    
+
     if (diff < 0) return 'Срок сдачи истек';
-    
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     return `${days}д ${hours}ч ${minutes}м`;
   };
 
   if (!isOpen) return null;
 
-  // Проверяем, является ли текущее задание заданием по политологии о СССР
-  const isPoliticsHomework = homework.subjectId === 'politics' && 
-                             homework.title.toLowerCase().includes('влияние ссср');
+  // Теперь голосовой чат доступен для всех домашних заданий
+  const isVoiceChatAvailable = true;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       {/* Голосовой оверлей */}
-      {isVoiceChatActive && <VoiceOverlay />}
-      
+      {isRealtimeActive && <VoiceOverlay />}
+
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -782,18 +822,18 @@ const HomeworkDetailsModal: React.FC<{
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            {/* Добавляем кнопку для голосового чата, если это задание по политологии */}
-            {isPoliticsHomework && (
+            {/* Кнопка голосового чата теперь всегда доступна
+            {isVoiceChatAvailable && (
               <button
                 onClick={() => initRealtimeSession()}
                 className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center shadow-md"
-                disabled={isVoiceChatActive}
+                disabled={isRealtimeActive}
                 title="Обсудить задание с ИИ"
               >
                 <FaMicrophone className="mr-2" />
                 Голосовой чат
               </button>
-            )}
+            )} */}
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <FaTimes className="w-6 h-6" />
             </button>
@@ -815,7 +855,7 @@ const HomeworkDetailsModal: React.FC<{
             <div className="text-sm text-gray-500 mb-1">Приоритет</div>
             <div className="font-medium text-purple-700">
               {homework.priority === 'high' ? 'Высокий' :
-               homework.priority === 'medium' ? 'Средний' : 'Низкий'}
+                homework.priority === 'medium' ? 'Средний' : 'Низкий'}
             </div>
             <div className="text-sm text-purple-600 mt-1">
               Примерное время: {homework.estimatedTime} мин
@@ -832,21 +872,21 @@ const HomeworkDetailsModal: React.FC<{
         </div>
 
         {/* Большая заметная кнопка для запуска голосового чата в секции описания */}
-        {isPoliticsHomework && (
+        {isVoiceChatAvailable && (
           <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-lg p-4 flex items-center justify-between">
             <div>
-              <h4 className="text-lg font-medium text-green-700 mb-1">AI-учитель для защиты работы</h4>
+              <h4 className="text-lg font-medium text-green-700 mb-1">AI-учитель для обсуждения задания</h4>
               <p className="text-sm text-green-600">
-                Защитите свою работу перед AI-учителем и получите предварительную оценку вашего эссе по влиянию СССР на промышленность Казахстана
+                Обсудите выполнение задания с AI-учителем и получите обратную связь или подсказки по вашей работе
               </p>
             </div>
             <button
               onClick={() => initRealtimeSession()}
               className="px-6 py-3 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center shadow-lg transition-transform transform hover:scale-105"
-              disabled={isVoiceChatActive}
+              disabled={isRealtimeActive}
             >
               <FaMicrophone className="mr-2 text-lg" />
-              <span className="font-bold">Сдать работу</span>
+              <span className="font-bold">Голосовой чат</span>
             </button>
           </div>
         )}
@@ -1062,11 +1102,11 @@ const HomeworkPage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
           {role === 'student' ? 'Мои задания' :
-           role === 'parent' ? 'Задания ребенка' :
-           role === 'teacher' ? 'Управление заданиями' :
-           'Все задания'}
+            role === 'parent' ? 'Задания ребенка' :
+              role === 'teacher' ? 'Управление заданиями' :
+                'Все задания'}
         </h1>
-        
+
         {(role === 'teacher' || role === 'admin') && (
           <button
             onClick={() => setIsModalOpen(true)}
