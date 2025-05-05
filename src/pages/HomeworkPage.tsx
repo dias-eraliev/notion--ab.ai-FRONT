@@ -1,6 +1,6 @@
-import React, {useState, useEffect, useMemo} from 'react';
-import {motion, AnimatePresence} from 'framer-motion';
-import useSWR, {mutate} from 'swr';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import useSWR, { mutate } from 'swr';
 import {
     FaBook,
     FaUpload,
@@ -16,10 +16,10 @@ import {
     FaStar,
     FaSpinner
 } from 'react-icons/fa';
-import {useAuth} from '../contexts/AuthContext';
-import {homeworkApi} from '../api';
-import {CreateHomeworkDto} from '../api/homework.api';
-import {toast} from 'react-toastify';
+import { useAuth } from '../contexts/AuthContext';
+import { homeworkApi } from '../api';
+import { CreateHomeworkDto } from '../api/homework.api';
+import { toast } from 'react-toastify';
 
 // Updated Homework interface to match backend data structure
 interface Homework {
@@ -153,7 +153,7 @@ const mapHomeworkResponseToHomework = (homework: any): Homework => {
 };
 
 // Компонент для отображения статуса задания
-const StatusBadge: React.FC<{ status: Homework['status'] }> = ({status}) => {
+const StatusBadge: React.FC<{ status: Homework['status'] }> = ({ status }) => {
     const getStatusStyle = () => {
         switch (status) {
             case 'pending':
@@ -186,8 +186,8 @@ const StatusBadge: React.FC<{ status: Homework['status'] }> = ({status}) => {
 
     return (
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusStyle()}`}>
-      {getStatusText()}
-    </span>
+            {getStatusText()}
+        </span>
     );
 };
 
@@ -258,8 +258,8 @@ const HomeworkModal: React.FC<{
     onSubmit: (data: any) => void;
     initialData?: Partial<HomeworkModalData>;
     homework;
-}> = ({isOpen, onClose, onSubmit, initialData}) => {
-    const {payload} = useAuth();
+}> = ({ isOpen, onClose, onSubmit, initialData }) => {
+    const { payload } = useAuth();
 
     // Extract groups and syllabuses from the payload
     const userGroups = payload?.profile?.groups || payload?.profile?.groups || [];
@@ -288,10 +288,10 @@ const HomeworkModal: React.FC<{
             options: ['', '', '', ''],
             correctOption: 0,
             answers: [
-                {text: '', isCorrect: false},
-                {text: '', isCorrect: false},
-                {text: '', isCorrect: false},
-                {text: '', isCorrect: false}
+                { text: '', isCorrect: false },
+                { text: '', isCorrect: false },
+                { text: '', isCorrect: false },
+                { text: '', isCorrect: false }
             ]
         }]
     });
@@ -305,9 +305,9 @@ const HomeworkModal: React.FC<{
             // In a real implementation, you would fetch lessons for the selected studyPlan
             // For now, we'll simulate with mock data
             setAvailableLessons([
-                {id: 1, name: 'Урок 1: Введение'},
-                {id: 2, name: 'Урок 2: Основные концепции'},
-                {id: 3, name: 'Урок 3: Практическое применение'}
+                { id: 1, name: 'Урок 1: Введение' },
+                { id: 2, name: 'Урок 2: Основные концепции' },
+                { id: 3, name: 'Урок 3: Практическое применение' }
             ]);
         } else {
             setAvailableLessons([]);
@@ -322,16 +322,16 @@ const HomeworkModal: React.FC<{
 
     const handleQuestionChange = (index: number, field: string, value: any) => {
         const newQuestions = [...formData.questions];
-        newQuestions[index] = {...newQuestions[index], [field]: value};
-        setFormData({...formData, questions: newQuestions});
+        newQuestions[index] = { ...newQuestions[index], [field]: value };
+        setFormData({ ...formData, questions: newQuestions });
     };
 
     const handleOptionChange = (questionIndex: number, optionIndex: number, value: string) => {
         const newQuestions = [...formData.questions];
         const newOptions = [...newQuestions[questionIndex].options];
         newOptions[optionIndex] = value;
-        newQuestions[questionIndex] = {...newQuestions[questionIndex], options: newOptions};
-        setFormData({...formData, questions: newQuestions});
+        newQuestions[questionIndex] = { ...newQuestions[questionIndex], options: newOptions };
+        setFormData({ ...formData, questions: newQuestions });
     };
 
     const addQuestion = () => {
@@ -339,10 +339,10 @@ const HomeworkModal: React.FC<{
             ...formData,
             questions: [...formData.questions, {
                 question: '', options: ['', '', '', ''], correctOption: 0, answers: [
-                    {text: '', isCorrect: false},
-                    {text: '', isCorrect: false},
-                    {text: '', isCorrect: false},
-                    {text: '', isCorrect: false}
+                    { text: '', isCorrect: false },
+                    { text: '', isCorrect: false },
+                    { text: '', isCorrect: false },
+                    { text: '', isCorrect: false }
                 ]
             }]
         });
@@ -351,7 +351,7 @@ const HomeworkModal: React.FC<{
     const removeQuestion = (index: number) => {
         const newQuestions = [...formData.questions];
         newQuestions.splice(index, 1);
-        setFormData({...formData, questions: newQuestions});
+        setFormData({ ...formData, questions: newQuestions });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -420,22 +420,22 @@ const HomeworkModal: React.FC<{
 
     if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[700px] max-h-[80vh] overflow-y-auto"
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">
-            {initialData ? 'Редактировать задание' : 'Новое задание'}
-          </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <FaTimes />
-          </button>
-        </div>
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white rounded-lg p-6 w-[700px] max-h-[80vh] overflow-y-auto"
+            >
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium">
+                        {initialData ? 'Редактировать задание' : 'Новое задание'}
+                    </h3>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                        <FaTimes />
+                    </button>
+                </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-4">
@@ -446,7 +446,7 @@ const HomeworkModal: React.FC<{
                             <input
                                 type="text"
                                 value={formData.title}
-                                onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                 required
                             />
@@ -458,7 +458,7 @@ const HomeworkModal: React.FC<{
                             </label>
                             <textarea
                                 value={formData.description}
-                                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                 rows={4}
                                 required
@@ -471,7 +471,7 @@ const HomeworkModal: React.FC<{
                             </label>
                             <select
                                 value={formData.studyPlanId}
-                                onChange={(e) => setFormData({...formData, studyPlanId: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, studyPlanId: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                 required
                             >
@@ -490,7 +490,7 @@ const HomeworkModal: React.FC<{
                             </label>
                             <select
                                 value={formData.groupId}
-                                onChange={(e) => setFormData({...formData, groupId: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, groupId: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                 required
                             >
@@ -509,7 +509,7 @@ const HomeworkModal: React.FC<{
                             </label>
                             <select
                                 value={formData.lessonId}
-                                onChange={(e) => setFormData({...formData, lessonId: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, lessonId: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                 required
                                 disabled={!formData.studyPlanId}
@@ -536,7 +536,7 @@ const HomeworkModal: React.FC<{
                                 <input
                                     type="date"
                                     value={formData.date}
-                                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     required
                                 />
@@ -548,7 +548,7 @@ const HomeworkModal: React.FC<{
                                 <input
                                     type="datetime-local"
                                     value={formData.deadline}
-                                    onChange={(e) => setFormData({...formData, deadline: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     required
                                 />
@@ -561,7 +561,7 @@ const HomeworkModal: React.FC<{
                             </label>
                             <select
                                 value={formData.materialType}
-                                onChange={(e) => setFormData({...formData, materialType: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, materialType: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                             >
                                 <option value="">Без материала</option>
@@ -580,7 +580,7 @@ const HomeworkModal: React.FC<{
                                 <input
                                     type="url"
                                     value={formData.materialUrl}
-                                    onChange={(e) => setFormData({...formData, materialUrl: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, materialUrl: e.target.value })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     placeholder="https://example.com/resource"
                                 />
@@ -595,7 +595,7 @@ const HomeworkModal: React.FC<{
                                 <div
                                     className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                                     <div className="space-y-1 text-center">
-                                        <FaUpload className="mx-auto h-12 w-12 text-gray-400"/>
+                                        <FaUpload className="mx-auto h-12 w-12 text-gray-400" />
                                         <div className="flex text-sm text-gray-600">
                                             <label
                                                 className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
@@ -623,18 +623,18 @@ const HomeworkModal: React.FC<{
                             </div>
                         )}
 
-            <div className="flex items-center space-x-2 mt-4">
-              <input
-                type="checkbox"
-                id="hasQuiz"
-                checked={formData.hasQuiz}
-                onChange={(e) => setFormData({ ...formData, hasQuiz: e.target.checked })}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-xs"
-              />
-              <label htmlFor="hasQuiz" className="text-sm font-medium text-gray-700">
-                Добавить тест
-              </label>
-            </div>
+                        <div className="flex items-center space-x-2 mt-4">
+                            <input
+                                type="checkbox"
+                                id="hasQuiz"
+                                checked={formData.hasQuiz}
+                                onChange={(e) => setFormData({ ...formData, hasQuiz: e.target.checked })}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-xs"
+                            />
+                            <label htmlFor="hasQuiz" className="text-sm font-medium text-gray-700">
+                                Добавить тест
+                            </label>
+                        </div>
 
                         {formData.hasQuiz && (
                             <div className="space-y-4 border-t pt-4">
@@ -646,7 +646,7 @@ const HomeworkModal: React.FC<{
                                     <input
                                         type="text"
                                         value={formData.quizTitle}
-                                        onChange={(e) => setFormData({...formData, quizTitle: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, quizTitle: e.target.value })}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                         required={formData.hasQuiz}
                                     />
@@ -658,7 +658,7 @@ const HomeworkModal: React.FC<{
                                     </label>
                                     <textarea
                                         value={formData.quizDescription}
-                                        onChange={(e) => setFormData({...formData, quizDescription: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, quizDescription: e.target.value })}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                         rows={2}
                                     />
@@ -688,7 +688,7 @@ const HomeworkModal: React.FC<{
                                                         onClick={() => removeQuestion(qIndex)}
                                                         className="text-red-500 hover:text-red-700"
                                                     >
-                                                        <FaTimes/>
+                                                        <FaTimes />
                                                     </button>
                                                 )}
                                             </div>
@@ -748,7 +748,7 @@ const HomeworkModal: React.FC<{
                         >
                             {isUploading ? (
                                 <>
-                                    <FaSpinner className="animate-spin"/>
+                                    <FaSpinner className="animate-spin" />
                                     <span>Загрузка...</span>
                                 </>
                             ) : (
@@ -768,8 +768,8 @@ const HomeworkDetailsModal: React.FC<{
     onClose: () => void;
     homework: Homework;
     onSubmit?: (files: File[], comment: string) => void;
-}> = ({isOpen, onClose, homework, onSubmit}) => {
-    const {payload} = useAuth();
+}> = ({ isOpen, onClose, homework, onSubmit }) => {
+    const { payload } = useAuth();
     const [comment, setComment] = useState('');
     const [files, setFiles] = useState<File[]>([]);
 
@@ -790,34 +790,34 @@ const HomeworkDetailsModal: React.FC<{
 
     if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto"
-      >
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">{homework.name}</h3>
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <span className="flex items-center">
-                <FaBook className="mr-1"/>
-                  {homework.Lesson?.name || 'Урок'}
-              </span>
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto"
+            >
+                <div className="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{homework.name}</h3>
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
                             <span className="flex items-center">
-                <FaUser className="mr-1"/>
+                                <FaBook className="mr-1" />
+                                {homework.Lesson?.name || 'Урок'}
+                            </span>
+                            <span className="flex items-center">
+                                <FaUser className="mr-1" />
                                 {homework.Lesson?.Syllabus?.teacher?.name}
-              </span>
+                            </span>
                             <span className="flex items-center">
-                <FaUsers className="mr-1"/>
+                                <FaUsers className="mr-1" />
                                 {homework.Lesson?.Syllabus?.group?.map(g => g.name).join(', ') || 'Группа'}
-              </span>
+                            </span>
                         </div>
                     </div>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                        <FaTimes className="w-6 h-6"/>
+                        <FaTimes className="w-6 h-6" />
                     </button>
                 </div>
 
@@ -834,7 +834,7 @@ const HomeworkDetailsModal: React.FC<{
 
                     <div className="bg-green-50 p-4 rounded-lg">
                         <div className="text-sm text-gray-500 mb-1">Статус</div>
-                        <StatusBadge status={homework.status}/>
+                        <StatusBadge status={homework.status} />
                         {homework.grade && (
                             <div className="text-sm text-green-600 mt-1">
                                 Оценка: {homework.grade}
@@ -934,26 +934,26 @@ const HomeworkDetailsModal: React.FC<{
                                             </div>
                                         )}
 
-                    {/* Video tab */}
-                    {activeTab === 'video' && (
-                      <div>
-                        {homework.material.videoUrl ? (
-                          <>
-                            <h5 className="font-medium mb-2">Видео материал</h5>
-                            <div className="aspect-w-16 aspect-h-9">
-                              <iframe
-                                src={homework.material.videoUrl}
-                                className="w-full h-64 rounded-xs"
-                                allowFullScreen
-                                title="Video material"
-                              ></iframe>
-                            </div>
-                          </>
-                        ) : (
-                          <p className="text-gray-600 italic">Видео материал недоступен</p>
-                        )}
-                      </div>
-                    )}
+                                        {/* Video tab */}
+                                        {activeTab === 'video' && (
+                                            <div>
+                                                {homework.material.videoUrl ? (
+                                                    <>
+                                                        <h5 className="font-medium mb-2">Видео материал</h5>
+                                                        <div className="aspect-w-16 aspect-h-9">
+                                                            <iframe
+                                                                src={homework.material.videoUrl}
+                                                                className="w-full h-64 rounded-xs"
+                                                                allowFullScreen
+                                                                title="Video material"
+                                                            ></iframe>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <p className="text-gray-600 italic">Видео материал недоступен</p>
+                                                )}
+                                            </div>
+                                        )}
 
                                         {/* Presentation tab */}
                                         {activeTab === 'presentation' && (
@@ -967,7 +967,7 @@ const HomeworkDetailsModal: React.FC<{
                                                             rel="noopener noreferrer"
                                                             className="flex items-center text-blue-600 hover:underline"
                                                         >
-                                                            <FaDownload className="mr-2"/>
+                                                            <FaDownload className="mr-2" />
                                                             Скачать презентацию
                                                         </a>
                                                     </>
@@ -985,16 +985,16 @@ const HomeworkDetailsModal: React.FC<{
                                                         <h5 className="font-medium mb-2">Тест: {homework.material.Quiz.name}</h5>
                                                         <p className="mb-2 text-gray-700">{homework.material.Quiz.description}</p>
 
-                            <div className="space-y-4 mt-3">
-                              {homework.material.Quiz.questions.map((question, idx) => (
-                                <div key={question.id} className="border border-gray-200 p-3 rounded-xs">
-                                  <p className="font-medium mb-2">{idx + 1}. {question.question}</p>
+                                                        <div className="space-y-4 mt-3">
+                                                            {homework.material.Quiz.questions.map((question, idx) => (
+                                                                <div key={question.id} className="border border-gray-200 p-3 rounded-xs">
+                                                                    <p className="font-medium mb-2">{idx + 1}. {question.question}</p>
 
                                                                     {question.answers && (
                                                                         <div className="pl-4 space-y-1">
                                                                             {question.answers.map((answer) => (
                                                                                 <div key={answer.id}
-                                                                                     className="flex items-center">
+                                                                                    className="flex items-center">
                                                                                     <input
                                                                                         type="radio"
                                                                                         id={`answer-${answer.id}`}
@@ -1034,7 +1034,7 @@ const HomeworkDetailsModal: React.FC<{
                                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                                 >
                                     <div className="flex items-center">
-                                        <FaPaperclip className="text-gray-400 mr-2"/>
+                                        <FaPaperclip className="text-gray-400 mr-2" />
                                         <div>
                                             <div className="font-medium">{file.name}</div>
                                             <div className="text-sm text-gray-500">
@@ -1043,7 +1043,7 @@ const HomeworkDetailsModal: React.FC<{
                                         </div>
                                     </div>
                                     <button className="text-blue-500 hover:text-blue-600">
-                                        <FaDownload className="w-5 h-5"/>
+                                        <FaDownload className="w-5 h-5" />
                                     </button>
                                 </div>
                             ))}
@@ -1075,7 +1075,7 @@ const HomeworkDetailsModal: React.FC<{
                                 <div
                                     className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
                                     <div className="space-y-1 text-center">
-                                        <FaUpload className="mx-auto h-12 w-12 text-gray-400"/>
+                                        <FaUpload className="mx-auto h-12 w-12 text-gray-400" />
                                         <div className="flex text-sm text-gray-600">
                                             <label
                                                 className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
@@ -1128,7 +1128,7 @@ const HomeworkDetailsModal: React.FC<{
                                         className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                                     >
                                         <div className="flex items-center">
-                                            <FaPaperclip className="text-gray-400 mr-2"/>
+                                            <FaPaperclip className="text-gray-400 mr-2" />
                                             <div>
                                                 <div className="font-medium">{file.name}</div>
                                                 <div className="text-sm text-gray-500">
@@ -1137,7 +1137,7 @@ const HomeworkDetailsModal: React.FC<{
                                             </div>
                                         </div>
                                         <button className="text-blue-500 hover:text-blue-600">
-                                            <FaDownload className="w-5 h-5"/>
+                                            <FaDownload className="w-5 h-5" />
                                         </button>
                                     </div>
                                 ))}
@@ -1170,7 +1170,7 @@ const HomeworkDetailsModal: React.FC<{
 };
 
 const HomeworkPage: React.FC = () => {
-    const {payload} = useAuth();
+    const { payload } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
     const [filters, setFilters] = useState({
@@ -1187,7 +1187,7 @@ const HomeworkPage: React.FC = () => {
     useEffect(() => {
         if (payload?.role) {
             if (payload.role === 'STUDENT' && payload.profile?.name) {
-                setFilters(prev => ({...prev, groupId: payload.id || null}));
+                setFilters(prev => ({ ...prev, groupId: payload.id || null }));
             } else if (payload.role === 'TEACHER' && userSyllabuses.length > 0) {
                 setFilters(prev => ({
                     ...prev,
@@ -1198,7 +1198,7 @@ const HomeworkPage: React.FC = () => {
         }
     }, [payload, userGroups, userSyllabuses]);
 
-    const {data: homeworkData, error, isLoading} = useSWR(
+    const { data: homeworkData, error, isLoading } = useSWR(
         // Ключ SWR снова зависит от filters.groupId и filters.studyPlanId
         // Мы используем ?? 'all', чтобы передать 'all' в ключ, если фильтр null
         `/api/homework?groupId=${filters.groupId ?? ''}&studyPlanId=${filters.studyPlanId ?? ''}`,
@@ -1254,7 +1254,7 @@ const HomeworkPage: React.FC = () => {
         }
     };
 
-    const getFilteredHomeworks = useMemo(() => {
+    const getFilteredHomeworks = () => {
 
         if (isLoading) {
             return [];
@@ -1288,8 +1288,7 @@ const HomeworkPage: React.FC = () => {
             console.log("Filtering: Search filter not active.");
         }
         return filtered;
-    }, [isLoading, error, homeworkData, filters.status, filters.search]);
-
+    }
 
     const handleFilterChange = (field: keyof Filters, value: string | number | null) => {
         setFilters(prevFilters => ({
@@ -1313,7 +1312,7 @@ const HomeworkPage: React.FC = () => {
                         onClick={() => setIsModalOpen(true)}
                         className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
                     >
-                        <FaPlus className="mr-2"/>
+                        <FaPlus className="mr-2" />
                         Новое задание
                     </button>
                 )}
@@ -1367,96 +1366,96 @@ const HomeworkPage: React.FC = () => {
                         placeholder="Поиск по заданиям..."
                         className="w-full px-4 py-2 pl-10 border border-gray-200 rounded-md"
                     />
-                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"/>
+                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 </div>
             </div>
 
             {/* Loading, error, and empty states */}
             {isLoading && (
                 <div className="flex justify-center items-center py-10">
-                    <FaSpinner className="animate-spin text-blue-500 mr-2"/>
+                    <FaSpinner className="animate-spin text-blue-500 mr-2" />
                     <span>Загрузка заданий...</span>
                 </div>
             )}
 
-      {/* Error state */}
-      {error && !isLoading && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xs relative mb-4">
-          <strong className="font-bold">Ошибка!</strong>
-          <span className="block sm:inline"> Не удалось загрузить задания. Пожалуйста, попробуйте позже.</span>
-        </div>
-      )}
-
-      {/* Empty state */}
-      {!isLoading && !error && getFilteredHomeworks().length === 0 && (
-        <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-10 rounded-xs text-center">
-          <FaExclamationTriangle className="mx-auto text-gray-400 text-4xl mb-4" />
-          <h3 className="text-xl font-medium mb-2">Нет доступных заданий</h3>
-          <p className="text-gray-600">
-            {filters.search || filters.status
-              ? 'Попробуйте изменить параметры фильтрации'
-              : 'Задания еще не были созданы'}
-          </p>
-        </div>
-      )}
-
-      {/* Список заданий */}
-      {!isLoading && !error && getFilteredHomeworks().length > 0 && (
-        <div className="space-y-4">
-          {getFilteredHomeworks().map(homework => (
-            <div
-              key={homework.id}
-              className="bg-white rounded-lg shadow-xs p-4 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center mb-2">
-                    <span className="text-sm font-medium text-gray-500 mr-2">
-                      {homework.Lesson?.Syllabus?.name}
-                    </span>
-                    <StatusBadge status={homework.status} />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">{homework.name}</h3>
-                  <p className="text-gray-600 line-clamp-2 mb-4">{homework.description}</p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <FaClock className="mr-1" />
-                      Срок: {homework.deadline ? new Date(homework.deadline).toLocaleDateString() : 'Срок не установлен'}
-                    </span>
-                    {homework.grade && (
-                      <span className="flex items-center text-green-600">
-                        <FaStar className="mr-1" />
-                        Оценка: {homework.grade}
-                      </span>
-                    )}
-                    <span className="flex items-center">
-                      <FaUser className="mr-1" />
-                      {homework.Lesson?.Syllabus?.teacher?.name}
-                    </span>
-                  </div>
+            {/* Error state */}
+            {error && !isLoading && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xs relative mb-4">
+                    <strong className="font-bold">Ошибка!</strong>
+                    <span className="block sm:inline"> Не удалось загрузить задания. Пожалуйста, попробуйте позже.</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setSelectedHomework(homework)}
-                    className="px-4 py-2 text-blue-500 hover:bg-blue-50 rounded-md"
-                  >
-                    Подробнее
-                  </button>
-                  {(payload.role === 'admin' ||
-                    (payload.role === 'teacher' && homework.Lesson?.Syllabus?.teacher?.id === payload.id)) && (
-                      <button
-                        onClick={() => deleteHomework(homework.id)}
-                        className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-md"
-                      >
-                        Удалить
-                      </button>
-                    )}
+            )}
+
+            {/* Empty state */}
+            {!isLoading && !error && getFilteredHomeworks().length === 0 && (
+                <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-10 rounded-xs text-center">
+                    <FaExclamationTriangle className="mx-auto text-gray-400 text-4xl mb-4" />
+                    <h3 className="text-xl font-medium mb-2">Нет доступных заданий</h3>
+                    <p className="text-gray-600">
+                        {filters.search || filters.status
+                            ? 'Попробуйте изменить параметры фильтрации'
+                            : 'Задания еще не были созданы'}
+                    </p>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            )}
+
+            {/* Список заданий */}
+            {!isLoading && !error && getFilteredHomeworks().length > 0 && (
+                <div className="space-y-4">
+                    {getFilteredHomeworks().map(homework => (
+                        <div
+                            key={homework.id}
+                            className="bg-white rounded-lg shadow-xs p-4 hover:shadow-md transition-shadow"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <div className="flex items-center mb-2">
+                                        <span className="text-sm font-medium text-gray-500 mr-2">
+                                            {homework.Lesson?.Syllabus?.name}
+                                        </span>
+                                        <StatusBadge status={homework.status} />
+                                    </div>
+                                    <h3 className="text-lg font-medium mb-2">{homework.name}</h3>
+                                    <p className="text-gray-600 line-clamp-2 mb-4">{homework.description}</p>
+                                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                        <span className="flex items-center">
+                                            <FaClock className="mr-1" />
+                                            Срок: {homework.deadline ? new Date(homework.deadline).toLocaleDateString() : 'Срок не установлен'}
+                                        </span>
+                                        {homework.grade && (
+                                            <span className="flex items-center text-green-600">
+                                                <FaStar className="mr-1" />
+                                                Оценка: {homework.grade}
+                                            </span>
+                                        )}
+                                        <span className="flex items-center">
+                                            <FaUser className="mr-1" />
+                                            {homework.Lesson?.Syllabus?.teacher?.name}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        onClick={() => setSelectedHomework(homework)}
+                                        className="px-4 py-2 text-blue-500 hover:bg-blue-50 rounded-md"
+                                    >
+                                        Подробнее
+                                    </button>
+                                    {(payload.role === 'ADMIN' ||
+                                        (payload.role === 'TEACHER' && homework.Lesson?.Syllabus?.teacher?.id === payload.id)) && (
+                                            <button
+                                                onClick={() => deleteHomework(homework.id)}
+                                                className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-md"
+                                            >
+                                                Удалить
+                                            </button>
+                                        )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {/* Create/Update Homework Modal */}
             <AnimatePresence>
@@ -1473,6 +1472,5 @@ const HomeworkPage: React.FC = () => {
         </div>
     );
 };
-
 
 export default HomeworkPage;

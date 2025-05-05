@@ -158,44 +158,44 @@ const EmployeesPage: React.FC = () => {
     //   }
     // };
 
-  // Компонент таблицы сотрудников
-  const EmployeeTable = ({ employees, title }: { employees: Employee[], title: string }) => (
-    <div className="bg-white rounded-lg shadow-xs">
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h2 className="text-lg font-medium text-gray-900">{title} ({employees.length})</h2>
-        <p className="text-sm text-gray-500">Всего: {employees.length} человек</p>
-      </div>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead>
-          <tr>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Сотрудник
-            </th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Должность
-            </th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Стаж
-            </th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Статус
-            </th>
-            <th className="px-6 py-3 bg-gray-50"></th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {employees.map((employee) => (
-            <tr 
-              key={employee.id} 
-              className="hover:bg-gray-50 cursor-pointer"
-              onClick={() => setSelectedEmployee(employee)}
-            >
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 font-medium">
-                      {employee.fullName.split(' ').map(n => n[0]).join('')}
-                    </span>
+    // Компонент таблицы сотрудников
+    const EmployeeTable = ({ employees, title }: { employees: Employee[], title: string }) => (
+        <div className="bg-white rounded-lg shadow-xs">
+            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">{title} ({employees?.length})</h2>
+                <p className="text-sm text-gray-500">Всего: {employees?.length} человек</p>
+            </div>
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Сотрудник
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Должность
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Стаж
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Статус
+                        </th>
+                        <th className="px-6 py-3 bg-gray-50"></th>
+                    </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {employees?.map((employee) => (
+                        <tr
+                            key={employee.id}
+                            className="hover:bg-gray-50 cursor-pointer"
+                            onClick={() => setSelectedEmployee(employee)}
+                        >
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span className="text-blue-600 font-medium">
+                                            {employee.fullName.split(' ').map(n => n[0]).join('')}
+                                        </span>
                                     </div>
                                     <div className="ml-4">
                                         <div className="text-sm font-medium text-gray-900">{employee.fullName}</div>
@@ -326,42 +326,40 @@ const EmployeesPage: React.FC = () => {
                 <EmployeeTable employees={parttimeEmployees} title="🟨 Совместители" />
             </div>
 
-      {/* Модальное окно сотрудника */}
-      {selectedEmployee && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              {/* Заголовок */}
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center">
-                  <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 text-xl font-medium">
-                      {selectedEmployee.name.split(' ').map(n => n[0]).join('')}
-                    </span>
-                  </div>
-                  <div className="ml-4">
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-2xl font-bold text-gray-900">{selectedEmployee.name}</h2>
-                      <span className="text-sm text-gray-500">ИИН: {selectedEmployee.iin}</span>
-                    </div>
-                    <p className="text-gray-600">{selectedEmployee.position}</p>
-                    <div className="flex gap-2 mt-2">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status)}`}>
-                        {getStatusText(selectedEmployee.status)}
-                      </span>
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentType)}`}>
-                        {getEmploymentTypeText(selectedEmployee.employmentType)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  className="text-gray-400 hover:text-gray-500"
-                  onClick={() => setSelectedEmployee(null)}
-                >
-                  <FaTimes className="w-6 h-6" />
-                </button>
-              </div>
+            {/* Модальное окно сотрудника */}
+            {selectedEmployee && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <div className="p-6">
+                            {/* Заголовок */}
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="flex items-center">
+                                    <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
+                                    </div>
+                                    <div className="ml-4">
+                                        <div className="flex items-start flex-col gap-2">
+                                            <h2 className="text-2xl font-bold text-gray-900">{selectedEmployee.fullName}</h2>
+                                            <p className="text-sm text-gray-500">ИИН: {selectedEmployee.iin}</p>
+                                            <p className="text-gray-600">{selectedEmployee.position}</p>
+                                        </div>
+
+                                        <div className="flex gap-2 mt-2">
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status)}`}>
+                                                {getStatusText(selectedEmployee.status)}
+                                            </span>
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentType)}`}>
+                                                {getEmploymentTypeText(selectedEmployee.employmentType)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    className="text-gray-400 hover:text-gray-500"
+                                    onClick={() => setSelectedEmployee(null)}
+                                >
+                                    <FaTimes className="w-6 h-6" />
+                                </button>
+                            </div>
 
                             {/* Основная информация */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -417,8 +415,6 @@ const EmployeesPage: React.FC = () => {
                             {selectedEmployee.generalSubjects && (
                                 <div className="mb-6">
                                     <h3 className="text-lg font-semibold mb-4 pb-2 border-b">Преподаваемые предметы</h3>
-                                    ф
-                                    ф
                                     {/* Общепрофессиональные дисциплины */}
                                     {selectedEmployee.generalSubjects.length > 0 && (
                                         <div className="mb-4">
@@ -531,52 +527,52 @@ const EmployeesPage: React.FC = () => {
                 </div>
             )}
 
-      {/* Модальное окно добавления сотрудника */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Добавить сотрудника</h2>
-                <button 
-                  className="text-gray-400 hover:text-gray-500"
-                  onClick={() => setShowAddModal(false)}
-                >
-                  <FaTimes className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="mb-6">
-                <p className="mb-4 text-gray-700">Выберите тип занятости:</p>
-                <div className="flex gap-4">
-                  <div className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-blue-500 cursor-pointer">
-                    <h3 className="font-medium mb-2">Штатный преподаватель</h3>
-                    <p className="text-sm text-gray-500">Полная занятость, официальное трудоустройство</p>
-                  </div>
-                  <div className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-blue-500 cursor-pointer">
-                    <h3 className="font-medium mb-2">Совместитель</h3>
-                    <p className="text-sm text-gray-500">Частичная занятость, почасовая оплата</p>
-                  </div>
+            {/* Модальное окно добавления сотрудника */}
+            {showAddModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-lg">
+                        <div className="p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold">Добавить сотрудника</h2>
+                                <button
+                                    className="text-gray-400 hover:text-gray-500"
+                                    onClick={() => setShowAddModal(false)}
+                                >
+                                    <FaTimes className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="mb-6">
+                                <p className="mb-4 text-gray-700">Выберите тип занятости:</p>
+                                <div className="flex gap-4">
+                                    <div className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-blue-500 cursor-pointer">
+                                        <h3 className="font-medium mb-2">Штатный преподаватель</h3>
+                                        <p className="text-sm text-gray-500">Полная занятость, официальное трудоустройство</p>
+                                    </div>
+                                    <div className="flex-1 p-4 border border-gray-200 rounded-lg hover:border-blue-500 cursor-pointer">
+                                        <h3 className="font-medium mb-2">Совместитель</h3>
+                                        <p className="text-sm text-gray-500">Частичная занятость, почасовая оплата</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                                    onClick={() => setShowAddModal(false)}
+                                >
+                                    Отмена
+                                </button>
+                                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                    Продолжить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              
-              <div className="flex justify-end gap-3">
-                <button 
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
-                  onClick={() => setShowAddModal(false)}
-                >
-                  Отмена
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                  Продолжить
-                </button>
-              </div>
-            </div>
-          </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default EmployeesPage; 
