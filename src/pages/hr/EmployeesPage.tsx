@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     FaSearch,
     FaDownload,
@@ -13,9 +13,10 @@ import {
     FaMapMarkerAlt,
     FaExchangeAlt
 } from 'react-icons/fa';
-import {HrRequests} from "@/api/Requests/Hr.requests.ts";
-import {Employee, EmploymentTypeEnum} from '@/Interfeces/Hr.interface';
-import {useForm} from "react-hook-form";
+import { HrRequests } from "@/api/Requests/Hr.requests.ts";
+import { Employee, EmploymentTypeEnum } from '@/Interfeces/Hr.interface';
+import { useForm } from "react-hook-form";
+import useSWR from 'swr';
 
 const HrReq = new HrRequests()
 
@@ -25,7 +26,6 @@ const EmployeesPage: React.FC = () => {
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
     const [statusFilter, setStatusFilter] = useState<Employee['status'] | 'all'>('all');
-    const [employeesList, setEmployeesList] = useState<Employee[]>([]);
 
     const [addStep, setAddStep] = useState(1);
     const [selectedType, setSelectedType] = useState<'FULL_TIME' | 'PART_TIME' | null>(null);
@@ -34,27 +34,27 @@ const EmployeesPage: React.FC = () => {
         register,
         handleSubmit,
         watch,
-        formState: {errors},
+        formState: { errors },
     } = useForm()
 
+    // useEffect(() => {
 
-    useEffect(() => {
+    //     const fetchHr = async () => {
+    //         try {
+    //             const GetHrAll = useSWR('/hr', HrReq.getHr)
 
-        const fetchHr = async () => {
-            try {
-                const GetHrAll = await HrReq.getHr()
+    //             console.log(GetHrAll)
 
-                console.log(GetHrAll)
+    //             setEmployeesList(GetHrAll.data?.data || [])
 
-                setEmployeesList(GetHrAll.data?.data)
+    //         } catch (error) {
+    //             console.error("Error fetching hr:", error);
+    //         }
+    //     }
+    //     fetchHr()
+    // }, []);
 
-
-            } catch (error) {
-                console.error("Error fetching hr:", error);
-            }
-        }
-        fetchHr()
-    }, []);
+    const { data: employeesList, error, mutate } = useSWR('/hr', HrReq.getHr)
 
     const CreateHr = async (data: any) => {
         try {
@@ -65,12 +65,13 @@ const EmployeesPage: React.FC = () => {
             }
 
             console.log(selectedType)
-            return await HrReq.addHr(payload).catch(errors => console.log(errors));
+            await HrReq.addHr(payload).catch(errors => console.log(errors));
+            mutate(); // Обновляем данные после добавления
+            setShowAddModal(false);
         } catch (error) {
             console.error("Error add hr:", error);
         }
     };
-
 
     const getStatusColor = (status: Employee['status']) => {
         switch (status) {
@@ -110,7 +111,7 @@ const EmployeesPage: React.FC = () => {
         return type === 'FULL_TIME' ? 'Штатный' : 'Совместитель';
     };
 
-    const filteredEmployees = employeesList.filter(employee => {
+    const filteredEmployees = employeesList?.data?.data.filter(employee => {
         // Фильтр по поиску
         const matchesSearch = employee.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             employee.position.toLowerCase().includes(searchQuery.toLowerCase());
@@ -126,8 +127,8 @@ const EmployeesPage: React.FC = () => {
     });
 
     // Разделение сотрудников на штатных и совместителей
-    const fulltimeEmployees = filteredEmployees.filter(emp => emp.employmentType === 'FULL_TIME');
-    const parttimeEmployees = filteredEmployees.filter(emp => emp.employmentType === 'PART_TIME');
+    const fulltimeEmployees = filteredEmployees?.filter(emp => emp.employmentType === 'FULL_TIME');
+    const parttimeEmployees = filteredEmployees?.filter(emp => emp.employmentType === 'PART_TIME');
 
     // Функция для изменения типа занятости
     // const toggleEmploymentType = (employeeId: number) => {
@@ -158,15 +159,15 @@ const EmployeesPage: React.FC = () => {
     // };
 
     // Компонент таблицы сотрудников
-    const EmployeeTable = ({employees, title}: { employees: Employee[], title: string }) => (
+    const EmployeeTable = ({ employees, title }: { employees: Employee[], title: string }) => (
 
-            <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                    <h2 className="text-lg font-medium text-gray-900">{title} ({employees.length})</h2>
-                    <p className="text-sm text-gray-500">Всего: {employees.length} человек</p>
-                </div>
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead>
+        <div className="bg-white rounded-lg shadow">
+            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">{title} ({employees?.length})</h2>
+                <p className="text-sm text-gray-500">Всего: {employees?.length} человек</p>
+            </div>
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead>
                     <tr>
                         <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Сотрудник
@@ -182,9 +183,9 @@ const EmployeesPage: React.FC = () => {
                         </th>
                         <th className="px-6 py-3 bg-gray-50"></th>
                     </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                    {employees.map((employee) => (
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {employees?.map((employee) => (
                         <tr
                             key={employee.id}
                             className="hover:bg-gray-50 cursor-pointer"
@@ -193,9 +194,9 @@ const EmployeesPage: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
                                     <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 font-medium">
-                      {employee.fullName.split(' ').map(n => n[0]).join('')}
-                    </span>
+                                        <span className="text-blue-600 font-medium">
+                                            {employee.fullName.split(' ').map(n => n[0]).join('')}
+                                        </span>
                                     </div>
                                     <div className="ml-4">
                                         <div className="text-sm font-medium text-gray-900">{employee.fullName}</div>
@@ -211,10 +212,10 @@ const EmployeesPage: React.FC = () => {
                                 {employee.workExperience}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status)}`}>
-                  {getStatusText(employee.status)}
-                </span>
+                                <span
+                                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(employee.status)}`}>
+                                    {getStatusText(employee.status)}
+                                </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div className="flex justify-end gap-2">
@@ -226,7 +227,7 @@ const EmployeesPage: React.FC = () => {
                                         }}
                                         title={employee.employmentType === 'FULL_TIME' ? 'Перевести в совместители' : 'Перевести в штатные'}
                                     >
-                                        <FaExchangeAlt className="w-4 h-4"/>
+                                        <FaExchangeAlt className="w-4 h-4" />
                                     </button>
                                     <button
                                         className="text-gray-400 hover:text-gray-500"
@@ -235,24 +236,24 @@ const EmployeesPage: React.FC = () => {
                                             setSelectedEmployee(employee);
                                         }}
                                     >
-                                        <FaEllipsisV className="w-4 h-4"/>
+                                        <FaEllipsisV className="w-4 h-4" />
                                     </button>
                                 </div>
                             </td>
                         </tr>
                     ))}
-                    {employees.length === 0 && (
+                    {employees?.length === 0 && (
                         <tr>
                             <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
                                 В этой категории нет сотрудников
                             </td>
                         </tr>
                     )}
-                    </tbody>
-                </table>
-            </div>
-        )
-    ;
+                </tbody>
+            </table>
+        </div>
+    )
+        ;
 
     return (
         <div className="p-6">
@@ -264,14 +265,14 @@ const EmployeesPage: React.FC = () => {
                 <div className="flex gap-4">
                     <button
                         className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                        <FaDownload className="w-4 h-4"/>
+                        <FaDownload className="w-4 h-4" />
                         Экспорт
                     </button>
                     <button
                         className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 flex items-center gap-2"
                         onClick={() => setShowAddModal(true)}
                     >
-                        <FaPlus className="w-4 h-4"/>
+                        <FaPlus className="w-4 h-4" />
                         Добавить сотрудника
                     </button>
                 </div>
@@ -279,7 +280,7 @@ const EmployeesPage: React.FC = () => {
 
             <div className="flex gap-4 mb-6">
                 <div className="flex-1 relative">
-                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"/>
+                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Поиск по сотрудникам..."
@@ -320,10 +321,10 @@ const EmployeesPage: React.FC = () => {
             {/* Двухколоночный макет */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Колонка штатных сотрудников */}
-                <EmployeeTable employees={fulltimeEmployees} title="🟦 Штатные преподаватели"/>
+                <EmployeeTable employees={fulltimeEmployees} title="🟦 Штатные преподаватели" />
 
                 {/* Колонка совместителей */}
-                <EmployeeTable employees={parttimeEmployees} title="🟨 Совместители"/>
+                <EmployeeTable employees={parttimeEmployees} title="🟨 Совместители" />
             </div>
 
             {/* Модальное окно сотрудника */}
@@ -336,9 +337,9 @@ const EmployeesPage: React.FC = () => {
                                 <div className="flex items-center">
                                     <div
                                         className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 text-xl font-medium">
-                      {selectedEmployee.fullName.split(' ').map(n => n[0]).join('')}
-                    </span>
+                                        <span className="text-blue-600 text-xl font-medium">
+                                            {selectedEmployee.fullName.split(' ').map(n => n[0]).join('')}
+                                        </span>
                                     </div>
                                     <div className="ml-4">
                                         <div className="flex items-center gap-2">
@@ -347,14 +348,14 @@ const EmployeesPage: React.FC = () => {
                                         </div>
                                         <p className="text-gray-600">{selectedEmployee.position}</p>
                                         <div className="flex gap-2 mt-2">
-                      <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status)}`}>
-                        {getStatusText(selectedEmployee.status)}
-                      </span>
+                                            <span
+                                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedEmployee.status)}`}>
+                                                {getStatusText(selectedEmployee.status)}
+                                            </span>
                                             <span
                                                 className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getEmploymentTypeColor(selectedEmployee.employmentType)}`}>
-                        {getEmploymentTypeText(selectedEmployee.employmentType)}
-                      </span>
+                                                {getEmploymentTypeText(selectedEmployee.employmentType)}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -362,7 +363,7 @@ const EmployeesPage: React.FC = () => {
                                     className="text-gray-400 hover:text-gray-500"
                                     onClick={() => setSelectedEmployee(null)}
                                 >
-                                    <FaTimes className="w-6 h-6"/>
+                                    <FaTimes className="w-6 h-6" />
                                 </button>
                             </div>
 
@@ -372,18 +373,18 @@ const EmployeesPage: React.FC = () => {
                                     <h3 className="text-lg font-semibold mb-4 pb-2 border-b">Контактная информация</h3>
                                     <div className="space-y-3">
                                         <div className="flex items-center">
-                                            <FaEnvelope className="w-5 h-5 text-gray-400 mr-3"/>
+                                            <FaEnvelope className="w-5 h-5 text-gray-400 mr-3" />
                                             <span>{selectedEmployee.email}</span>
                                         </div>
                                         {selectedEmployee.phone && (
                                             <div className="flex items-center">
-                                                <FaPhone className="w-5 h-5 text-gray-400 mr-3"/>
+                                                <FaPhone className="w-5 h-5 text-gray-400 mr-3" />
                                                 <span>{selectedEmployee.phone}</span>
                                             </div>
                                         )}
                                         {selectedEmployee.address && (
                                             <div className="flex items-center">
-                                                <FaMapMarkerAlt className="w-5 h-5 text-gray-400 mr-3"/>
+                                                <FaMapMarkerAlt className="w-5 h-5 text-gray-400 mr-3" />
                                                 <span>{selectedEmployee.address}</span>
                                             </div>
                                         )}
@@ -396,19 +397,19 @@ const EmployeesPage: React.FC = () => {
                                     <div className="space-y-3">
                                         {selectedEmployee.education && (
                                             <div className="flex items-center">
-                                                <FaGraduationCap className="w-5 h-5 text-gray-400 mr-3"/>
+                                                <FaGraduationCap className="w-5 h-5 text-gray-400 mr-3" />
                                                 <span>{selectedEmployee.education}</span>
                                             </div>
                                         )}
                                         {selectedEmployee.specialization && (
                                             <div className="flex items-center">
-                                                <FaIdCard className="w-5 h-5 text-gray-400 mr-3"/>
+                                                <FaIdCard className="w-5 h-5 text-gray-400 mr-3" />
                                                 <span>{selectedEmployee.specialization}</span>
                                             </div>
                                         )}
                                         {selectedEmployee.hireDate && (
                                             <div className="flex items-center">
-                                                <FaCalendarAlt className="w-5 h-5 text-gray-400 mr-3"/>
+                                                <FaCalendarAlt className="w-5 h-5 text-gray-400 mr-3" />
                                                 <span>Дата приема: {selectedEmployee.hireDate}</span>
                                             </div>
                                         )}
@@ -433,8 +434,8 @@ const EmployeesPage: React.FC = () => {
                                                         key={`general-${index}`}
                                                         className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                                                     >
-                            {subject}
-                          </span>
+                                                        {subject}
+                                                    </span>
                                                 ))}
                                             </div>
                                         </div>
@@ -451,8 +452,8 @@ const EmployeesPage: React.FC = () => {
                                                         key={`special-${index}`}
                                                         className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
                                                     >
-                            {subject}
-                          </span>
+                                                        {subject}
+                                                    </span>
                                                 ))}
                                             </div>
                                         </div>
@@ -489,13 +490,12 @@ const EmployeesPage: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                              doc.status === 'VALID' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {doc.status === 'VALID' ? 'Действующий' : 'Истёк'}
-                          </span>
+                                                    <span className={`px-2 py-1 text-xs rounded-full ${doc.status === 'VALID' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                        }`}>
+                                                        {doc.status === 'VALID' ? 'Действующий' : 'Истёк'}
+                                                    </span>
                                                     <button className="p-2 text-gray-400 hover:text-gray-600">
-                                                        <FaDownload className="w-4 h-4"/>
+                                                        <FaDownload className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </div>
@@ -516,7 +516,7 @@ const EmployeesPage: React.FC = () => {
                                     </button>
                                     <button
                                         className="px-4 py-2 bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100"
-                                        // onClick={() => toggleEmploymentType(selectedEmployee.id)}
+                                    // onClick={() => toggleEmploymentType(selectedEmployee.id)}
                                     >
                                         {selectedEmployee.employmentType === 'FULL_TIME'
                                             ? 'Перевести в совместители'
@@ -525,7 +525,7 @@ const EmployeesPage: React.FC = () => {
                                 </div>
                                 <button
                                     className="px-4 py-2 bg-red-50 text-red-700 rounded-md hover:bg-red-100"
-                                    // onClick={() => deleteEmployee(selectedEmployee.id)}
+                                // onClick={() => deleteEmployee(selectedEmployee.id)}
                                 >
                                     Удалить
                                 </button>
@@ -550,7 +550,7 @@ const EmployeesPage: React.FC = () => {
                                         setSelectedType(null);
                                     }}
                                 >
-                                    <FaTimes className="w-5 h-5"/>
+                                    <FaTimes className="w-5 h-5" />
                                 </button>
                             </div>
 
@@ -560,9 +560,8 @@ const EmployeesPage: React.FC = () => {
                                     <div className="flex gap-4 mb-6">
                                         <div
                                             onClick={() => setSelectedType('FULL_TIME')}
-                                            className={`flex-1 p-4 border rounded-lg cursor-pointer ${
-                                                selectedType === 'FULL_TIME' ? 'border-blue-500' : 'border-gray-200 hover:border-blue-300'
-                                            }`}
+                                            className={`flex-1 p-4 border rounded-lg cursor-pointer ${selectedType === 'FULL_TIME' ? 'border-blue-500' : 'border-gray-200 hover:border-blue-300'
+                                                }`}
                                         >
                                             <h3 className="font-medium mb-2">Штатный преподаватель</h3>
                                             <p className="text-sm text-gray-500">Полная занятость, официальное
@@ -570,9 +569,8 @@ const EmployeesPage: React.FC = () => {
                                         </div>
                                         <div
                                             onClick={() => setSelectedType('PART_TIME')}
-                                            className={`flex-1 p-4 border rounded-lg cursor-pointer ${
-                                                selectedType === 'PART_TIME' ? 'border-blue-500' : 'border-gray-200 hover:border-blue-300'
-                                            }`}
+                                            className={`flex-1 p-4 border rounded-lg cursor-pointer ${selectedType === 'PART_TIME' ? 'border-blue-500' : 'border-gray-200 hover:border-blue-300'
+                                                }`}
                                         >
                                             <h3 className="font-medium mb-2">Совместитель</h3>
                                             <p className="text-sm text-gray-500">Частичная занятость, почасовая
@@ -588,9 +586,8 @@ const EmployeesPage: React.FC = () => {
                                         </button>
                                         <button
                                             disabled={!selectedType}
-                                            className={`px-4 py-2 text-white rounded-md ${
-                                                selectedType ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'
-                                            }`}
+                                            className={`px-4 py-2 text-white rounded-md ${selectedType ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'
+                                                }`}
                                             onClick={() => setAddStep(2)}
                                         >
                                             Продолжить
@@ -601,77 +598,77 @@ const EmployeesPage: React.FC = () => {
 
                             {addStep === 2 && (
                                 <form onSubmit={handleSubmit(CreateHr)}
-                                      className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                                    className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
                                     <div>
                                         <label className="block text-sm font-medium">ФИО</label>
-                                        <input {...register('fullName', {required: "Это поле обязательно"})}
-                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        <input {...register('fullName', { required: "Это поле обязательно" })}
+                                            className="w-full border px-3 py-2 rounded-md" />
                                         {errors.fullName &&
                                             <span className="text-red-500 text-xs">{errors.fullName.message}</span>}
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium">ИИН</label>
-                                        <input {...register('iin', {required: "Это поле обязательно"})}
-                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        <input {...register('iin', { required: "Это поле обязательно" })}
+                                            className="w-full border px-3 py-2 rounded-md" />
                                         {errors.iin &&
                                             <span className="text-red-500 text-xs">{errors.iin.message}</span>}
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium">Должность</label>
-                                        <input {...register('position', {required: "Это поле обязательно"})}
-                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        <input {...register('position', { required: "Это поле обязательно" })}
+                                            className="w-full border px-3 py-2 rounded-md" />
                                         {errors.position &&
                                             <span className="text-red-500 text-xs">{errors.position.message}</span>}
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium">Email</label>
-                                        <input type="email" {...register('email', {required: "Это поле обязательно"})}
-                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        <input type="email" {...register('email', { required: "Это поле обязательно" })}
+                                            className="w-full border px-3 py-2 rounded-md" />
                                         {errors.email &&
                                             <span className="text-red-500 text-xs">{errors.email.message}</span>}
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium">Телефон</label>
-                                        <input {...register('phone', {required: "Это поле обязательно"})}
-                                               className="w-full border px-3 py-2 rounded-md"/>
+                                        <input {...register('phone', { required: "Это поле обязательно" })}
+                                            className="w-full border px-3 py-2 rounded-md" />
                                         {errors.phone &&
                                             <span className="text-red-500 text-xs">{errors.phone.message}</span>}
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium">Адрес</label>
-                                        <input {...register('address')} className="w-full border px-3 py-2 rounded-md"/>
+                                        <input {...register('address')} className="w-full border px-3 py-2 rounded-md" />
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium">Образование</label>
                                         <input {...register('education')}
-                                               className="w-full border px-3 py-2 rounded-md"/>
+                                            className="w-full border px-3 py-2 rounded-md" />
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium">Дата найма</label>
                                         <input type="date" {...register('hireDate')}
-                                               className="w-full border px-3 py-2 rounded-md"/>
+                                            className="w-full border px-3 py-2 rounded-md" />
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium">Стаж работы</label>
                                         <input {...register('workExperience')}
-                                               className="w-full border px-3 py-2 rounded-md"/>
+                                            className="w-full border px-3 py-2 rounded-md" />
                                     </div>
 
                                     <div className="flex justify-end gap-3 pt-4">
                                         <button type="button" onClick={() => setAddStep(1)}
-                                                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+                                            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
                                             Назад
                                         </button>
                                         <button type="submit"
-                                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                                             Сохранить
                                         </button>
                                     </div>
