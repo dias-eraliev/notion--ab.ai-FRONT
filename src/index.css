@@ -1,4 +1,6 @@
 @import './styles/colors.css';
+@import 'katex/dist/katex.min.css';
+@import './styles/math-renderer.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

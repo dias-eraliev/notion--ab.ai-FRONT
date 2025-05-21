@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FaArrowLeft, FaVideo, FaFile, FaClipboardCheck, FaSpinner, FaPlay, FaPause, FaExpand } from 'react-icons/fa';
+import MathRenderer from '../components/MathRenderer';
 
 interface Lesson {
   id: string;
@@ -55,11 +56,11 @@ const LessonDetailPage: React.FC = () => {
           description: 'Связь между корнями квадратного уравнения и его коэффициентами',
           content: `
             <h2>Теорема Виета</h2>
-            <p>Если квадратное уравнение ax² + bx + c = 0 имеет корни x₁ и x₂, то:</p>
-            <ul>
-              <li>x₁ + x₂ = -b/a</li>
-              <li>x₁ · x₂ = c/a</li>
-            </ul>
+            <p>Если квадратное уравнение $ax^2 + bx + c = 0$ имеет корни $x_1$ и $x_2$, то:</p>
+            <div>
+              <p>$x_1 + x_2 = -\\frac{b}{a}$</p>
+              <p>$x_1 \\cdot x_2 = \\frac{c}{a}$</p>
+            </div>
             <h3>Применение теоремы</h3>
             <p>Теорема Виета позволяет:</p>
             <ul>
@@ -68,13 +69,13 @@ const LessonDetailPage: React.FC = () => {
               <li>Решать задачи на нахождение корней уравнения</li>
             </ul>
             <h3>Примеры решения</h3>
-            <p>Рассмотрим уравнение: x² - 5x + 6 = 0</p>
+            <p>Рассмотрим уравнение: $x^2 - 5x + 6 = 0$</p>
             <p>По теореме Виета:</p>
-            <ul>
-              <li>x₁ + x₂ = 5</li>
-              <li>x₁ · x₂ = 6</li>
-            </ul>
-            <p>Отсюда можно определить, что корни уравнения: x₁ = 2 и x₂ = 3</p>
+            <div>
+              <p>$x_1 + x_2 = 5$</p>
+              <p>$x_1 \\cdot x_2 = 6$</p>
+            </div>
+            <p>Отсюда можно определить, что корни уравнения: $x_1 = 2$ и $x_2 = 3$</p>
           `,
           videoUrl: 'https://example.com/video.mp4',
           presentationUrl: 'https://example.com/presentation.pdf',
@@ -92,13 +93,13 @@ const LessonDetailPage: React.FC = () => {
             questions: [
               {
                 id: 1,
-                question: 'Чему равна сумма корней уравнения x² - 5x + 6 = 0?',
+                question: 'Чему равна сумма корней уравнения $x^2 - 5x + 6 = 0$?',
                 options: ['3', '4', '5', '6'],
                 correctAnswer: 2
               },
               {
                 id: 2,
-                question: 'Чему равно произведение корней уравнения x² - 5x + 6 = 0?',
+                question: 'Чему равно произведение корней уравнения $x^2 - 5x + 6 = 0$?',
                 options: ['4', '5', '6', '7'],
                 correctAnswer: 2
               }
@@ -201,7 +202,9 @@ const LessonDetailPage: React.FC = () => {
           </div>
 
           {activeTab === 'content' && (
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }} />
+            <div className="prose max-w-none">
+              <MathRenderer content={lesson.content} />
+            </div>
           )}
 
           {activeTab === 'video' && (
@@ -251,8 +254,8 @@ const LessonDetailPage: React.FC = () => {
                   Слайд {currentSlide + 1} из {lesson.presentation.slides.length}
                 </span>
                 <button
-                  onClick={() => setCurrentSlide(Math.min(lesson.presentation.slides.length - 1, currentSlide + 1))}
-                  disabled={currentSlide === lesson.presentation.slides.length - 1}
+                  onClick={() => setCurrentSlide(Math.min((lesson.presentation?.slides.length || 0) - 1, currentSlide + 1))}
+                  disabled={currentSlide === (lesson.presentation?.slides.length || 0) - 1}
                   className="px-4 py-2 bg-blue-50 text-blue-600 rounded-md disabled:opacity-50"
                 >
                   Следующий слайд
@@ -265,11 +268,13 @@ const LessonDetailPage: React.FC = () => {
             <div className="space-y-6">
               <div className="bg-gray-50 p-6 rounded-lg">
                 <h3 className="text-xl font-semibold mb-4">
-                  Вопрос {currentQuestion + 1} из {lesson.test.questions.length}
+                  Вопрос {currentQuestion + 1} из {lesson.test?.questions.length}
                 </h3>
-                <p className="text-lg mb-4">{lesson.test.questions[currentQuestion].question}</p>
+                <div className="text-lg mb-4">
+                  <MathRenderer content={lesson.test?.questions[currentQuestion].question || ''} />
+                </div>
                 <div className="space-y-2">
-                  {lesson.test.questions[currentQuestion].options.map((option, index) => (
+                  {lesson.test?.questions[currentQuestion].options.map((option, index) => (
                     <button
                       key={index}
                       onClick={() => setAnswers({ ...answers, [currentQuestion]: index })}
@@ -279,7 +284,7 @@ const LessonDetailPage: React.FC = () => {
                           : 'border-gray-200 hover:border-blue-500'
                       }`}
                     >
-                      {option}
+                      <MathRenderer content={option} />
                     </button>
                   ))}
                 </div>
@@ -293,8 +298,8 @@ const LessonDetailPage: React.FC = () => {
                   Предыдущий вопрос
                 </button>
                 <button
-                  onClick={() => setCurrentQuestion(Math.min(lesson.test.questions.length - 1, currentQuestion + 1))}
-                  disabled={currentQuestion === lesson.test.questions.length - 1}
+                  onClick={() => setCurrentQuestion(Math.min((lesson.test?.questions.length || 0) - 1, currentQuestion + 1))}
+                  disabled={currentQuestion === (lesson.test?.questions.length || 0) - 1}
                   className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50"
                 >
                   Следующий вопрос
