@@ -89,6 +89,7 @@
   "homepage": "https://github.com/dias-eraliev/notion--ab.ai-FRONT#readme",
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@tailwindcss/oxide",
       "core-js",
       "esbuild"
     ]
