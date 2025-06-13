@@ -76,8 +76,8 @@ const sidebarLinks = {
     },
     {
       to: "/app/neuro-abai",
-      icon: <FaBrain size={16} />,
-      label: 'FIZMAT.AI',
+      icon: <FaBrain />,
+      label: 'Fizmat AI Ala',
       type: 'SidebarLink'
     }
   ],
@@ -264,7 +264,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-4">
         <div className="flex items-center mb-8">
           <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold bg-gradient-to-r from-[#1e40af] to-white bg-clip-text text-transparent">FIZMAT.AI</span>
+            <span className="text-2xl font-bold text-corporate-primary">FIZMAT.AI</span>
           </Link>
         </div>
 
@@ -481,4 +481,4 @@ export const Sidebar: React.FC = () => {
   );
 };
 
-export default Sidebar; 
+export default Sidebar;

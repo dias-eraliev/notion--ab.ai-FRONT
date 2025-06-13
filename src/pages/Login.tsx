@@ -37,7 +37,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const letters = "FIZMAT.AI".split("");
+  const letters = "FIZMAT AI ALA".split("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,11 +220,19 @@ const Login: React.FC = () => {
           transition={{ delay: 1.2 }}
           className="mt-8 text-center text-sm text-white/70"
         >
-          Copyright © 2024 - FIZMAT.AI
+          Copyright © 2024 - Fizmat AI Ala
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4 }}
+          className="mt-2 text-center text-sm text-corporate-primary/70"
+        >
+          Powered by AB.AI
         </motion.p>
       </div>
     </div>
   );
 };
 
-export default Login; 
+export default Login;

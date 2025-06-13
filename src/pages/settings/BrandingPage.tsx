@@ -12,7 +12,7 @@ interface BrandingSettings {
 }
 
 const initialSettings: BrandingSettings = {
-  schoolName: 'UIB College Ai',
+  schoolName: 'Fizmat AI Ala',
   logo: '/logo.png',
   favicon: '/favicon.ico',
   primaryColor: '#1C7E66',
@@ -230,4 +230,4 @@ const BrandingPage: React.FC = () => {
   );
 };
 
-export default BrandingPage; 
+export default BrandingPage;
