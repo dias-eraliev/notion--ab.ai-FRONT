@@ -89,7 +89,7 @@ const sidebarLinks = {
     {
       to: "/app/neuro-abai",
       icon: <FaBrain />,
-      label: 'UIB College Ai',
+      label: 'Fizmat AI Ala',
       type: 'SidebarLink'
     }
   ],
@@ -283,7 +283,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-4">
         <div className="flex items-center mb-8">
           <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-[#1C7E66]">UIB.AI</span>
+            <span className="text-2xl font-bold text-corporate-primary">FIZMAT.AI</span>
           </Link>
         </div>
 

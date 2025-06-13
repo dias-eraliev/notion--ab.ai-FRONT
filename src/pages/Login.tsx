@@ -41,7 +41,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const letters = "UIB.AI".split("");
+  const letters = "FIZMAT AI ALA".split("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -247,7 +247,7 @@ const Login: React.FC = () => {
           transition={{ delay: 1.2 }}
           className="mt-8 text-center text-sm text-corporate-primary/70"
         >
-          Copyright © 2024 - UIB College Ai
+          Copyright © 2024 - Fizmat AI Ala
         </motion.p>
         <motion.p
           initial={{ opacity: 0 }}
