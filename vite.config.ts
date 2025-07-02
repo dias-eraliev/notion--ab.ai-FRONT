@@ -8,7 +8,8 @@ export default defineConfig({
   },
   preview: {
     allowedHosts: ['*'],
-    port: 8119
+    port: 8119,
+    host: "::"
   },
   resolve: {
     alias: {
