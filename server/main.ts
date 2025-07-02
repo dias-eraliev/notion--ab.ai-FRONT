@@ -26,7 +26,7 @@ const router = express.Router();
 const upload = multer();
 
 router.post('/init-session', async (req, res) => {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = "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";
   const { instructions } = req.body;
   try {
     const response = await axios.post('https://api.openai.com/v1/realtime/sessions', {
