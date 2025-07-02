@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 8119,
+    allowedHosts: ['fizmat-ala.abai.live', 'fizmat.abai.live', 'localhost'],
   },
   preview: {
     allowedHosts: ["fizmat-ala.abai.live", "fizmat.abai.live", "localhost"],
