@@ -7,7 +7,7 @@ export default defineConfig({
     port: 8119,
   },
   preview: {
-    allowedHosts: ['*'],
+    allowedHosts: ["fizmat-ala.abai.live", "fizmat.abai.live", "localhost"],
     port: 8119,
     host: "::"
   },
