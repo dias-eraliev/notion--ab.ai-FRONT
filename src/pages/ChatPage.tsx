@@ -276,9 +276,9 @@ const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex bg-[#FFFFFF]">
+    <div className="h-screen flex flex-col md:flex-row bg-[#FFFFFF]">
       {/* Левая панель со списком чатов */}
-      <div className="w-[300px] border-r border-[#E5E5E5] bg-[#FAFAFA]">
+      <div className="w-full md:w-[300px] border-r border-[#E5E5E5] bg-[#FAFAFA] md:block" style={{ display: selectedChat ? 'none' : 'block' }}>
         <div className="p-5">
           <h1 className="text-xl font-medium text-[#37352F] mb-4">Все Чаты</h1>
           <div className="relative">
@@ -473,4 +473,4 @@ const ChatPage: React.FC = () => {
   );
 };
 
-export default ChatPage; 
+export default ChatPage;

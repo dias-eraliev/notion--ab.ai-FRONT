@@ -154,7 +154,7 @@ const InventoryPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Заголовок и основные действия */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Digital инвентаризация</h1>
@@ -205,7 +205,7 @@ const InventoryPage: React.FC = () => {
       </div>
 
       {/* Таблица инвентаря */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -336,4 +336,4 @@ const InventoryPage: React.FC = () => {
   );
 };
 
-export default InventoryPage; 
+export default InventoryPage;

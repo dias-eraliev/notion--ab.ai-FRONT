@@ -117,7 +117,7 @@ const HomeworkModal: React.FC<{
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[600px] max-h-[80vh] overflow-y-auto"
+        className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg max-h-[80vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">
@@ -382,7 +382,7 @@ const HomeworkDetailsModal: React.FC<{
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto"
+        className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-lg md:max-w-2xl max-h-[80vh] overflow-y-auto"
       >
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -645,7 +645,7 @@ const HomeworkPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
+    <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
           {role === 'student' ? 'Мои задания' :
@@ -666,7 +666,7 @@ const HomeworkPage: React.FC = () => {
       </div>
 
       {/* Фильтры */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <select
           value={filters.subject}
           onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
@@ -781,4 +781,4 @@ const HomeworkPage: React.FC = () => {
   );
 };
 
-export default HomeworkPage; 
+export default HomeworkPage;

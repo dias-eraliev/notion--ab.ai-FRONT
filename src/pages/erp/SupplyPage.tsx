@@ -145,7 +145,7 @@ const SupplyPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Управление снабжением</h1>
         <div className="flex gap-4">
@@ -200,10 +200,10 @@ const SupplyPage: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
         {activeTab === 'requests' && (
           <div className="p-4">
-            <table className="w-full">
+            <table className="w-full min-w-[700px]">
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-2">ID</th>
@@ -307,4 +307,4 @@ const SupplyPage: React.FC = () => {
   );
 };
 
-export default SupplyPage; 
+export default SupplyPage;

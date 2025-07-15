@@ -439,7 +439,7 @@ const ClassroomsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
+    <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
       {/* Заголовок и кнопки */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Аудитории</h1>
@@ -463,7 +463,7 @@ const ClassroomsPage: React.FC = () => {
 
       {/* Панель фильтров */}
       <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <div>
             <select
               value={filters.type}
@@ -509,7 +509,7 @@ const ClassroomsPage: React.FC = () => {
       </div>
 
       {/* Таблица аудиторий */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -576,4 +576,4 @@ const ClassroomsPage: React.FC = () => {
   );
 };
 
-export default ClassroomsPage; 
+export default ClassroomsPage;

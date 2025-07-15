@@ -209,7 +209,7 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[500px]"
+className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Редактирование оценок</h3>
@@ -359,7 +359,7 @@ const GradeInfoModal: React.FC<{
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[500px] shadow-xl"
+className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg shadow-xl"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Информация об оценках</h3>
@@ -717,7 +717,7 @@ const AcademicJournalPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
+    <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
           {role === 'student' ? 'Мои оценки' :
@@ -729,7 +729,7 @@ const AcademicJournalPage: React.FC = () => {
 
       {/* Показываем панель фильтров только для учителей и администраторов */}
       {(role === 'admin' || role === 'teacher') && (
-        <div className="grid grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-6">
           <div className="relative">
             <select
               value={selectedSubject}
@@ -805,7 +805,7 @@ const AcademicJournalPage: React.FC = () => {
 
       {/* Для студентов и родителей показываем упрощенные фильтры */}
       {(role === 'student' || role === 'parent') && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div className="relative">
             <select
               value={selectedSubject}
@@ -939,4 +939,4 @@ const AcademicJournalPage: React.FC = () => {
   );
 };
 
-export default AcademicJournalPage; 
+export default AcademicJournalPage;
