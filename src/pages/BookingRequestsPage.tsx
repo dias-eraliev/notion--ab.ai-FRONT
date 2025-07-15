@@ -243,7 +243,7 @@ const BookingRequestsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Запросы на бронирование аудиторий</h1>
         <button
@@ -329,7 +329,7 @@ const BookingRequestsPage: React.FC = () => {
       {/* Модальное окно создания запроса */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full">
+          <div className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg">
             <h2 className="text-xl font-bold mb-4">Новый запрос на бронирование</h2>
             
             <div className="space-y-4">
@@ -430,7 +430,7 @@ const BookingRequestsPage: React.FC = () => {
       {/* Модальное окно подробной информации */}
       {selectedRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
+          <div className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-2xl md:max-w-3xl">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Подробная информация о запросе</h2>
               <button
@@ -545,4 +545,4 @@ const BookingRequestsPage: React.FC = () => {
   );
 };
 
-export default BookingRequestsPage; 
+export default BookingRequestsPage;

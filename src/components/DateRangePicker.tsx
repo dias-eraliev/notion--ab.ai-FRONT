@@ -54,15 +54,15 @@ const calendarStyles = `
   }
   .react-datepicker__day--selected,
   .react-datepicker__day--in-range {
-    background-color: #3b82f6 !important;
+    background-color: #ca181f !important;
     color: white !important;
   }
   .react-datepicker__day--keyboard-selected {
-    background-color: #93c5fd;
+    background-color: #f6cfd3;
     color: white;
   }
   .react-datepicker__day--in-selecting-range {
-    background-color: #bfdbfe;
+    background-color: #fbeaec;
   }
   .react-datepicker__current-month {
     color: #1f2937;
@@ -250,4 +250,4 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ startDate, endDate, o
   );
 };
 
-export default DateRangePicker; 
+export default DateRangePicker;

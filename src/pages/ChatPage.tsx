@@ -272,7 +272,7 @@ const ChatPage: React.FC = () => {
   return (
     <div className="h-screen flex bg-[#1E5945]">
       {/* Левая панель со списком чатов */}
-      <div className="w-[300px] border-r border-[#E5E5E5] bg-[#FAFAFA]">
+      <div className="w-full md:w-[300px] border-r border-[#E5E5E5] bg-[#FAFAFA] md:block" style={{ display: selectedChat ? 'none' : 'block' }}>
         <div className="p-5">
           <h1 className="text-xl font-medium text-[#37352F] mb-4">Все Чаты</h1>
           <div className="relative">

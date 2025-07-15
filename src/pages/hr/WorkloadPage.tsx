@@ -292,7 +292,7 @@ const WorkloadPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-6">
           <div>
@@ -488,7 +488,7 @@ const WorkloadPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-xl shadow-md overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -664,7 +664,7 @@ const WorkloadPage: React.FC = () => {
 
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3 border-b pb-2">Распределение нагрузки по предметам</h3>
-                <div className="overflow-hidden rounded-lg border">
+                <div className="overflow-x-auto rounded-lg border">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>

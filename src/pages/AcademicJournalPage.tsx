@@ -98,7 +98,7 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[500px]"
+className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Редактирование оценок</h3>
@@ -281,7 +281,7 @@ const GradeInfoModal: React.FC<{
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-[500px] shadow-xl"
+className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg shadow-xl"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Информация об оценках</h3>
@@ -1076,7 +1076,7 @@ const AcademicJournalPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
+    <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
           {role === 'student' ? 'Мои оценки' :
@@ -1088,116 +1088,99 @@ const AcademicJournalPage: React.FC = () => {
 
       {/* Показываем панель фильтров только для учителей и администраторов */}
       {(role === 'admin' || role === 'teacher') && (
-        <div>
-          <div className="grid grid-cols-5 gap-4 mb-4">
-            <div className="relative">
-              <select
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-              >
-                <option value="">{t('selectSubject')}</option>
-                <option value="math">{t('math')}</option>
-                <option value="physics">{t('physics')}</option>
-                <option value="chemistry">{t('chemistry')}</option>
-                <option value="biology">{t('biology')}</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <FaCaretDown className="text-gray-400" />
-              </div>
-            </div>
-
-            <div className="relative">
-              <select
-                value={selectedClass}
-                onChange={(e) => setSelectedClass(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-              >
-                <option value="">{t('selectGroup')}</option>
-                <option value="МК24-1М">МК24-1М (Менеджмент)</option>
-                <option value="МК24-2М">МК24-2М (Менеджмент)</option>
-                <option value="ПК24-1П">ПК24-1П (Программирование)</option>
-                <option value="ПР24-1Ю">ПР24-1Ю (Право)</option>
-                <option value="ПР24-2Ю">ПР24-2Ю (Право)</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <FaCaretDown className="text-gray-400" />
-              </div>
-            </div>
-
-            <div className="relative">
-              <select
-                value={selectedSemester}
-                onChange={(e) => setSelectedSemester(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-              >
-                <option value="">{t('selectSemester')}</option>
-                <option value="1">{t('semester1')}</option>
-                <option value="2">{t('semester2')}</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <FaCaretDown className="text-gray-400" />
-              </div>
-            </div>
-
-            <DateRangePicker
-              startDate={startDate}
-              endDate={endDate}
-              onChange={handleDateChange}
-            />
-
-            <div className="relative">
-              <div className="flex items-center w-full">
-                <input
-                  type="text"
-                  placeholder={t('searchByName')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <button className="px-4 py-2 bg-white border border-l-0 border-gray-200 rounded-r-md hover:bg-gray-50">
-                  <FaSearch className="text-gray-400" />
-                </button>
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-6">
+          <div className="relative">
+            <select
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+            >
+              <option value="">{t('selectSubject')}</option>
+              <option value="math">{t('math')}</option>
+              <option value="physics">{t('physics')}</option>
+              <option value="chemistry">{t('chemistry')}</option>
+              <option value="biology">{t('biology')}</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
             </div>
           </div>
-          
-          <div className="flex justify-end mb-6">
-            <button
-              onClick={handleApplyFilters}
-              disabled={!areFiltersComplete()}
-              className={`px-6 py-2 rounded-md text-white transition-colors ${
-                areFiltersComplete()
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-gray-400 cursor-not-allowed'
-              }`}
+
+          <div className="relative">
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
             >
-              Применить фильтры
-            </button>
+              <option value="">{t('selectGroup')}</option>
+              <option value="МК24-1М">МК24-1М (Менеджмент)</option>
+              <option value="МК24-2М">МК24-2М (Менеджмент)</option>
+              <option value="ПК24-1П">ПК24-1П (Программирование)</option>
+              <option value="ПР24-1Ю">ПР24-1Ю (Право)</option>
+              <option value="ПР24-2Ю">ПР24-2Ю (Право)</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
+            </div>
+          </div>
+
+          <div className="relative">
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+            >
+              <option value="">{t('selectSemester')}</option>
+              <option value="1">{t('semester1')}</option>
+              <option value="2">{t('semester2')}</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
+            </div>
+          </div>
+
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onChange={handleDateChange}
+          />
+
+          <div className="relative">
+            <div className="flex items-center w-full">
+              <input
+                type="text"
+                placeholder={t('searchByName')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button className="px-4 py-2 bg-white border border-l-0 border-gray-200 rounded-r-md hover:bg-gray-50">
+                <FaSearch className="text-gray-400" />
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Для студентов и родителей показываем упрощенные фильтры */}
       {(role === 'student' || role === 'parent') && (
-        <div>
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <div className="relative">
-              <select
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-              >
-                <option value="">{t('selectSubject')}</option>
-                <option value="math">{t('math')}</option>
-                <option value="physics">{t('physics')}</option>
-                <option value="chemistry">{t('chemistry')}</option>
-                <option value="biology">{t('biology')}</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <FaCaretDown className="text-gray-400" />
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="relative">
+            <select
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+            >
+              <option value="">{t('selectSubject')}</option>
+              <option value="math">{t('math')}</option>
+              <option value="physics">{t('physics')}</option>
+              <option value="chemistry">{t('chemistry')}</option>
+              <option value="biology">{t('biology')}</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaCaretDown className="text-gray-400" />
             </div>
+          </div>
 
             <div className="relative">
               <select
