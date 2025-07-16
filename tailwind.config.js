@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'corporate-primary': '#7C3AED',
+        'corporate-primary': '#ca181f',
         'corporate-secondary': '#fff',
         'corporate-bg': '#f8fafc',
         'notion-gray': {
@@ -20,7 +20,7 @@ module.exports = {
           light: '#6B6B6B',
         },
         'event': {
-          meeting: '#4299e1',
+          meeting: '#ca181f',
           task: '#e53e3e',
           reminder: '#9f7aea',
           event: '#ecc94b',
