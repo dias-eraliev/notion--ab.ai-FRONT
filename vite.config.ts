@@ -9,7 +9,7 @@ export default defineConfig({
   preview: {
     port: 8119,
     host: "::",
-    allowedHosts: ["*.abai.live"]
+    allowedHosts: ["*.abai.live", "fizmat-ala.abai.live"]
   },
   resolve: {
     alias: {
