@@ -31,7 +31,7 @@ const widgetComponents: { [key: string]: React.ComponentType } = {
   // Finance Widgets
   'Доход за неделю': FinanceWidgets.WeeklyIncomeWidget,
   'Долги по классам': FinanceWidgets.ClassDebtsWidget,
-  'AI-прогноз доходов': FinanceWidgets.AIRevenueProjectionWidget,
+  'AI-прогноз доходов': FinanceWidgets.AIRevenueWidget,
   'Фонд зарплат': FinanceWidgets.SalaryFundWidget,
   'Отклонения расходов': FinanceWidgets.ExpenseDeviationsWidget,
 
@@ -177,9 +177,9 @@ const Dashboard: React.FC = () => {
             dragListener={false}
             className={`
               relative bg-white rounded-xl p-4 shadow-notion transition-all duration-200
-              ${widget.size === 'small' ? 'col-span-1' : 
-                widget.size === 'medium' ? 'col-span-1 md:col-span-2' : 
-                'col-span-1 md:col-span-2 lg:col-span-3'}
+              ${widget.size === 'small' ? 'col-span-1' :
+                widget.size === 'medium' ? 'col-span-1 md:col-span-2' :
+                  'col-span-1 md:col-span-2 lg:col-span-3'}
               ${draggedWidget === widget.id ? 'ring-2 ring-corporate-primary' : ''}
             `}
             onDragStart={() => handleDragStart(widget.id)}
