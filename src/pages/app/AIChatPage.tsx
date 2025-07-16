@@ -452,7 +452,7 @@ const AIChatPage: React.FC = () => {
       setShowVoiceOverlay(true);
 
     } catch (error) {
-      console.error("Ошибка при инициализации Realtime сессии:", error);
+      console.error("Ошибка при инициализации Realtime сессии:", JSON.stringify(error));
       setIsRecording(false);
       setShowVoiceOverlay(false);
 
