@@ -209,7 +209,7 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg"
+        className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Редактирование оценок</h3>
@@ -359,7 +359,7 @@ const GradeInfoModal: React.FC<{
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg shadow-xl"
+        className="bg-white rounded-lg p-6 w-full max-w-xs sm:max-w-md md:max-w-lg shadow-xl"
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Информация об оценках</h3>
@@ -686,7 +686,8 @@ const AcademicJournalPage: React.FC = () => {
     const now = new Date().toLocaleString();
     let newGrades = {
       classwork: classworkGrade ? { ...classworkGrade, createdAt: now } : undefined,
-      homework: homeworkGrade ? { ...homeworkGrade, createdAt: now } : undefined
+      homework: homeworkGrade ? { ...homeworkGrade, createdAt: now } : undefined,
+      average: 0
     };
 
     // Расчет среднего арифметического
