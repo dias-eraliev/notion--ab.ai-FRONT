@@ -4,12 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import { FaFaceSmile } from 'react-icons/fa6';
 import AnimatedBackground from '../components/AnimatedBackground';
+import FaceIDScanner from '@/components/auth/FaceIDScanner';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showFaceID, setShowFaceID] = useState(false);
 
   // Анимация для формы
   const formVariants = {
@@ -32,25 +34,35 @@ const Login: React.FC = () => {
     setTimeout(() => {
       setIsLoading(false);
       setIsSuccess(false);
-      navigate('/dashboard');
+      navigate('/');
     }, 1000);
   };
 
-  const handleFaceIDLogin = () => {
-    setIsLoading(true);
+  const handleFaceIDAuthentication = () => {
+    // Показываем компонент сканирования лица вместо старой реализации
+    setShowFaceID(true);
+  };
+
+  const handleFaceIDSuccess = () => {
+    // Закрываем сканер и показываем анимацию успеха
+    setShowFaceID(false);
     setIsSuccess(true);
     setTimeout(() => {
-      setIsLoading(false);
-      setIsSuccess(false);
-      navigate('/dashboard');
-    }, 1000);
+      sessionStorage.setItem("loggedIn", "true");
+      navigate('/');
+    }, 1500);
+  };
+
+  const handleFaceIDCancel = () => {
+    // Просто закрываем сканер Face ID
+    setShowFaceID(false);
   };
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4 relative overflow-hidden">
       <AnimatedBackground />
-      
-<div className="w-full max-w-xs sm:max-w-sm md:max-w-md relative z-10">
+
+      <div className="w-full max-w-xs sm:max-w-sm md:max-w-md relative z-10">
         {/* Логотип */}
         <div className="flex justify-center mb-8">
           <motion.img
@@ -67,12 +79,12 @@ const Login: React.FC = () => {
             className="w-32 h-32 object-contain"
           />
         </div>
-        
+
         <motion.div
           variants={formVariants}
           initial="hidden"
           animate="visible"
-className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-4 sm:p-6 md:p-8 relative border-2 border-[#ca181f]/20"
+          className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-4 sm:p-6 md:p-8 relative border-2 border-[#ca181f]/20"
         >
           <AnimatePresence>
             {isSuccess && (
@@ -96,12 +108,12 @@ className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-4 sm:p-6 md:p-8 r
 
           <h2 className="text-2xl font-semibold text-center mb-2 text-[#ca181f]">Добро пожаловать</h2>
           <p className="text-gray-600 text-center mb-8">Войдите в свою учетную запись, чтобы продолжить</p>
-          
+
           {/* Кнопка входа через Google */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleFaceIDLogin}
+            onClick={handleFaceIDAuthentication}
             className="w-full flex items-center justify-center py-2 px-4 mb-6 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ca181f]"
           >
             <FaFaceSmile className="w-5 h-5 mr-2 text-[#ca181f]" />
@@ -116,7 +128,7 @@ className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-4 sm:p-6 md:p-8 r
               <span className="px-2 bg-white text-gray-500">или</span>
             </div>
           </div>
-          
+
           {/* Форма входа */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
@@ -130,7 +142,7 @@ className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-4 sm:p-6 md:p-8 r
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
                   type="email"
-className="block w-full pl-10 pr-3 py-3 sm:py-2 text-base sm:text-sm border border-[#ca181f]/20 rounded-lg focus:ring-2 focus:ring-[#ca181f] focus:border-[#ca181f] bg-white/50 transition-all duration-200 ease-in-out hover:shadow-lg"
+                  className="block w-full pl-10 pr-3 py-3 sm:py-2 text-base sm:text-sm border border-[#ca181f]/20 rounded-lg focus:ring-2 focus:ring-[#ca181f] focus:border-[#ca181f] bg-white/50 transition-all duration-200 ease-in-out hover:shadow-lg"
                   placeholder="Введите email"
                 />
               </div>
@@ -147,7 +159,7 @@ className="block w-full pl-10 pr-3 py-3 sm:py-2 text-base sm:text-sm border bord
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
                   type={showPassword ? "text" : "password"}
-className="block w-full pl-10 pr-10 py-3 sm:py-2 text-base sm:text-sm border border-[#ca181f]/20 rounded-lg focus:ring-2 focus:ring-[#ca181f] focus:border-[#ca181f] bg-white/50 transition-all duration-200 ease-in-out hover:shadow-lg"
+                  className="block w-full pl-10 pr-10 py-3 sm:py-2 text-base sm:text-sm border border-[#ca181f]/20 rounded-lg focus:ring-2 focus:ring-[#ca181f] focus:border-[#ca181f] bg-white/50 transition-all duration-200 ease-in-out hover:shadow-lg"
                   placeholder="Введите пароль"
                 />
                 <button
@@ -189,7 +201,7 @@ className="block w-full pl-10 pr-10 py-3 sm:py-2 text-base sm:text-sm border bor
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoading}
-className={`w-full flex justify-center py-3 sm:py-2 px-4 text-base sm:text-sm border border-transparent rounded-lg shadow-sm font-medium text-white bg-[#ca181f] hover:bg-[#ca181f]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ca181f] transition-all duration-200 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`w-full flex justify-center py-3 sm:py-2 px-4 text-base sm:text-sm border border-transparent rounded-lg shadow-sm font-medium text-white bg-[#ca181f] hover:bg-[#ca181f]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ca181f] transition-all duration-200 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {isLoading ? (
                 <motion.div
@@ -203,7 +215,7 @@ className={`w-full flex justify-center py-3 sm:py-2 px-4 text-base sm:text-sm bo
             </motion.button>
           </form>
         </motion.div>
-        
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -221,6 +233,15 @@ className={`w-full flex justify-center py-3 sm:py-2 px-4 text-base sm:text-sm bo
           Powered by AB.AI
         </motion.p>
       </div>
+
+      <AnimatePresence>
+        {showFaceID && (
+          <FaceIDScanner
+            onSuccess={handleFaceIDSuccess}
+            onCancel={handleFaceIDCancel}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

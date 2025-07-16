@@ -29,7 +29,7 @@ interface MonthlyWorkload {
 }
 
 interface QuarterlyWorkload {
-  quarter: number;         // Номер четверти
+  quarter: number;         // Номер четвертиasd
   standardHours: number;   // Нормативные часы
   actualHours: number;     // Фактические часы
 }
@@ -251,3 +251,4 @@ curl -X POST http://api.example.com/api/workload/teachers/123/daily \
 4. Интеграция с системой отчетности
 5. Экспорт данных в различные форматы
 6. Интеграция с системой уведомлений 
+sasd
