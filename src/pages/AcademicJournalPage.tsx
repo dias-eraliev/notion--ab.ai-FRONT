@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaFilter, FaPlus, FaEllipsisH, FaCalendar, FaCaretDown, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaCaretDown, FaTimes } from 'react-icons/fa';
 import { useLanguage } from '../hooks/useLanguage';
 import DateRangePicker from '../components/DateRangePicker';
-import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
-import { useAuthContext, UserRole } from '../providers/AuthProvider';
+import { useAuthContext } from '../providers/AuthProvider';
 
 // Обновляем интерфейс для поддержки двух оценок
 interface GradeItem {
@@ -22,7 +20,7 @@ interface Student {
     [date: string]: {
       classwork?: GradeItem;
       homework?: GradeItem;
-      average?: number; // Среднее арифметическое двух оценок
+      average?: number | string; // Поддерживаем и числа, и строки (Н, Б, П)
     } | null;
   };
 }
@@ -41,7 +39,7 @@ interface GradeInfo {
   classwork?: GradeItem;
   homework?: GradeItem;
   date: string;
-  average?: number;
+  average?: number | string;
 }
 
 // Обновленный модальный компонент для двух оценок
@@ -61,8 +59,6 @@ const GradeModal: React.FC<GradeModalProps> = ({ isOpen, onClose, initialData, o
   const [classworkEnabled, setClassworkEnabled] = useState<boolean>(!!initialData?.classwork);
   const [homeworkEnabled, setHomeworkEnabled] = useState<boolean>(!!initialData?.homework);
   const [attendanceTag, setAttendanceTag] = useState<string>('');
-
-  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -928,7 +924,12 @@ const AcademicJournalPage: React.FC = () => {
 
   const handleFilterChange = () => {
     if (selectedSubject && selectedClass) {
-      setFilteredStudents(mockData[selectedSubject]?.[selectedClass] || []);
+      const subjectData = (mockData as any)[selectedSubject];
+      if (subjectData) {
+        setFilteredStudents(subjectData[selectedClass] || []);
+      } else {
+        setFilteredStudents([]);
+      }
     } else {
       setFilteredStudents([]); // Пустая таблица, если фильтры не выбраны
     }
@@ -944,7 +945,7 @@ const AcademicJournalPage: React.FC = () => {
             const gradeDate = new Date(startDate.getFullYear(), month - 1, day);
             return gradeDate >= startDate && gradeDate <= endDate;
           })
-          .reduce((acc, date) => {
+          .reduce((acc: any, date) => {
             acc[date] = student.grades[date];
             return acc;
           }, {});
@@ -984,7 +985,7 @@ const AcademicJournalPage: React.FC = () => {
       case 'teacher':
         // Учитель видит всех студентов выбранного класса
         if (selectedClass) {
-          filtered = filtered.filter(student => true); // Здесь должна быть фильтрация по классу
+          filtered = filtered.filter(() => true); // Здесь должна быть фильтрация по классу
         }
         break;
       
@@ -1022,7 +1023,7 @@ const AcademicJournalPage: React.FC = () => {
     if (!selectedGradeInfo) return;
     
     const now = new Date().toLocaleString();
-    let newGrades = {
+    let newGrades: any = {
       classwork: classworkGrade ? { ...classworkGrade, createdAt: now } : undefined,
       homework: homeworkGrade ? { ...homeworkGrade, createdAt: now } : undefined
     };
@@ -1164,23 +1165,24 @@ const AcademicJournalPage: React.FC = () => {
 
       {/* Для студентов и родителей показываем упрощенные фильтры */}
       {(role === 'student' || role === 'parent') && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="relative">
-            <select
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
-            >
-              <option value="">{t('selectSubject')}</option>
-              <option value="math">{t('math')}</option>
-              <option value="physics">{t('physics')}</option>
-              <option value="chemistry">{t('chemistry')}</option>
-              <option value="biology">{t('biology')}</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <FaCaretDown className="text-gray-400" />
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div className="relative">
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-gray-700"
+              >
+                <option value="">{t('selectSubject')}</option>
+                <option value="math">{t('math')}</option>
+                <option value="physics">{t('physics')}</option>
+                <option value="chemistry">{t('chemistry')}</option>
+                <option value="biology">{t('biology')}</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <FaCaretDown className="text-gray-400" />
+              </div>
             </div>
-          </div>
 
             <div className="relative">
               <select
@@ -1217,7 +1219,7 @@ const AcademicJournalPage: React.FC = () => {
               Применить фильтры
             </button>
           </div>
-        </div>
+        </>
       )}
       
       {/* Таблица журнала или сообщение о необходимости выбрать фильтры */}
