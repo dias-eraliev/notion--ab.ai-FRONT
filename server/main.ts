@@ -50,6 +50,31 @@ router.post('/init-session', async (req, res) => {
   }
 });
 
+router.get("/init-session", async (req, res) => {
+  const apiKey = "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";
+  const { instructions } = req.body;
+  try {
+    const response = await axios.post('https://api.openai.com/v1/realtime/sessions', {
+      "model": "gpt-4o-realtime-preview",
+      input_audio_transcription: {
+        language: "ru",
+        model: "gpt-4o-mini-transcribe",
+      },
+      instructions: instructions || "",
+      voice: "shimmer"
+    }, {
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get ephemeral token' });
+  }
+})
+
 router.post('/openai-responses', upload.any(), async (req, res) => {
   const isCSVOrExcel = (filename: string) => {
     return filename.endsWith('.csv') || filename.endsWith('.xlsx') || filename.endsWith('.xls');
