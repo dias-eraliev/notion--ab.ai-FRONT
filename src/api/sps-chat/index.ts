@@ -2,7 +2,7 @@ import api from '..';
 
 export const spsChatApi = {
     initSession: async (data?: { instructions?: string }) => {
-        const response = await api.post('/sps-chat/init-session', data || {});
+        const response = await api.post('/sps-chat/init-sessions', data || {});
         return response.data;
     }
 }
