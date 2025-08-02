@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-
-// Обращение к глобальной переменной face-api, которая добавлена через CDN
-declare const faceapi: any;
+import * as faceapi from 'face-api.js';
 
 interface FaceIDScannerProps {
     onSuccess: () => void;
@@ -63,7 +61,6 @@ const FaceIDScanner: React.FC<FaceIDScannerProps> = ({ onSuccess, onCancel }) =>
 
             tracks.forEach(track => track.stop());
             videoRef.current.srcObject = null;
-            console.log('Camera stopped');
         }
     };
 
@@ -96,10 +93,10 @@ const FaceIDScanner: React.FC<FaceIDScannerProps> = ({ onSuccess, onCancel }) =>
             const displaySize = { width: video.videoWidth, height: video.videoHeight };
             faceapi.matchDimensions(canvas, displaySize);
 
-            // Настройка прогресс-бара для демонстрации
+            // Настройка прогресс-бара для демонстрации (2 секунды)
             let progress = 0;
             progressInterval = window.setInterval(() => {
-                progress += 2;
+                progress += 5;
                 setScanProgress(Math.min(progress, 100));
 
                 // После заполнения прогресс-бара вызываем onSuccess
@@ -110,11 +107,11 @@ const FaceIDScanner: React.FC<FaceIDScannerProps> = ({ onSuccess, onCancel }) =>
                     }
                     setTimeout(() => {
                         handleSuccess();
-                    }, 500);
+                    }, 300);
                 }
             }, 100);
 
-            // Запуск распознавания
+            // Запуск распознавания (увеличенный интервал для производительности)
             recognitionInterval = window.setInterval(async () => {
                 // Обнаружение лица и его характеристик
                 const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
@@ -184,7 +181,7 @@ const FaceIDScanner: React.FC<FaceIDScannerProps> = ({ onSuccess, onCancel }) =>
                         }
                     }
                 }
-            }, 100);
+            }, 200);
         };
 
         // Настраиваем распознавание когда видео начинает воспроизводиться
@@ -225,7 +222,7 @@ const FaceIDScanner: React.FC<FaceIDScannerProps> = ({ onSuccess, onCancel }) =>
                     {/* Прогресс-бар сканирования */}
                     <div className="absolute bottom-0 left-0 w-full bg-gray-200 h-2">
                         <motion.div
-                            className="bg-corporate-primary h-full"
+                            className="bg-red-600 h-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${scanProgress}%` }}
                             transition={{ duration: 0.2 }}
@@ -234,7 +231,7 @@ const FaceIDScanner: React.FC<FaceIDScannerProps> = ({ onSuccess, onCancel }) =>
                 </div>
 
                 <div className="p-4 space-y-2">
-                    <h3 className="text-xl font-semibold text-center text-corporate-primary">
+                    <h3 className="text-xl font-semibold text-center text-red-600">
                         Сканирование лица
                     </h3>
                     <p className="text-center text-gray-600">
@@ -246,7 +243,7 @@ const FaceIDScanner: React.FC<FaceIDScannerProps> = ({ onSuccess, onCancel }) =>
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={handleCancel}
-                            className="px-6 py-2 text-corporate-primary border border-corporate-primary rounded-lg"
+                            className="px-6 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50"
                         >
                             Отмена
                         </motion.button>

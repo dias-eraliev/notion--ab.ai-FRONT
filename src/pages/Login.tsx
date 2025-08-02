@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
@@ -39,7 +39,6 @@ const Login: React.FC = () => {
   };
 
   const handleFaceIDAuthentication = () => {
-    // Показываем компонент сканирования лица вместо старой реализации
     setShowFaceID(true);
   };
 
@@ -115,6 +114,7 @@ const Login: React.FC = () => {
             whileTap={{ scale: 0.98 }}
             onClick={handleFaceIDAuthentication}
             className="w-full flex items-center justify-center py-2 px-4 mb-6 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ca181f]"
+            type="button"
           >
             <FaFaceSmile className="w-5 h-5 mr-2 text-[#ca181f]" />
             Войти через Face ID
